@@ -44,7 +44,6 @@
 #include "output.h"
 #include "my_matrix_creator.h"
 #include "my_vector_tools.h"
-#include "melt_film_heat_flux_function.h"
 
 
 namespace PDE
@@ -261,14 +260,9 @@ namespace PDE
         this->convection_velocity[axis] = params.pde.convection_velocity[axis];
     }
     
-    this->diffusivity = params.pde.diffusivity;
+    this->peclet_number = params.pde.peclet_number;
     
-    if (this->params.pde.use_physical_diffusivity)
-    {
-        this->diffusivity = this->params.solid.heat_conductivity /
-            (this->params.solid.density * this->params.solid.specific_heat_capacity);
-    }
-
+    this->unit_advection_velocity = params.pde.unit_advection_velocity;
     
     create_coarse_grid();
     
@@ -380,11 +374,7 @@ namespace PDE
     unsigned int boundary_count = params.boundary_conditions.implementation_types.size();
     
     assert(params.boundary_conditions.function_names.size() == boundary_count);
-    
-    CloseContactMelting::MeltFilmHeatFluxFunction<dim> melt_film(
-        this->triangulation,
-        this->params);
-              
+
     std::vector<ConstantFunction<dim>> constant_functions;
     
     for (unsigned int boundary = 0; boundary < boundary_count; boundary++)
@@ -416,7 +406,6 @@ namespace PDE
         
     // Organize boundary functions to simplify application during the time loop
     
-    bool use_melt_film = false;
     
     std::vector<Function<dim>*> boundary_functions;
     unsigned int constant_function_index = 0;
@@ -432,60 +421,19 @@ namespace PDE
             boundary_functions.push_back(&constant_functions[constant_function_index]);
             constant_function_index++;
         }
-        else if ((function_name == "melt_film"))
+        else if ((function_name == "MMS"))
         {
-            assert(boundary_type == "natural");
-         
-            use_melt_film = true;
-            
-            boundary_functions.push_back(&melt_film); //@todo: Update this to the variable function
-            this->params.boundary_conditions.melt_film.boundary_ids.push_back(boundary);
+            if (boundary_type == "strong")
+            {
+                boundary_functions.push_back(&mms_dirichlet);
+            }
+            else if (boundary_type == "natural")
+            {
+                boundary_functions.push_back(&mms_neumann);
+            }
+
         }
         
-    }
-    
-    /*
-    @todo
-    
-        Until recently, the Neumann boundary conditions weren't using 
-        material properties for diffusivity. This should be changed and tests updated.
-        Or maybe it will make sense to have a version of the code which still lets you set
-        the mathematical parameters directly.
-        
-    */
-    if (params.pde.use_physical_diffusivity)
-    {
-        std::cout << "Solid material properties:" << std::endl
-                  << "\tHeat conductivity = " << params.solid.heat_conductivity << std::endl
-                  << "\tDensity =  " << params.solid.density << std::endl
-                  << "\tSpecific heat capacity = " << params.solid.specific_heat_capacity << std::endl
-                  << "\tThermal diffusivity = " << this->diffusivity << std::endl;
-    }
-    if (use_melt_film)
-    {
-        std::cout << "Stefan boundary enabled." << std::endl
-
-                  << "Melt film parameters:" << std::endl
-         
-                  << "\tPCI velocity = " << -params.pde.convection_velocity[0];
-        
-        for (unsigned int axis = 1; axis < dim; axis++)
-        {
-                std::cout << ", "  << -params.pde.convection_velocity[axis];
-        }
-        std::cout << std::endl
-                         
-                  << "\tThickness = " << params.boundary_conditions.melt_film.thickness << std::endl
-                  << "\tWall temperature = " <<
-                        params.boundary_conditions.melt_film.wall_temperature << std::endl
-                  
-                  << "Sample boundary values:" << std::endl
-                  << "\tHeat flux out of boundary = " <<
-                        std::to_string( melt_film.value(Point<dim>()) *  // @todo: Get a vertex from a melt boundary
-                        (params.solid.density * params.solid.specific_heat_capacity) / 
-                        params.time.time_step) << std::endl
-                  << "\tNeumann BC = " << melt_film.value(Point<dim>()) << std::endl;
-
     }
     
     // Initialize refinement
@@ -529,7 +477,7 @@ start_time_iteration:
 
         convection_diffusion_matrix.vmult(tmp, old_solution);
         
-        system_rhs.add(-(1 - params.time.semi_implicit_theta) * params.time.time_step, tmp);
+        system_rhs.add(-(1. - params.time.semi_implicit_theta) * params.time.time_step, tmp);
         
         // Add natural boundary conditions
         for (unsigned int boundary = 0; boundary < boundary_count; boundary++)

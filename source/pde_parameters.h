@@ -41,33 +41,15 @@ namespace PDE
     
         struct AdvectionDiffusionEquation
         {
-            bool use_physical_diffusivity;
-            double diffusivity;
-            std::vector<double> convection_velocity = {0., 0., 0.};
+            double peclet_number;
+            std::vector<double> unit_convection_velocity = {1., 0., 0.};
         };
     
-        struct MaterialProperties
-        {
-            double melt_temperature;
-            double latent_heat_of_melting;
-            double density;
-            double specific_heat_capacity;
-            double heat_conductivity;
-        };
-    
-        struct MeltFilmBoundary
-        { // Melt film boundary based on the Stefan Condition
-            double wall_temperature;
-            double thickness;
-            std::vector<unsigned int> boundary_ids;
-        };
-        
         struct BoundaryConditions
         {
             std::vector<std::string> implementation_types;
             std::vector<std::string> function_names;
             std::list<double> function_double_arguments;
-            MeltFilmBoundary melt_film;
         };
         
         struct InitialValues
@@ -127,7 +109,6 @@ namespace PDE
         struct StructuredParameters
         {
             AdvectionDiffusionEquation pde;
-            MaterialProperties solid, liquid;
             BoundaryConditions boundary_conditions;
             InitialValues initial_values;
             Geometry geometry;
@@ -141,60 +122,14 @@ namespace PDE
         {
             prm.enter_subsection("pde");
             {
-                prm.declare_entry("use_physical_diffusivity", "false", Patterns::Bool());
-
-                prm.declare_entry("diffusivity", "1.",
-                    Patterns::Double(0.),
-                    "The thermal diffusivity of the domain."
-                    "\nThis will be replaced with solid material properties"
-                    " if using a melt film boundary.");
+                prm.declare_entry("peclet_number", "0.",
+                    Patterns::Double(0.));
                     
-                prm.declare_entry("convection_velocity", "0., 0., 0.",
+                prm.declare_entry("unit_convection_velocity", "1., 0., 0.",
                     Patterns::List(Patterns::Double()));
             }
             prm.leave_subsection();
             
-
-            prm.enter_subsection("solid");
-            {
-                prm.declare_entry("melt_temperature", "0.",
-                    Patterns::Double(),
-                    "The melting temperature [deg C] of the material at the melting temperature."
-                    "\nThe default value is for water-ice at STP");
-                    
-                prm.declare_entry("latent_heat_of_melting", "3.34e6",
-                    Patterns::Double(0.),
-                    "The latent heat of melting [J/kg] of the material."
-                    "\nThe default value is for water-ice at STP");
-                    
-                prm.declare_entry("density", "916.7",
-                    Patterns::Double(0.),
-                    "The density [kg/m^3] of the material at the melting temperature."
-                    "\nThe default value is for water-ice at STP");
-                    
-                prm.declare_entry("specific_heat_capacity", "2110",
-                    Patterns::Double(0.),
-                    "The specific heat capacity [J/kg/K] of the material at the melting temperature."
-                    "\nThe default value is for water-ice at STP");
-                    
-                prm.declare_entry("heat_conductivity", "2.14",
-                    Patterns::Double(),
-                    "The heat conductivity [Watts per m-Kelvin] of the solid material at the melting temperature."
-                    "\nThe default value is for water at STP");   
-                    
-            }
-            prm.leave_subsection();
-            
-            
-            prm.enter_subsection("liquid");
-            {
-                prm.declare_entry("heat_conductivity", "0.5611",
-                    Patterns::Double(),
-                    "The heat conductivity [Watts per m-Kelvin] of the liquid material at the melting temperature."
-                    "\nThe default value is for water at STP");                  
-            }
-            prm.leave_subsection();
-
             
             prm.enter_subsection ("geometry");
             {
@@ -214,7 +149,7 @@ namespace PDE
                      
                      "\ncylinder:"
                      "\n\tBoundary ID's"
-                     "\n\t\t0: Melt film"
+                     "\n\t\t0: Heat flux"
                      "\n\t\t1: Outflow"
                      "\n\t\t2: Domain sides"
                      "\n\t\t3: Inflow"
@@ -249,7 +184,7 @@ namespace PDE
             prm.enter_subsection ("initial_values");
             {
                 prm.declare_entry("function_name", "constant",
-                    Patterns::List(Patterns::Selection("constant | ramp | interpolate_old_field")));
+                    Patterns::List(Patterns::Selection("constant | MMS | ramp | interpolate_old_field")));
                     
                 prm.declare_entry("function_double_arguments", "-1.",
                     Patterns::List(Patterns::Double())); 
@@ -266,7 +201,7 @@ namespace PDE
                     "Type of boundary conditions to apply to each boundary");  
                     
                 prm.declare_entry("function_names", "constant, constant, constant, constant",
-                    Patterns::List(Patterns::Selection("constant | ramp | melt_film")),
+                    Patterns::List(Patterns::Selection("constant | MMS | ramp ")),
                     "Names of functions to apply to each boundary");
                     
                 prm.declare_entry("function_double_arguments", "10., -1., 0., -1.",
@@ -277,20 +212,6 @@ namespace PDE
                     "\n\t- The function values will only be popped during initialization."
                     "\n\t- Boundaries will be handled in order of their ID's."
                     "\n\t- If a function needs a Point as an argument, then it will pop doubles to make the point in order."); 
-
-                    
-                prm.enter_subsection("melt_film");
-                {
-                    prm.declare_entry("thickness", "1.e-4",
-                        Patterns::Double(),
-                        "[m]");
-                    
-                    prm.declare_entry("wall_temperature", "10.",
-                        Patterns::Double(),
-                        "[deg C]");
-
-                }
-                prm.leave_subsection();
     
             }
             prm.leave_subsection ();
@@ -362,7 +283,7 @@ namespace PDE
                     Patterns::Double(1.e-16),
                     "End the time-dependent simulation once this time is reached.");
                     
-                prm.declare_entry("semi_implicit_theta", "0.7",
+                prm.declare_entry("semi_implicit_theta", "0.51",
                     Patterns::Double(0., 1.),
                     "This is the theta parameter for the theta-family of "
                     "semi-implicit time integration schemes."
@@ -449,25 +370,7 @@ namespace PDE
             }
             prm.leave_subsection();
             
-            
-            prm.enter_subsection("solid");
-            {
-                p.solid.melt_temperature = prm.get_double("melt_temperature");
-                p.solid.latent_heat_of_melting = prm.get_double("latent_heat_of_melting");
-                p.solid.density = prm.get_double("density");
-                p.solid.specific_heat_capacity = prm.get_double("specific_heat_capacity");
-                p.solid.heat_conductivity = prm.get_double("heat_conductivity");
-            }
-            prm.leave_subsection();
-            
-            
-            prm.enter_subsection("liquid");
-            {
-                p.liquid.heat_conductivity = prm.get_double("heat_conductivity");
-            }
-            prm.leave_subsection();
-            
-            
+
             prm.enter_subsection("pde");
             {
                 p.pde.use_physical_diffusivity = prm.get_bool("use_physical_diffusivity");
@@ -492,17 +395,6 @@ namespace PDE
                 {
                     p.boundary_conditions.function_double_arguments.push_back(v);
                 }
-                
-                prm.enter_subsection("melt_film");
-                {
-                    p.boundary_conditions.melt_film.thickness = 
-                        prm.get_double("thickness");
-                    
-                    p.boundary_conditions.melt_film.wall_temperature = 
-                        prm.get_double("wall_temperature");
-                        
-                }
-                prm.leave_subsection();
                 
             }    
             prm.leave_subsection();
