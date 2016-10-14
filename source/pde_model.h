@@ -12,7 +12,7 @@
  *  - Re-designed parmameter handling
  *  - Generalized boundary condition handling via the parameter input file
  *  - Writes FEFieldFunction to disk, and can read it from disk to initialize a restart
- *  - Added verification via MMS (Method of Manufactured Solutions) with convergence table based on approach from Tutorial 7
+ *  - Added verification via MMS (Method of Manufactured Solutions) with error table based on approach from Tutorial 7
  *
  * @author Alexander Zimmerman <zimmerman@aices.rwth-aachen.de>, RWTH AAchen University, 2016
  */
@@ -79,8 +79,6 @@ namespace PDE
     void setup_system(bool quiet = false);
     void solve_time_step();
     void write_solution();
-    void append_solution_to_table();
-    void write_solution_table(std::string file_name);
     
     Triangulation<dim>   triangulation;
     FE_Q<dim>            fe;
@@ -98,18 +96,25 @@ namespace PDE
     Vector<double>       system_rhs;
 
     double               time;
-    unsigned int         timestep_number;
+    unsigned int         time_step_counter;
     
     Point<dim> spherical_manifold_center;
     
     std::vector<unsigned int> manifold_ids;
     std::vector<std::string> manifold_descriptors;
     
-    std::vector<double> convection_velocity;
-    double diffusivity;
+    double peclet_number;
+    std::vector<double> unit_convection_velocity;
     
-    TableHandler solution_table;
-    std::string solution_table_file_name = "solution_table.txt";
+    void mms_append_error_table();
+    void mms_write_error_table();
+    TableHandler mms_error_table;
+    std::string mms_error_table_file_name = "mms_error_table.txt";
+    
+    void append_1D_solution_to_table();
+    void write_1D_solution_table(std::string file_name);
+    TableHandler solution_table_1D;
+    std::string solution_table_1D_file_name = "1D_solution_table.txt";
     
   };
 
@@ -241,7 +246,7 @@ namespace PDE
               << " " << solver_name << " iterations." << std::endl;
   }
   
-  #include "pde_solution_table.h"
+  #include "pde_1D_solution_table.h"
   
   template<int dim>
   void Model<dim>::write_solution()
@@ -250,12 +255,12 @@ namespace PDE
     if (params.output.write_solution_vtk)
     {
         Output::write_solution_to_vtk(
-            "solution-"+Utilities::int_to_string(timestep_number)+".vtk",
+            "solution-"+Utilities::int_to_string(time_step_counter)+".vtk",
             this->dof_handler,
             this->solution);    
     }
     
-    if (params.output.write_solution_table)
+    if (dim == 1)
     {
         this->append_solution_to_table();
     }
@@ -263,11 +268,64 @@ namespace PDE
   }
   
   template<int dim>
+  void Model<dim>::mms_append_error_table()
+  {
+    assert(params.mms.enabled);
+    
+    Vector<float> difference_per_cell(triangulation.n_active_cells());
+    
+    ManufacturedSolution<dim> manufactured_solution;
+    manufactured_solution.set_time(time);
+    
+    VectorTools::integrate_difference()
+        dof_handler,
+        solution,
+        manufactured_solution,
+        difference_per_cell,
+        QGauss<dim>(3),
+        VectorTools::L2_norm);
+        
+    double L2_norm_error = difference_per_cell.l2_norm();
+    
+    mms_error_table.add_value("time_step_size", time_step_size);
+    mms_error_table.add_value("time", time);
+    mms_error_table.add_value("cells", triangulation.n_active_cells());
+    mms_error_table.add_value("dofs", dof_handler.n_dofs());
+    mms_error_table.add_value("L2_norm_error", L2_norm_error);
+  }
+  
+  template<int dim>
+  void Model<dim>::mms_write_error_table()
+  {
+    const int precision = 14;
+    
+    this->mms_error_table.set_precision("time", precision);
+    this->mms_error_table.set_scientific("time", true);
+    
+    this->mms_error_table.set_precision("time_step_size", precision);
+    this->mms_error_table.set_scientific("time_step_size", true);
+    
+    this->mms_error_table.set_precision("cells", precision);
+    this->mms_error_table.set_scientific("cells", true);
+    
+    this->mms_error_table.set_precision("dofs", precision);
+    this->mms_error_table.set_scientific("dofs", true);
+    
+    this->mms_error_table.set_precision("L2_norm_error", precision);
+    this->mms_error_table.set_scientific("L2_norm_error", true);
+    
+    std::ofstream out_file(this->mms_error_table_file_name, std::fstream::app);
+    assert(out_file.good());
+    this->mms_error_table.write_text(out_file);
+    out_file.close(); 
+  }
+  
+  template<int dim>
   void Model<dim>::run()
   {
     if (dim == 1)
     {
-        std::remove(solution_table_file_name.c_str()); // In 1D, the solution will be appended here at every time step.    
+        std::remove(solution_table_1D_file_name.c_str()); // In 1D, the solution will be appended here at every time step.    
     }        
     
     for (unsigned int axis = 0; axis < dim; axis++)
@@ -322,23 +380,23 @@ start_time_iteration:
                              old_solution); 
     
     solution = old_solution;
-    timestep_number = 0; // @todo: Expose initial time step as a parameter
+    time_step_counter = 0; // @todo: Expose initial time step as a parameter
     time            = 0; // @todo: Expose initial time as a parameter
     write_solution();
     
     double epsilon = 1e-16;
     while (time < params.time.end_time - epsilon)
     {
-        ++timestep_number;
-        time = params.time.time_step*timestep_number; // Incrementing the time directly would accumulate errors
+        ++time_step_counter;
+        time = params.time.step_size*time_step_counter; // Incrementing the time directly would accumulate errors
         
-        std::cout << "Time step " << timestep_number << " at t=" << time << std::endl;
+        std::cout << "Time step " << time_step_counter << " at t=" << time << std::endl;
 
         mass_matrix.vmult(system_rhs, old_solution);
 
         convection_diffusion_matrix.vmult(tmp, old_solution);
         
-        system_rhs.add(-(1. - params.time.semi_implicit_theta) * params.time.time_step, tmp);
+        system_rhs.add(-(1. - params.time.semi_implicit_theta) * params.time.step_size, tmp);
         
         // Add source terms
         source_function.set_time(time);
@@ -347,14 +405,14 @@ start_time_iteration:
                                             source_function,
                                             tmp);
         forcing_terms = tmp;
-        forcing_terms *= time_step * theta;
+        forcing_terms *= time_step_size * theta;
         
-        source_function.set_time(time - time_step);
+        source_function.set_time(time - time_step_size);
         VectorTools::create_right_hand_side(dof_handler,
                                             QGauss<dim>(fe.degree+1),
                                             source_function,
                                             tmp);
-        forcing_terms.add(time_step * (1 - theta), tmp);
+        forcing_terms.add(time_step_size * (1 - theta), tmp);
         
         system_rhs += forcing_terms;
         
@@ -377,9 +435,9 @@ start_time_iteration:
                 tmp,
                 dealii_boundary_id);
             forcing_terms = tmp;
-            forcing_terms *= time_step * theta;
+            forcing_terms *= time_step_size * theta;
                 
-            *boundary_functions[boundary].set_time(time - time_step);
+            *boundary_functions[boundary].set_time(time - time_step_size);
             MyVectorTools::my_create_boundary_right_hand_side(
                 dof_handler,
                 QGauss<dim-1>(fe.degree+1),
@@ -387,7 +445,7 @@ start_time_iteration:
                 tmp,
                 dealii_boundary_id);
              
-            forcing_terms.add(time_step * (1 - theta), tmp);
+            forcing_terms.add(time_step_size * (1 - theta), tmp);
             
             system_rhs += forcing_terms;
         }
@@ -395,7 +453,7 @@ start_time_iteration:
         //
         system_matrix.copy_from(mass_matrix);
         
-        system_matrix.add(params.time.semi_implicit_theta * params.time.time_step, convection_diffusion_matrix);
+        system_matrix.add(params.time.semi_implicit_theta * params.time.step_size, convection_diffusion_matrix);
 
         constraints.condense (system_matrix, system_rhs);
 
@@ -429,7 +487,12 @@ start_time_iteration:
 
         write_solution();
 
-        if ((timestep_number == 1) &&
+        if (params.mms.enabled)
+        {
+            mms_tabulate_L2_error();
+        }
+        
+        if ((time_step_counter == 1) &&
             (pre_refinement_step < params.refinement.adaptive.initial_cycles))
         {
             adaptive_refine();
@@ -441,9 +504,9 @@ start_time_iteration:
 
             goto start_time_iteration;
         }
-        else if ((timestep_number > 0) 
+        else if ((time_step_counter > 0) 
                  && (params.refinement.adaptive.interval > 0)  // % 0 (mod 0) is undefined
-                 && (timestep_number % params.refinement.adaptive.interval == 0))
+                 && (time_step_counter % params.refinement.adaptive.interval == 0))
         {
             for (unsigned int cycle = 0;
                  cycle < params.refinement.adaptive.cycles_at_interval; cycle++)
@@ -459,10 +522,16 @@ start_time_iteration:
     // Save data for FEFieldFunction so that it can be loaded for initialization
     FEFieldTools::save_field_parts(triangulation, dof_handler, solution);
     
-    // Write the solution table containing pointwise values for every timestep.
-    if (params.output.write_solution_table)
+    // Write error table
+    if (params.mms.enabled)
     {
-        this->write_solution_table(this->solution_table_file_name);
+        mms_write_error_table();
+    }
+    
+    // Write the solution table containing pointwise values for every timestep.
+    if (dim == 1)
+    {
+        this->write_1D_solution_table(this->solution_table_1D_file_name);
     }
     
     // Cleanup

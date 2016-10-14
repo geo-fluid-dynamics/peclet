@@ -41,8 +41,11 @@ namespace PDE
     
         struct ConvectionDiffusionEquation
         {
-            double peclet_number;
-            std::vector<double> unit_convection_velocity = {1., 0., 0.};
+            double peclet_number_function_name;
+            std::list<double> peclet_number_function_double_arguments;
+            
+            double unit_convection_velocity_function_name;
+            std::list<double> unit_convection_velocity_function_double_arguments; 
         };
     
         struct BoundaryConditions
@@ -88,7 +91,7 @@ namespace PDE
         struct Time
         {
             double end_time;
-            double time_step;
+            double step_size;
             double semi_implicit_theta;
         };
         
@@ -110,7 +113,7 @@ namespace PDE
         {
             bool enabled;
             double iv_perturbation;
-            double max_Pe;
+            double max_peclet_number;
         };
         
         struct StructuredParameters
@@ -287,7 +290,7 @@ namespace PDE
                     Patterns::Double(0.),
                     "End the time-dependent simulation once this time is reached.");
                     
-                prm.declare_entry("time_step", "0.001",
+                prm.declare_entry("step_size", "0.001",
                     Patterns::Double(1.e-16),
                     "End the time-dependent simulation once this time is reached.");
                     
@@ -328,6 +331,14 @@ namespace PDE
                     " easily read by MATLAB."
                     "\nThe way this is currently implemented takes a great deal of memory"
                     ", so you should probably only use this in 1D.");
+            }
+            prm.leave_subsection();
+            
+            prm.enter_subsection("mms");
+            {
+                prm.declare_entry("enabled", "true", Patterns::Bool());
+                prm.declare_entry("iv_perturbation", "1.001", Patterns::Double());
+                prm.declare_entry("max_peclet_number", "1.", Patterns::Double());
             }
             prm.leave_subsection();
             
@@ -450,7 +461,7 @@ namespace PDE
             prm.enter_subsection("time");
             {
                 p.time.end_time = prm.get_double("end_time");
-                p.time.time_step = prm.get_double("time_step");
+                p.time.step_size = prm.get_double("step_size");
                 p.time.semi_implicit_theta = prm.get_double("semi_implicit_theta");
             }    
             prm.leave_subsection();
@@ -469,6 +480,14 @@ namespace PDE
             {
                 p.output.write_solution_vtk = prm.get_bool("write_solution_vtk");
                 p.output.write_solution_table = prm.get_bool("write_solution_table");
+            }
+            prm.leave_subsection();
+            
+            prm.enter_subsection("mms");
+            {
+                p.mms.enabled = prm.get_bool("enabled");
+                p.mms.iv_perturbation = prm.get_double("iv_perturbation");
+                p.mms.max_peclet_number = prm.get_double("max_peclet_number");
             }
             prm.leave_subsection();
             

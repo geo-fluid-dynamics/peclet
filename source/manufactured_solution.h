@@ -3,6 +3,8 @@
 
 /*
 
+@brief Manufactured solution for the unsteady convection-diffusion equation.
+
 @detail
 
     Referencing Sandia Report SAND2000-1444 (June 2000): 

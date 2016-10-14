@@ -100,7 +100,7 @@
     
     Function<dim>* source_function = &zero_source_function;
     
-    MMS::Source<dim> mms_source_function(params.mms.max_Pe);
+    MMS::Source<dim> mms_source_function(params.mms.max_peclet_number);
     
     if (params.mms.enabled)
     {
@@ -117,7 +117,7 @@
     std::vector<ConstantFunction<dim>> constant_functions;
     
     MMS::ManufacturedSolution dirichlet_boundary_function;
-    MMS::NeumannBoundary neumann_boundary_function(this->tria, params.mms.max_Pe);
+    MMS::NeumannBoundary neumann_boundary_function(this->tria, params.mms.max_peclet_number);
     
     for (unsigned int boundary = 0; boundary < boundary_count; boundary++)
     {
