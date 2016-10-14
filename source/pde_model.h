@@ -251,22 +251,19 @@ namespace PDE
   template<int dim>
   void Model<dim>::run()
   {
-      
-    std::remove(solution_table_file_name.c_str()); // The solution will be appended here at every time step.
-    
+    if (dim == 1)
+    {
+        std::remove(solution_table_file_name.c_str()); // In 1D, the solution will be appended here at every time step.    
+    }        
     
     for (unsigned int axis = 0; axis < dim; axis++)
     {
-        this->convection_velocity[axis] = params.pde.convection_velocity[axis];
+        this->unit_convection_velocity[axis] = params.pde.unit_convection_velocity[axis];
     }
     
     this->peclet_number = params.pde.peclet_number;
     
-    this->unit_advection_velocity = params.pde.unit_advection_velocity;
-    
     create_coarse_grid();
-    
-    // @todo: validate inputs, e.g. that there is a boundary condition for every boundary.
     
     // Attach manifolds
     assert(dim < 3); // @todo: 3D extension: For now the CylindricalManifold is being ommitted.
@@ -285,6 +282,9 @@ namespace PDE
     ConstantFunction<dim> constant_function(0.);
     
     Function<dim>* initial_values_function = &constant_function;
+    
+    MMS::InitialValues mms_initial_values_function(params.mms.iv_perturbation);
+    mms_initial_values_function.set_time(0.);
     
     Point<dim> ramp_start_point, ramp_end_point;
     
@@ -361,13 +361,31 @@ namespace PDE
             params.initial_values.function_double_arguments.front());
         initial_values_function = & constant_function;
                         
-    }    
+    }
     else if (params.initial_values.function_name == "ramp")
     {
-
-        initial_values_function = & ramp_function;
+        initial_values_function =  & ramp_function;
         
     }
+    else if (params.initial_values.function_name == "MMS")
+    { 
+        assert(params.mms.enabled);
+        initial_values_function = & mms_initial_values_function;
+                        
+    }
+    
+    // Make RHS functions
+    ConstantFunction<dim> zero_source_function(0.);
+    
+    Function<dim>* source_function = &zero_source_function;
+    
+    MMS::Source<dim> mms_source_function(params.mms.max_Pe);
+    
+    if (params.mms.enabled)
+    {
+        source_function = &mms_source_function;
+    }
+    
     
     // Make boundary functions
     
@@ -376,6 +394,9 @@ namespace PDE
     assert(params.boundary_conditions.function_names.size() == boundary_count);
 
     std::vector<ConstantFunction<dim>> constant_functions;
+    
+    MMS::ManufacturedSolution dirichlet_boundary_function;
+    MMS::NeumannBoundary neumann_boundary_function(this->tria, params.mms.max_Pe);
     
     for (unsigned int boundary = 0; boundary < boundary_count; boundary++)
     {
@@ -423,6 +444,7 @@ namespace PDE
         }
         else if ((function_name == "MMS"))
         {
+            assert(params.mms.enabled);
             if (boundary_type == "strong")
             {
                 boundary_functions.push_back(&mms_dirichlet);
@@ -450,6 +472,7 @@ namespace PDE
 
     unsigned int pre_refinement_step = 0;
     Vector<double> tmp;
+    Vector<double> forcing_terms;
     
     // Iterate
 start_time_iteration:
@@ -479,6 +502,24 @@ start_time_iteration:
         
         system_rhs.add(-(1. - params.time.semi_implicit_theta) * params.time.time_step, tmp);
         
+        // Add source terms
+        source_function.set_time(time);
+        VectorTools::create_right_hand_side(dof_handler,
+                                            QGauss<dim>(fe.degree+1),
+                                            source_function,
+                                            tmp);
+        forcing_terms = tmp;
+        forcing_terms *= time_step * theta;
+        
+        source_function.set_time(time - time_step);
+        VectorTools::create_right_hand_side(dof_handler,
+                                            QGauss<dim>(fe.degree+1),
+                                            source_function,
+                                            tmp);
+        forcing_terms.add(time_step * (1 - theta), tmp);
+        
+        system_rhs += forcing_terms;
+        
         // Add natural boundary conditions
         for (unsigned int boundary = 0; boundary < boundary_count; boundary++)
         {
@@ -489,15 +530,28 @@ start_time_iteration:
             
             std::set<types::boundary_id> dealii_boundary_id = {boundary}; // @todo: This throws a warning
             
+            *boundary_functions[boundary].set_time(time);
+            
             MyVectorTools::my_create_boundary_right_hand_side(
                 dof_handler,
                 QGauss<dim-1>(fe.degree+1),
                 *boundary_functions[boundary],
                 tmp,
-                dealii_boundary_id
-                );
+                dealii_boundary_id);
+            forcing_terms = tmp;
+            forcing_terms *= time_step * theta;
                 
-            system_rhs += tmp;
+            *boundary_functions[boundary].set_time(time - time_step);
+            MyVectorTools::my_create_boundary_right_hand_side(
+                dof_handler,
+                QGauss<dim-1>(fe.degree+1),
+                *boundary_functions[boundary],
+                tmp,
+                dealii_boundary_id);
+             
+            forcing_terms.add(time_step * (1 - theta), tmp);
+            
+            system_rhs += forcing_terms;
         }
         
         //
@@ -516,6 +570,9 @@ start_time_iteration:
                 {
                     continue;
                 }
+                
+                *boundary_functions[boundary].set_time(time);
+                
                 VectorTools::interpolate_boundary_values
                     (
                     dof_handler,

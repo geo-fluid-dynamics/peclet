@@ -39,7 +39,7 @@ namespace PDE
     {   
         using namespace dealii;
     
-        struct AdvectionDiffusionEquation
+        struct ConvectionDiffusionEquation
         {
             double peclet_number;
             std::vector<double> unit_convection_velocity = {1., 0., 0.};
@@ -106,9 +106,16 @@ namespace PDE
             bool write_solution_table;
         };
         
+        struct MMS
+        {
+            bool enabled;
+            double iv_perturbation;
+            double max_Pe;
+        };
+        
         struct StructuredParameters
         {
-            AdvectionDiffusionEquation pde;
+            ConvectionDiffusionEquation pde;
             BoundaryConditions boundary_conditions;
             InitialValues initial_values;
             Geometry geometry;
@@ -116,6 +123,7 @@ namespace PDE
             Time time;
             IterativeSolver solver;
             Output output;
+            MMS mms;
         };
       
         void declare(ParameterHandler &prm)
