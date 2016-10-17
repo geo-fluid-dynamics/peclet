@@ -41,11 +41,9 @@ namespace PDE
     
         struct ConvectionDiffusionEquation
         {
-            double peclet_number_function_name;
-            std::list<double> peclet_number_function_double_arguments;
-            
-            double unit_convection_velocity_function_name;
-            std::list<double> unit_convection_velocity_function_double_arguments; 
+            double reference_peclet_number;
+            std::string convection_velocity_function_name;
+            std::list<double> convection_velocity_function_double_arguments; 
         };
     
         struct BoundaryConditions
@@ -133,11 +131,11 @@ namespace PDE
         {
             prm.enter_subsection("pde");
             {
-                prm.declare_entry("peclet_number", "0.",
+                prm.declare_entry("reference_peclet_number", "1.",
                     Patterns::Double(0.));
                     
-                prm.declare_entry("unit_convection_velocity", "1., 0., 0.",
-                    Patterns::List(Patterns::Double()));
+                prm.declare_entry("convection_velocity_function_name", "MMS",
+                    Patterns::List(Patterns::String()));
             }
             prm.leave_subsection();
             
@@ -147,7 +145,7 @@ namespace PDE
                 prm.declare_entry("dim", "2",
                     Patterns::Integer(1, 3));
                     
-                prm.declare_entry("grid_name", "cylinder_with_split_boundaries",
+                prm.declare_entry("grid_name", "hyper_shell",
                      Patterns::Selection("hyper_cube | hyper_shell | hemisphere_cylinder_shell"
                                       " | cylinder | cylinder_with_split_boundaries"
                                       " | hyper_cube_with_cylindrical_hole"),
@@ -169,7 +167,7 @@ namespace PDE
                      "\n\tOuter boundary ID = 0"
                      "\n\tInner spherical boundary ID = 1");
                      
-                prm.declare_entry("sizes", "0.375, 0.125, 0.5",
+                prm.declare_entry("sizes", "0.5, 1.",
                     Patterns::List(Patterns::Double(0.)),
                     "Set the sizes for the grid's geometry."
                     "\n hyper_shell:"
@@ -194,10 +192,10 @@ namespace PDE
             
             prm.enter_subsection ("initial_values");
             {
-                prm.declare_entry("function_name", "constant",
+                prm.declare_entry("function_name", "MMS",
                     Patterns::List(Patterns::Selection("constant | MMS | ramp | interpolate_old_field")));
                     
-                prm.declare_entry("function_double_arguments", "-1.",
+                prm.declare_entry("function_double_arguments", "",
                     Patterns::List(Patterns::Double())); 
                     
             }
@@ -207,15 +205,15 @@ namespace PDE
             prm.enter_subsection ("boundary_conditions");
             {
                 // Each of these lists needs a value for every boundary, in order
-                prm.declare_entry("implementation_types", "natural, strong, natural, strong",
+                prm.declare_entry("implementation_types", "natural, strong",
                     Patterns::List(Patterns::Selection("natural | strong")),
                     "Type of boundary conditions to apply to each boundary");  
                     
-                prm.declare_entry("function_names", "constant, constant, constant, constant",
+                prm.declare_entry("function_names", "MMS, MMS",
                     Patterns::List(Patterns::Selection("constant | MMS | ramp ")),
                     "Names of functions to apply to each boundary");
                     
-                prm.declare_entry("function_double_arguments", "10., -1., 0., -1.",
+                prm.declare_entry("function_double_arguments", "",
                     Patterns::List(Patterns::Double()),
                     "This list of doubles will be popped from front to back as needed."
                     "\nThis puts some work on the user to greatly ease development."
@@ -230,12 +228,12 @@ namespace PDE
             
             prm.enter_subsection ("refinement");
             {
-                prm.declare_entry("initial_global_cycles", "0",
+                prm.declare_entry("initial_global_cycles", "2",
                     Patterns::Integer(),
                     "Initially globally refine the grid this many times "
                     "without using any error measure");
                     
-                prm.declare_entry("initial_boundary_cycles", "6",
+                prm.declare_entry("initial_boundary_cycles", "4",
                     Patterns::Integer(),
                     "Initially refine the grid this many times"
                     "near the boundaries that are listed for refinement");
@@ -286,11 +284,11 @@ namespace PDE
             
             prm.enter_subsection ("time");
             {
-                prm.declare_entry("end_time", "0.02",
+                prm.declare_entry("end_time", "1.",
                     Patterns::Double(0.),
                     "End the time-dependent simulation once this time is reached.");
                     
-                prm.declare_entry("step_size", "0.001",
+                prm.declare_entry("step_size", "0.01",
                     Patterns::Double(1.e-16),
                     "End the time-dependent simulation once this time is reached.");
                     
@@ -338,7 +336,6 @@ namespace PDE
             {
                 prm.declare_entry("enabled", "true", Patterns::Bool());
                 prm.declare_entry("iv_perturbation", "1.001", Patterns::Double());
-                prm.declare_entry("max_peclet_number", "1.", Patterns::Double());
             }
             prm.leave_subsection();
             
@@ -392,15 +389,10 @@ namespace PDE
 
             prm.enter_subsection("pde");
             {
-                p.pde.use_physical_diffusivity = prm.get_bool("use_physical_diffusivity");
-                
-                p.pde.diffusivity = prm.get_double("diffusivity");    
-                
-                std::vector<double> vector = get_vector<double>(prm, "convection_velocity");
-                for (unsigned int axis = 0; axis < p.geometry.dim; axis++)
-                {
-                    p.pde.convection_velocity[axis] = vector[axis];
-                }
+                p.pde.reference_peclet_number = 
+                    prm.get_double("reference_peclet_number");    
+                p.pde.convection_velocity_function_name = 
+                    prm.get("convection_velocity_function_name");
             }
             prm.leave_subsection();
             
