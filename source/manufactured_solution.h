@@ -48,16 +48,16 @@ namespace MMS
     
     
     template<int dim>
-    class AdvectionVelocity : public Function<dim>
+    class ConvectionVelocity : public Function<dim>
     {
     public:
-        AdvectionVelocity() : Function<dim>() {}
+        ConvectionVelocity() : Function<dim>() {}
         virtual double value(const Point<dim> &x,
                              const unsigned int component = 0) const;
     };
 
     template<int dim>
-    double AdvectionVelocity<dim>::value
+    double ConvectionVelocity<dim>::value
         (
         const Point<dim> &x,
         const unsigned int /* component */
