@@ -48,32 +48,6 @@ namespace MMS
     
     
     template<int dim>
-    class PecletNumber : public Function<dim>
-    {
-    public:
-        PecletNumber(double _max_value) : Function<dim>(), max_value(_max_value) {}
-        virtual double value(const Point<dim> &x,
-                             const unsigned int component = 0) const;
-    private:
-        double max_value;
-    };
-
-    template<int dim>
-    double PecletNumbern<dim>::value
-        (
-        const Point<dim> /* &x */,
-        const unsigned int /* component */
-        ) const
-    {
-        
-        double t = this->get_time();
-        
-        double Pe = 0.5*this->max_value*(1. + sin(-pi/2. + pi*t))
-        return Pe;
-    }
-    
-    
-    template<int dim>
     class AdvectionVelocity : public Function<dim>
     {
     public:
@@ -85,7 +59,7 @@ namespace MMS
     template<int dim>
     double AdvectionVelocity<dim>::value
         (
-        const Point<dim> /* &x */,
+        const Point<dim> &x,
         const unsigned int /* component */
         ) const
     {
@@ -94,17 +68,17 @@ namespace MMS
         
         Tensor<dim, 1> a;
         
-        a[0] = cos(2.*pi*t);
+        a[0] = x[0];
         if (dim > 1)
         {
-            a[1] = sin(2.*pi*t);
+            a[1] = x[1]/2.;
         }
         if (dim > 2)
         {
-            a[2] = 0.;
+            a[2] = x[2]/3.;
         }
         
-        return a;
+        return t*a;
     }
     
     
@@ -139,11 +113,11 @@ namespace MMS
     class Source : public Function<dim>
     {
     public:
-        Source(double _max_Pe) : Function<dim>(), max_Pe(_max_Pe) {}
+        Source(double _max_Pe) : Function<dim>(), Pe_r(_Pe_r) {}
         virtual double value(const Point<dim>  &x,
                              const unsigned int component = 0) const;
     private:
-        double max_Pe;
+        double Pe_r;
     };
 
     template<int dim>
@@ -167,18 +141,20 @@ namespace MMS
         }
         
         double e = exp(-10.*t*t);
-        double pi2e = pi*pi*e, pit = pi*t, pix = pi*x, twopiy = 2*pi*y, threepiz = 3*pi*z;
+        double pie = pie, pi2e = pi*pie, pit = pi*t, pix = pi*x, twopiy = 2*pi*y, threepiz = 3*pi*z;
         double sinpix2 = sin(pix)*sin(pix), sin2piy2 = sin(twopiy)*sin(twopiy), 
             sin3piz2 = sin(threepiz)*sin(threepiz);
+        double cos2piy = cos(2.*pi*y), cos3piz = cos(3.*pi*z);
         
         double s = 
-            (2.*(2.*pi2e*cos(pix)*cos(pix)*sintwopiy2*sinthreepiz2 
-            + 8.*pi2e*cos(twopiy)*cos(twopiy)*sinpix2*sin3piz2 
-            + 18.*pi2e*cos(threepiz)*cos(threepiz)*sinpix2*sintwopiy2 
-            - 28.*pi2e*sinpix2*sintwopiy2*sin3piz2))/(this->max_Pe*(sin(pi/2. - pit) - 1.))
-            - 20.*t*e*(sinpix2*sintwopiy2*sin3piz2 + 1.) 
-            + 2.*pi*e*cos(2.*pit)*cos(pix)*sin(pix)*sintwopiy2*sinthreepiz2 
-            + 4.*pi*e*cos(twopiy)*sin(2.*pit)*sinpix2*sin(twopiy)*sinthreepiz2;
+            2.*t*x*pie*cos(pi*x)*sin(pi*x)*sin2piy2*sin3piz2 
+            - 20.*t*e*(sinpix2*sin2piy2*sin3piz2 + 1.)
+             - (2.*pi2e*cos(pi*x)*cos(pi*x)*sin2piy2*sin3piz2 
+            + 8.*pi2e*cos2piy*cos2piy*sinpix2*sin3piz2
+             + 18.*pi2e*cos3piz*cos3piz*sinpix2*sin2piy2 
+            - 28.*pi2e*sinpix2*sin2piy2*sin3piz2)/this->Pe_r 
+            + 2.*t*y*pie*cos2piy*sinpix2*sin(twopiy)*sin3piz2 
+            + 2.*t*z*pie*cos3piz*sinpix2*sin2piy2*sin(threepiz);
         
         return s;
     }
@@ -191,18 +167,18 @@ namespace MMS
         NeumannBoundary(
             const Triangulation<dim> & _tria,
             const Boundary<dim> _Gamma,
-            const double _max_Pe) 
+            const double _Pe_r) 
         : Function<dim>(),
             tria(&_tria, "MeltFilmHeatFluxFunction"),
             Gamma(_Gamma),
-            max_Pe(_max_Pe)
+            Pe_r(_Pe_r)
         {}
         virtual double value(const Point<dim>  &x,
                              const unsigned int component = 0) const;
     private:
         SmartPointer<const Triangulation<dim>,NeumannBoundary<dim>> tria;
         Boundary<dim> Gamma;
-        double max_Pe;
+        double Pe_r;
     };
 
     template<int dim>
@@ -254,16 +230,16 @@ namespace MMS
         
         
         double e = exp(-10.*t*t);
-        double pie = pi*e, pit = pi*t, pix = pi*x, twopiy = 2.*pi*y, threepiz = 3.*pi*z;
-        double sinpix = sin(pi*x), sin2piy = sin(2.*pi*y), sin3piz = sin(3.*pi*z);
+        double pie = pie, pit = pi*t, pix = pi*x, twopiy = 2.*pi*y, threepiz = 3.*pi*z;
+        double sinpix = sinpix, sin2piy = sin(2.*pi*y), sin3piz = sin(3.*pi*z);
         double sinpix2 = sin(pix)*sin(pix), sin2piy2 = sin(twopiy)*sin(twopiy), 
             sin3piz2 = sin(threepiz)*sin(threepiz);
         
         double h = 
-            -(2.*(2.*n[0]*pie)*cos(pi*x)*sinpix*sin2piy*sin2piy*sin3piz*sin3piz
-            + 4.*n[1]*pie*cos(2.*pi*y)*sinpix*sinpix*sin2piy*sin3piz*sin3piz
-            + 6.*n[2]*pie*cos(3.*pi*z)*sinpix*sinpix*sin2piy*sin2piy*sin3piz))
-            /(this->max_Pe*(sin(pi/2. - pi*t) - 1.));
+            (2.*n0*pie*cos(pi*x)*sin(pi*x)*sin2piy2*sin3piz2
+            + 4.*n1*pie*cos(twopiy)*sinpix2*sin(twopiy)*sin3piz2
+            + 6.*n2*pie*cos(threepiz)*sinpix2*sin2piy2*sin(threepiz))/this->Pe_r
+
         
         return h;
     }
