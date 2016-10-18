@@ -7,6 +7,7 @@ This is generally a terrible idea in 2D or 3D, and the text file gets quite larg
 problems, causing hard to trace errors. So this is explicitly only named for 1D.
 */
 
+template<int dim>
 void Model<dim>::append_1D_solution_to_table()
 {
     
@@ -40,6 +41,7 @@ void Model<dim>::append_1D_solution_to_table()
 
 }
 
+template<int dim>
 void Model<dim>::write_1D_solution_table(const std::string file_name)
 {
     

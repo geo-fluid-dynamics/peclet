@@ -14,15 +14,29 @@
 namespace MMS
 {
     using namespace dealii;
-    
+ 
+    double pi = numbers::PI;
     
     template<int dim>
     class ManufacturedSolution : public Function<dim>
     {
     public:
-        ManufacturedSolution() : Function<dim>() {}
+        ManufacturedSolution(double _perturbation = 1.)
+            :
+            Function<dim>(),
+            perturbation(_perturbation)
+        {}
+        
         virtual double value(const Point<dim>  &x,
                              const unsigned int component = 0) const;
+    private:
+        /*
+        Allow the user to perturb the solution.
+        When using class for initial values:
+        SAND2000-1444 says to multiply initial values by a factor 
+        "not too close to one" to avoid hiding coding mistakes.
+        */
+        double perturbation;
     };
 
     template<int dim>
@@ -42,7 +56,10 @@ namespace MMS
             product *= s*s;
         }
         
-        double u = exp(-10.*t*t)*(1. + product)
+        double u = exp(-10.*t*t)*(1. + product);
+        
+        u *= this->perturbation;
+        
         return u;
     }
     
@@ -51,22 +68,21 @@ namespace MMS
     class ConvectionVelocity : public Function<dim>
     {
     public:
-        ConvectionVelocity() : Function<dim>() {}
-        virtual double value(const Point<dim> &x,
-                             const unsigned int component = 0) const;
+        ConvectionVelocity() : Function<dim>(dim) {}
+        void vector_value(
+            const Point<dim> &x,
+            Vector<double> &a) const;
     };
 
     template<int dim>
-    double ConvectionVelocity<dim>::value
+    void ConvectionVelocity<dim>::vector_value
         (
         const Point<dim> &x,
-        const unsigned int /* component */
+        Vector<double> &a
         ) const
     {
         
         double t = this->get_time();
-        
-        Tensor<dim, 1> a;
         
         a[0] = x[0];
         if (dim > 1)
@@ -78,34 +94,7 @@ namespace MMS
             a[2] = x[2]/3.;
         }
         
-        return t*a;
-    }
-    
-    
-    template<int dim>
-    class InitialValues : public Function<dim>
-    {
-    public:
-        InitialValues(double _perturbation) : Function<dim>(), perturbation(_perturbation) {}
-        virtual double value(const Point<dim>  &x,
-                             const unsigned int component = 0) const;
-    private:
-        ManufacturedSolution<dim> u;
-        double perturbation; // SAND2000-1444 says to multiply initial values by a factor "not too close to one" to avoid hiding coding mistakes.
-    };
-
-    template<int dim>
-    double InitialValues<dim>::value
-        (
-        const Point<dim> &x,
-        const unsigned int /* component */
-        ) const
-    {
-        
-        double t = this->get_time();
-        this->u.set_time(t);
-
-        return perturbation*this->u(x);
+        a *= t;
     }
     
     
@@ -113,7 +102,7 @@ namespace MMS
     class Source : public Function<dim>
     {
     public:
-        Source(double _max_Pe) : Function<dim>(), Pe_r(_Pe_r) {}
+        Source(double _Pe_r) : Function<dim>(), Pe_r(_Pe_r) {}
         virtual double value(const Point<dim>  &x,
                              const unsigned int component = 0) const;
     private:
@@ -129,7 +118,7 @@ namespace MMS
     {
         
         double t = this->get_time();
-        double x, y, z;
+        double x = 0., y = 0., z = 0.;
         x = point[0];
         if (dim > 1)
         {
@@ -141,7 +130,7 @@ namespace MMS
         }
         
         double e = exp(-10.*t*t);
-        double pie = pie, pi2e = pi*pie, pit = pi*t, pix = pi*x,
+        double pie = pi*e, pi2e = pi*pie, pix = pi*x,
             twopiy = 2.*pi*y, threepiz = 3.*pi*z;
         double sinpix2 = sin(pix)*sin(pix), sin2piy2 = sin(twopiy)*sin(twopiy), 
             sin3piz2 = sin(threepiz)*sin(threepiz);
@@ -167,7 +156,7 @@ namespace MMS
     public:
         NeumannBoundary(
             const Triangulation<dim> & _tria,
-            const Boundary<dim> _Gamma,
+            const Boundary<dim,dim> _Gamma,
             const double _Pe_r) 
         : Function<dim>(),
             tria(&_tria, "NeumannBoundary"),
@@ -178,7 +167,7 @@ namespace MMS
                              const unsigned int component = 0) const;
     private:
         SmartPointer<const Triangulation<dim>,NeumannBoundary<dim>> tria;
-        Boundary<dim> Gamma;
+        Boundary<dim,dim> Gamma;
         double Pe_r;
     };
 
@@ -200,7 +189,7 @@ namespace MMS
         auto cell = GridTools::find_active_cell_around_point(*tria, point);
         assert(cell->at_boundary());
         
-        Tensor<dim, 1> n;
+        Tensor<1, dim> n;
         
         unsigned int f;
         for (f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
@@ -208,7 +197,7 @@ namespace MMS
 
             if (cell->face(f)->at_boundary())
             {
-                this->Gamma.normal_vector(cell->face(f), point);
+                n = this->Gamma.normal_vector(cell->face(f), point);
                 break;
             }
             
@@ -216,9 +205,14 @@ namespace MMS
         
         n = n/n.norm(); // We want the unit normal
         
+        Tensor<1, 3> n3D;
+        for (unsigned int i = 0; i < dim; i++)
+        {
+            n3D[i] = n[i];
+        }
         
         double t = this->get_time();
-        double x, y, z;
+        double x = 0., y = 0., z = 0.;
         x = point[0];
         if (dim > 1)
         {
@@ -229,17 +223,15 @@ namespace MMS
             z = point[2];
         }
         
-        
         double e = exp(-10.*t*t);
-        double pie = pie, pit = pi*t, pix = pi*x, twopiy = 2.*pi*y, threepiz = 3.*pi*z;
-        double sinpix = sinpix, sin2piy = sin(2.*pi*y), sin3piz = sin(3.*pi*z);
-        double sinpix2 = sin(pix)*sin(pix), sin2piy2 = sin(twopiy)*sin(twopiy), 
-            sin3piz2 = sin(threepiz)*sin(threepiz);
+        double pie = pi*e, pix = pi*x, twopiy = 2.*pi*y, threepiz = 3.*pi*z;
+        double sinpix = sinpix, sinpix2 = sin(pix)*sin(pix), 
+            sin2piy2 = sin(twopiy)*sin(twopiy), sin3piz2 = sin(threepiz)*sin(threepiz);
         
         double h = 
-            (2.*n0*pie*cos(pi*x)*sin(pi*x)*sin2piy2*sin3piz2
-            + 4.*n1*pie*cos(twopiy)*sinpix2*sin(twopiy)*sin3piz2
-            + 6.*n2*pie*cos(threepiz)*sinpix2*sin2piy2*sin(threepiz))/this->Pe_r;
+            (2.*n3D[0]*pie*cos(pi*x)*sin(pi*x)*sin2piy2*sin3piz2
+            + 4.*n3D[1]*pie*cos(twopiy)*sinpix2*sin(twopiy)*sin3piz2
+            + 6.*n3D[2]*pie*cos(threepiz)*sinpix2*sin2piy2*sin(threepiz))/Pe_r;
         
         return h;
     }

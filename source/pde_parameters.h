@@ -111,7 +111,6 @@ namespace PDE
         {
             bool enabled;
             double iv_perturbation;
-            double max_peclet_number;
         };
         
         struct StructuredParameters
@@ -135,7 +134,7 @@ namespace PDE
                     Patterns::Double(0.));
                     
                 prm.declare_entry("convection_velocity_function_name", "MMS",
-                    Patterns::List(Patterns::String()));
+                Patterns::List(Patterns::Selection("MMS | constant | ramp")));
             }
             prm.leave_subsection();
             
@@ -479,7 +478,6 @@ namespace PDE
             {
                 p.mms.enabled = prm.get_bool("enabled");
                 p.mms.iv_perturbation = prm.get_double("iv_perturbation");
-                p.mms.max_peclet_number = prm.get_double("max_peclet_number");
             }
             prm.leave_subsection();
             

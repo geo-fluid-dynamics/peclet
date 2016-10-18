@@ -53,6 +53,7 @@
 
 #include <assert.h> 
 #include <deal.II/grid/manifold_lib.h>
+#include <deal.II/grid/tria_boundary_lib.h>
 
 #include "my_functions.h"
 #include "extrapolated_field.h"
@@ -190,12 +191,12 @@ namespace PDE
     */
     ConstantFunction<dim> inverse_reference_peclet_number_function(1./this->reference_peclet_number);
     
-    MyMatrixCreator::create_convection_diffusion_matrix(
-        dof_handler,
+    MyMatrixCreator::create_convection_diffusion_matrix<dim>(
+        this->dof_handler,
         QGauss<dim>(fe.degree+1),
-        convection_diffusion_matrix,
+        this->convection_diffusion_matrix,
         &inverse_reference_peclet_number_function, 
-        &this->convection_velocity_function
+        this->convection_velocity_function
         );
 
     solution.reinit(dof_handler.n_dofs());
@@ -268,24 +269,26 @@ namespace PDE
     
     if (dim == 1)
     {
-        this->append_solution_to_table();
+        this->append_1D_solution_to_table();
     }
     
   }
   
+  #include "manufactured_solution.h"
+  
   template<int dim>
   void Model<dim>::mms_append_error_table()
   {
-    assert(params.mms.enabled);
+    assert(this->params.mms.enabled);
     
     Vector<float> difference_per_cell(triangulation.n_active_cells());
     
-    ManufacturedSolution<dim> manufactured_solution;
-    manufactured_solution.set_time(time);
+    MMS::ManufacturedSolution<dim> manufactured_solution;
+    manufactured_solution.set_time(this->time);
     
-    VectorTools::integrate_difference()
-        dof_handler,
-        solution,
+    VectorTools::integrate_difference(
+        this->dof_handler,
+        this->solution,
         manufactured_solution,
         difference_per_cell,
         QGauss<dim>(3),
@@ -293,10 +296,10 @@ namespace PDE
         
     double L2_norm_error = difference_per_cell.l2_norm();
     
-    mms_error_table.add_value("time_step_size", time_step_size);
-    mms_error_table.add_value("time", time);
-    mms_error_table.add_value("cells", triangulation.n_active_cells());
-    mms_error_table.add_value("dofs", dof_handler.n_dofs());
+    mms_error_table.add_value("time_step_size", this->params.time.step_size);
+    mms_error_table.add_value("time", this->time);
+    mms_error_table.add_value("cells", this->triangulation.n_active_cells());
+    mms_error_table.add_value("dofs", this->dof_handler.n_dofs());
     mms_error_table.add_value("L2_norm_error", L2_norm_error);
   }
   
@@ -335,19 +338,6 @@ namespace PDE
     }        
     
     this->reference_peclet_number = params.pde.reference_peclet_number;
-    
-    MMS::ConvectionVelocity<dim> mms_convection_velocity_function;
-    
-    if (params.pde.convection_velocity_function_name == "MMS")
-    {
-        assert(params.mms.enabled);
-        this->convection_velocity_function = &mms_convection_velocity_function;
-    }
-    else
-    {
-        Assert(false, ExcNotImplemented);
-        // @todo: Implement constant and ramp; shouldn't be much work
-    }
     
     create_coarse_grid();
     
@@ -396,6 +386,10 @@ start_time_iteration:
     solution = old_solution;
     time_step_counter = 0; // @todo: Expose initial time step as a parameter
     time            = 0; // @todo: Expose initial time as a parameter
+    
+    double theta = this->params.time.semi_implicit_theta;
+    double Delta_t = this->params.time.step_size;
+    
     write_solution();
     
     double epsilon = 1e-16;
@@ -410,23 +404,23 @@ start_time_iteration:
 
         convection_diffusion_matrix.vmult(tmp, old_solution);
         
-        system_rhs.add(-(1. - params.time.semi_implicit_theta) * params.time.step_size, tmp);
+        system_rhs.add(-(1. - theta) * Delta_t, tmp);
         
         // Add source terms
-        source_function.set_time(time);
+        source_function->set_time(time);
         VectorTools::create_right_hand_side(dof_handler,
                                             QGauss<dim>(fe.degree+1),
-                                            source_function,
+                                            *source_function,
                                             tmp);
         forcing_terms = tmp;
-        forcing_terms *= time_step_size * theta;
+        forcing_terms *= Delta_t * theta;
         
-        source_function.set_time(time - time_step_size);
+        source_function->set_time(time - Delta_t);
         VectorTools::create_right_hand_side(dof_handler,
                                             QGauss<dim>(fe.degree+1),
-                                            source_function,
+                                            *source_function,
                                             tmp);
-        forcing_terms.add(time_step_size * (1 - theta), tmp);
+        forcing_terms.add(Delta_t * (1 - theta), tmp);
         
         system_rhs += forcing_terms;
         
@@ -440,7 +434,7 @@ start_time_iteration:
             
             std::set<types::boundary_id> dealii_boundary_id = {boundary}; // @todo: This throws a warning
             
-            *boundary_functions[boundary].set_time(time);
+            boundary_functions[boundary]->set_time(time);
             
             MyVectorTools::my_create_boundary_right_hand_side(
                 dof_handler,
@@ -449,9 +443,9 @@ start_time_iteration:
                 tmp,
                 dealii_boundary_id);
             forcing_terms = tmp;
-            forcing_terms *= time_step_size * theta;
+            forcing_terms *= Delta_t * theta;
                 
-            *boundary_functions[boundary].set_time(time - time_step_size);
+            boundary_functions[boundary]->set_time(time - Delta_t);
             MyVectorTools::my_create_boundary_right_hand_side(
                 dof_handler,
                 QGauss<dim-1>(fe.degree+1),
@@ -459,7 +453,7 @@ start_time_iteration:
                 tmp,
                 dealii_boundary_id);
              
-            forcing_terms.add(time_step_size * (1 - theta), tmp);
+            forcing_terms.add(Delta_t * (1. - theta), tmp);
             
             system_rhs += forcing_terms;
         }
@@ -467,7 +461,7 @@ start_time_iteration:
         //
         system_matrix.copy_from(mass_matrix);
         
-        system_matrix.add(params.time.semi_implicit_theta * params.time.step_size, convection_diffusion_matrix);
+        system_matrix.add(theta * Delta_t, convection_diffusion_matrix);
 
         constraints.condense (system_matrix, system_rhs);
 
@@ -481,7 +475,7 @@ start_time_iteration:
                     continue;
                 }
                 
-                *boundary_functions[boundary].set_time(time);
+                boundary_functions[boundary]->set_time(time);
                 
                 VectorTools::interpolate_boundary_values
                     (
@@ -491,10 +485,11 @@ start_time_iteration:
                     boundary_values
                     );
             }
-            MatrixTools::apply_boundary_values(boundary_values,
-                                               system_matrix,
-                                               solution,
-                                               system_rhs);
+            MatrixTools::apply_boundary_values(
+                boundary_values,
+                system_matrix,
+                solution,
+                system_rhs);
         }
 
         solve_time_step();
@@ -503,7 +498,7 @@ start_time_iteration:
 
         if (params.mms.enabled)
         {
-            mms_tabulate_L2_error();
+            mms_append_error_table();
         }
         
         if ((time_step_counter == 1) &&

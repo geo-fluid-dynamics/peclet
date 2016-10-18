@@ -3,7 +3,7 @@
 ##
 
 # Set the name of the project and target:
-SET(TARGET "heat_problem")
+SET(TARGET "peclet")
 
 # Declare all source files the target consists of. Here, this is only
 # the one step-X.cc file, but as you expand your project you may wish
@@ -37,7 +37,7 @@ PROJECT(${TARGET})
 DEAL_II_INVOKE_AUTOPILOT()
 
 
-set_property(TARGET "heat_problem" PROPERTY CXX_STANDARD 11)
+set_property(TARGET "peclet" PROPERTY CXX_STANDARD 11)
 
 
 enable_testing()
