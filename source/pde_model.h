@@ -3,6 +3,10 @@
  *
  * @detail
  *
+ *  This solves the dimensionless form of the unsteady convection-diffusion problem,
+ *  with space and time dependent convection velocity, but constant diffusivity.
+ *  The reference Peclet Number Pe_r = x_r*a_r/nu
+ *
  *  Matrix assembly and time stepping are based on deal.II Tutorial 26 by Wolfgang Bangerth, Texas A&M University, 2013
  *
  *  Some of the more notable extensions include:
@@ -103,8 +107,8 @@ namespace PDE
     std::vector<unsigned int> manifold_ids;
     std::vector<std::string> manifold_descriptors;
     
-    double peclet_number;
-    std::vector<double> unit_convection_velocity;
+    double reference_peclet_number;
+    Function<dim>* convection_velocity_function;
     
     void mms_append_error_table();
     void mms_write_error_table();
@@ -123,8 +127,7 @@ namespace PDE
     :
     params(Parameters::get_parameters()),
     fe(1),
-    dof_handler(triangulation),
-    convection_velocity(dim)
+    dof_handler(triangulation)
   {}
   
   template<int dim>
@@ -179,17 +182,20 @@ namespace PDE
     MatrixCreator::create_mass_matrix(dof_handler,
                                       QGauss<dim>(fe.degree+1),
                                       mass_matrix);
-                                      
-    ConstantFunction<dim> diffusivity(this->diffusivity);
+                       
+    /*
+    In the unitless form of the convection-diffusion equation,
+    the inverse of the Peclet Number replaces the momentum diffusivity (nu) 
+    from the standard formulation.
+    */
+    ConstantFunction<dim> inverse_reference_peclet_number_function(1./this->reference_peclet_number);
     
-    ConstantFunction<dim> convection_velocity(this->convection_velocity);
-                                      
     MyMatrixCreator::create_convection_diffusion_matrix(
         dof_handler,
         QGauss<dim>(fe.degree+1),
         convection_diffusion_matrix,
-        &diffusivity, 
-        &convection_velocity
+        &inverse_reference_peclet_number_function, 
+        &this->convection_velocity_function
         );
 
     solution.reinit(dof_handler.n_dofs());
@@ -328,12 +334,20 @@ namespace PDE
         std::remove(solution_table_1D_file_name.c_str()); // In 1D, the solution will be appended here at every time step.    
     }        
     
-    for (unsigned int axis = 0; axis < dim; axis++)
-    {
-        this->unit_convection_velocity[axis] = params.pde.unit_convection_velocity[axis];
-    }
+    this->reference_peclet_number = params.pde.reference_peclet_number;
     
-    this->peclet_number = params.pde.peclet_number;
+    MMS::ConvectionVelocity<dim> mms_convection_velocity_function;
+    
+    if (params.pde.convection_velocity_function_name == "MMS")
+    {
+        assert(params.mms.enabled);
+        this->convection_velocity_function = &mms_convection_velocity_function;
+    }
+    else
+    {
+        Assert(false, ExcNotImplemented);
+        // @todo: Implement constant and ramp; shouldn't be much work
+    }
     
     create_coarse_grid();
     

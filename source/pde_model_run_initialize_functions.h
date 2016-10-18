@@ -7,6 +7,15 @@
     MMS::InitialValues mms_initial_values_function(params.mms.iv_perturbation);
     mms_initial_values_function.set_time(0.);
     
+    MMS::ManufacturedSolution mms_dirichlet_function();
+    
+    HyperBallBoundary<dim> mms_neumann_boundary(Point<dim>(), params.geometry.sizes[0]);
+    
+    MMS::NeumannBoundary mms_neumann_function(
+        this->triangulation,
+        mms_neumann_boundary,
+        this->reference_peclet_number);
+    
     Point<dim> ramp_start_point, ramp_end_point;
     
     double ramp_start_position = 0.,
@@ -129,15 +138,7 @@
             double value = params.boundary_conditions.function_double_arguments.front();
             params.boundary_conditions.function_double_arguments.pop_front();
             if (boundary_type == "natural")
-            {
-                /*
-                @todo
-                
-                    The natural boundary condition should also be divided by the thermal diffusivity.
-                    Note: Changing this will break existing Neumann tests.
-                
-                */
-                
+            {   
                 value *= params.time.time_step;
             }
 

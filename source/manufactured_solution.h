@@ -141,7 +141,8 @@ namespace MMS
         }
         
         double e = exp(-10.*t*t);
-        double pie = pie, pi2e = pi*pie, pit = pi*t, pix = pi*x, twopiy = 2*pi*y, threepiz = 3*pi*z;
+        double pie = pie, pi2e = pi*pie, pit = pi*t, pix = pi*x,
+            twopiy = 2.*pi*y, threepiz = 3.*pi*z;
         double sinpix2 = sin(pix)*sin(pix), sin2piy2 = sin(twopiy)*sin(twopiy), 
             sin3piz2 = sin(threepiz)*sin(threepiz);
         double cos2piy = cos(2.*pi*y), cos3piz = cos(3.*pi*z);
@@ -169,7 +170,7 @@ namespace MMS
             const Boundary<dim> _Gamma,
             const double _Pe_r) 
         : Function<dim>(),
-            tria(&_tria, "MeltFilmHeatFluxFunction"),
+            tria(&_tria, "NeumannBoundary"),
             Gamma(_Gamma),
             Pe_r(_Pe_r)
         {}
@@ -238,8 +239,7 @@ namespace MMS
         double h = 
             (2.*n0*pie*cos(pi*x)*sin(pi*x)*sin2piy2*sin3piz2
             + 4.*n1*pie*cos(twopiy)*sinpix2*sin(twopiy)*sin3piz2
-            + 6.*n2*pie*cos(threepiz)*sinpix2*sin2piy2*sin(threepiz))/this->Pe_r
-
+            + 6.*n2*pie*cos(threepiz)*sinpix2*sin2piy2*sin(threepiz))/this->Pe_r;
         
         return h;
     }
