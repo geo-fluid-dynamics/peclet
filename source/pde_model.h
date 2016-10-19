@@ -295,12 +295,38 @@ namespace PDE
         VectorTools::L2_norm);
         
     double L2_norm_error = difference_per_cell.l2_norm();
+    // Note: Wolfgang discourages checking the L2 norm for the heat equation.
+    
+    VectorTools::integrate_difference(
+        this->dof_handler,
+        this->solution,
+        manufactured_solution,
+        difference_per_cell,
+        QGauss<dim>(3),
+        VectorTools::L1_norm);
+        
+    double L1_norm_error = difference_per_cell.l1_norm();
+    
+    /*
+        @todo: Implement gradient of solution for MMS and calculate H1 norm
+    VectorTools::integrate_difference(
+        this->dof_handler,
+        this->solution,
+        manufactured_solution,
+        difference_per_cell,
+        QGauss<dim>(3),
+        VectorTools::H1_seminorm);
+    const double H1_seminorm_error = difference_per_cell.l2_norm();
+    mms_error_table.add_value("H1_seminorm_error", H1_seminorm_error);
+    */
     
     mms_error_table.add_value("time_step_size", this->params.time.step_size);
     mms_error_table.add_value("time", this->time);
     mms_error_table.add_value("cells", this->triangulation.n_active_cells());
     mms_error_table.add_value("dofs", this->dof_handler.n_dofs());
+    mms_error_table.add_value("L1_norm_error", L1_norm_error);
     mms_error_table.add_value("L2_norm_error", L2_norm_error);
+    
   }
   
   template<int dim>
@@ -323,6 +349,9 @@ namespace PDE
     this->mms_error_table.set_precision("L2_norm_error", precision);
     this->mms_error_table.set_scientific("L2_norm_error", true);
     
+    this->mms_error_table.set_precision("L1_norm_error", precision);
+    this->mms_error_table.set_scientific("L1_norm_error", true);
+    
     std::ofstream out_file(this->mms_error_table_file_name, std::fstream::app);
     assert(out_file.good());
     this->mms_error_table.write_text(out_file);
@@ -336,6 +365,11 @@ namespace PDE
     {
         std::remove(solution_table_1D_file_name.c_str()); // In 1D, the solution will be appended here at every time step.    
     }        
+    
+    if (this->params.mms.enabled)
+    {
+        std::remove(mms_error_table_file_name.c_str());
+    }
     
     this->reference_peclet_number = params.pde.reference_peclet_number;
     
