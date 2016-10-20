@@ -425,13 +425,13 @@ start_time_iteration:
     double Delta_t = this->params.time.step_size;
     
     write_solution();
-    
-    double epsilon = 1e-16;
-    while (time < params.time.end_time - epsilon)
+    bool final_time_step = false;
+    double epsilon = 1e-14;
+    do
     {
         ++time_step_counter;
         time = params.time.step_size*time_step_counter; // Incrementing the time directly would accumulate errors
-        
+        final_time_step = time > params.time.end_time - epsilon;
         std::cout << "Time step " << time_step_counter << " at t=" << time << std::endl;
 
         mass_matrix.vmult(system_rhs, old_solution);
@@ -528,7 +528,12 @@ start_time_iteration:
 
         solve_time_step();
 
-        write_solution();
+        if ((params.output.time_step_interval == 1) ||
+            ((time_step_counter % params.output.time_step_interval) == 0) ||
+            final_time_step)
+        {
+            write_solution();
+        }
 
         if (params.mms.enabled)
         {
@@ -560,7 +565,7 @@ start_time_iteration:
             
         }
         old_solution = solution;
-    }
+    } while (!final_time_step);
     
     // Save data for FEFieldFunction so that it can be loaded for initialization
     FEFieldTools::save_field_parts(triangulation, dof_handler, solution);

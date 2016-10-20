@@ -197,6 +197,22 @@ namespace MMS
 
             if (cell->face(f)->at_boundary())
             {
+                if (dim == 1) // Handle 1D as a special case, since the normal_vector method is not implemented
+                {
+                    if (cell->face(f)->boundary_id() == 0)
+                    {
+                        n[0] = 1.;
+                    }
+                    else if (cell->face(f)->boundary_id() == 1)
+                    {
+                        n[0] = -1.;
+                    }
+                    else
+                    {
+                        assert(false);
+                    }
+                    break;
+                }
                 n = this->Gamma.normal_vector(cell->face(f), point);
                 break;
             }

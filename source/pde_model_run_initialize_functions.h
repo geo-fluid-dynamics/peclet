@@ -2,15 +2,33 @@
     
     MMS::ConvectionVelocity<dim> mms_convection_velocity_function;
     
+    std::vector<double> constant_convection_velocity(dim);
+    if (this->params.pde.convection_velocity_function_name == "constant")
+    {
+        for (unsigned int i = 0; i < dim; i++)
+        {
+            constant_convection_velocity[i] =
+                this->params.pde.convection_velocity_function_double_arguments.front();
+            this->params.pde.convection_velocity_function_double_arguments.pop_front();
+        }    
+    }
+    
+    ConstantFunction<dim> 
+        constant_convection_velocity_function(constant_convection_velocity);
+    
     if (params.pde.convection_velocity_function_name == "MMS")
     {
         assert(params.mms.enabled);
         this->convection_velocity_function = &mms_convection_velocity_function;
     }
+    else if (params.pde.convection_velocity_function_name == "constant")
+    {
+        this->convection_velocity_function = &constant_convection_velocity_function;
+    }
     else
     {
         Assert(false, ExcNotImplemented());
-        // @todo: Implement constant and ramp; shouldn't be much work
+        // @todo: Implement ramp; shouldn't be much work
     }
 
     // Make initial values function

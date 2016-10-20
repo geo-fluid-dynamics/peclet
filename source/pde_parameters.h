@@ -105,6 +105,7 @@ namespace PDE
         {
             bool write_solution_vtk;
             bool write_solution_table;
+            int time_step_interval;
         };
         
         struct MMS
@@ -134,7 +135,10 @@ namespace PDE
                     Patterns::Double(0.));
                     
                 prm.declare_entry("convection_velocity_function_name", "MMS",
-                Patterns::List(Patterns::Selection("MMS | constant | ramp")));
+                    Patterns::List(Patterns::Selection("MMS | constant | ramp")));
+                    
+                prm.declare_entry("convection_velocity_function_double_arguments", "",
+                    Patterns::List(Patterns::Double()));
             }
             prm.leave_subsection();
             
@@ -328,6 +332,10 @@ namespace PDE
                     " easily read by MATLAB."
                     "\nThe way this is currently implemented takes a great deal of memory"
                     ", so you should probably only use this in 1D.");
+                prm.declare_entry("time_step_interval", "1", Patterns::Integer(0),
+                    "Solutions will only be written at every time_step_interval time step."
+                    "\nSet to one to output at every time step."
+                    "\n Set to zero to output only the final time.");
             }
             prm.leave_subsection();
             
@@ -392,6 +400,15 @@ namespace PDE
                     prm.get_double("reference_peclet_number");    
                 p.pde.convection_velocity_function_name = 
                     prm.get("convection_velocity_function_name");
+                
+                std::vector<double> vector = get_vector<double>(
+                    prm, "convection_velocity_function_double_arguments");
+                
+                for (auto v : vector)
+                {
+                    p.pde.convection_velocity_function_double_arguments.push_back(v);
+                }
+
             }
             prm.leave_subsection();
             
@@ -400,7 +417,9 @@ namespace PDE
             {
                 p.boundary_conditions.implementation_types = get_vector<std::string>(prm, "implementation_types");
                 p.boundary_conditions.function_names = get_vector<std::string>(prm, "function_names");
+                
                 std::vector<double> vector = get_vector<double>(prm, "function_double_arguments");
+                
                 for (auto v : vector)
                 {
                     p.boundary_conditions.function_double_arguments.push_back(v);
@@ -471,6 +490,7 @@ namespace PDE
             {
                 p.output.write_solution_vtk = prm.get_bool("write_solution_vtk");
                 p.output.write_solution_table = prm.get_bool("write_solution_table");
+                p.output.time_step_interval = prm.get_integer("time_step_interval");
             }
             prm.leave_subsection();
             
