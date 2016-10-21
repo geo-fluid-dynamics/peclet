@@ -1,0 +1,2005 @@
+
+===========================================
+Number of active cells: 16
+Number of degrees of freedom: 17
+
+Time step 1 at t=0.01
+     14 CG iterations.
+Time step 2 at t=0.02
+     13 CG iterations.
+Time step 3 at t=0.03
+     13 CG iterations.
+Time step 4 at t=0.04
+     13 CG iterations.
+Time step 5 at t=0.05
+     13 CG iterations.
+Time step 6 at t=0.06
+     13 CG iterations.
+Time step 7 at t=0.07
+     13 CG iterations.
+Time step 8 at t=0.08
+     13 CG iterations.
+Time step 9 at t=0.09
+     13 CG iterations.
+Time step 10 at t=0.1
+     13 CG iterations.
+Time step 11 at t=0.11
+     13 CG iterations.
+Time step 12 at t=0.12
+     13 CG iterations.
+Time step 13 at t=0.13
+     13 CG iterations.
+Time step 14 at t=0.14
+     13 CG iterations.
+Time step 15 at t=0.15
+     13 CG iterations.
+Time step 16 at t=0.16
+     12 CG iterations.
+Time step 17 at t=0.17
+     12 CG iterations.
+Time step 18 at t=0.18
+     12 CG iterations.
+Time step 19 at t=0.19
+     12 CG iterations.
+Time step 20 at t=0.2
+     12 CG iterations.
+Time step 21 at t=0.21
+     12 CG iterations.
+Time step 22 at t=0.22
+     12 CG iterations.
+Time step 23 at t=0.23
+     12 CG iterations.
+Time step 24 at t=0.24
+     12 CG iterations.
+Time step 25 at t=0.25
+     12 CG iterations.
+Time step 26 at t=0.26
+     12 CG iterations.
+Time step 27 at t=0.27
+     12 CG iterations.
+Time step 28 at t=0.28
+     12 CG iterations.
+Time step 29 at t=0.29
+     12 CG iterations.
+Time step 30 at t=0.3
+     12 CG iterations.
+Time step 31 at t=0.31
+     12 CG iterations.
+Time step 32 at t=0.32
+     12 CG iterations.
+Time step 33 at t=0.33
+     12 CG iterations.
+Time step 34 at t=0.34
+     12 CG iterations.
+Time step 35 at t=0.35
+     12 CG iterations.
+Time step 36 at t=0.36
+     12 CG iterations.
+Time step 37 at t=0.37
+     12 CG iterations.
+Time step 38 at t=0.38
+     12 CG iterations.
+Time step 39 at t=0.39
+     12 CG iterations.
+Time step 40 at t=0.4
+     12 CG iterations.
+Time step 41 at t=0.41
+     12 CG iterations.
+Time step 42 at t=0.42
+     12 CG iterations.
+Time step 43 at t=0.43
+     12 CG iterations.
+Time step 44 at t=0.44
+     12 CG iterations.
+Time step 45 at t=0.45
+     12 CG iterations.
+Time step 46 at t=0.46
+     12 CG iterations.
+Time step 47 at t=0.47
+     12 CG iterations.
+Time step 48 at t=0.48
+     12 CG iterations.
+Time step 49 at t=0.49
+     12 CG iterations.
+Time step 50 at t=0.5
+     12 CG iterations.
+Time step 51 at t=0.51
+     12 CG iterations.
+Time step 52 at t=0.52
+     12 CG iterations.
+Time step 53 at t=0.53
+     12 CG iterations.
+Time step 54 at t=0.54
+     12 CG iterations.
+Time step 55 at t=0.55
+     12 CG iterations.
+Time step 56 at t=0.56
+     12 CG iterations.
+Time step 57 at t=0.57
+     12 CG iterations.
+Time step 58 at t=0.58
+     12 CG iterations.
+Time step 59 at t=0.59
+     12 CG iterations.
+Time step 60 at t=0.6
+     12 CG iterations.
+Time step 61 at t=0.61
+     12 CG iterations.
+Time step 62 at t=0.62
+     12 CG iterations.
+Time step 63 at t=0.63
+     12 CG iterations.
+Time step 64 at t=0.64
+     12 CG iterations.
+Time step 65 at t=0.65
+     12 CG iterations.
+Time step 66 at t=0.66
+     12 CG iterations.
+Time step 67 at t=0.67
+     12 CG iterations.
+Time step 68 at t=0.68
+     12 CG iterations.
+Time step 69 at t=0.69
+     12 CG iterations.
+Time step 70 at t=0.7
+     12 CG iterations.
+Time step 71 at t=0.71
+     12 CG iterations.
+Time step 72 at t=0.72
+     12 CG iterations.
+Time step 73 at t=0.73
+     12 CG iterations.
+Time step 74 at t=0.74
+     11 CG iterations.
+Time step 75 at t=0.75
+     11 CG iterations.
+Time step 76 at t=0.76
+     11 CG iterations.
+Time step 77 at t=0.77
+     11 CG iterations.
+Time step 78 at t=0.78
+     11 CG iterations.
+Time step 79 at t=0.79
+     11 CG iterations.
+Time step 80 at t=0.8
+     11 CG iterations.
+Time step 81 at t=0.81
+     11 CG iterations.
+Time step 82 at t=0.82
+     11 CG iterations.
+Time step 83 at t=0.83
+     11 CG iterations.
+Time step 84 at t=0.84
+     11 CG iterations.
+Time step 85 at t=0.85
+     11 CG iterations.
+Time step 86 at t=0.86
+     11 CG iterations.
+Time step 87 at t=0.87
+     11 CG iterations.
+Time step 88 at t=0.88
+     11 CG iterations.
+Time step 89 at t=0.89
+     11 CG iterations.
+Time step 90 at t=0.9
+     11 CG iterations.
+Time step 91 at t=0.91
+     11 CG iterations.
+Time step 92 at t=0.92
+     11 CG iterations.
+Time step 93 at t=0.93
+     11 CG iterations.
+Time step 94 at t=0.94
+     11 CG iterations.
+Time step 95 at t=0.95
+     11 CG iterations.
+Time step 96 at t=0.96
+     11 CG iterations.
+Time step 97 at t=0.97
+     11 CG iterations.
+Time step 98 at t=0.98
+     11 CG iterations.
+Time step 99 at t=0.99
+     11 CG iterations.
+Time step 100 at t=1
+     11 CG iterations.
+Time step 101 at t=1.01
+     11 CG iterations.
+Time step 102 at t=1.02
+     11 CG iterations.
+Time step 103 at t=1.03
+     11 CG iterations.
+Time step 104 at t=1.04
+     11 CG iterations.
+Time step 105 at t=1.05
+     11 CG iterations.
+Time step 106 at t=1.06
+     11 CG iterations.
+Time step 107 at t=1.07
+     11 CG iterations.
+Time step 108 at t=1.08
+     11 CG iterations.
+Time step 109 at t=1.09
+     11 CG iterations.
+Time step 110 at t=1.1
+     11 CG iterations.
+Time step 111 at t=1.11
+     11 CG iterations.
+Time step 112 at t=1.12
+     11 CG iterations.
+Time step 113 at t=1.13
+     11 CG iterations.
+Time step 114 at t=1.14
+     11 CG iterations.
+Time step 115 at t=1.15
+     11 CG iterations.
+Time step 116 at t=1.16
+     11 CG iterations.
+Time step 117 at t=1.17
+     11 CG iterations.
+Time step 118 at t=1.18
+     11 CG iterations.
+Time step 119 at t=1.19
+     11 CG iterations.
+Time step 120 at t=1.2
+     11 CG iterations.
+Time step 121 at t=1.21
+     11 CG iterations.
+Time step 122 at t=1.22
+     11 CG iterations.
+Time step 123 at t=1.23
+     11 CG iterations.
+Time step 124 at t=1.24
+     11 CG iterations.
+Time step 125 at t=1.25
+     10 CG iterations.
+Time step 126 at t=1.26
+     10 CG iterations.
+Time step 127 at t=1.27
+     10 CG iterations.
+Time step 128 at t=1.28
+     10 CG iterations.
+Time step 129 at t=1.29
+     10 CG iterations.
+Time step 130 at t=1.3
+     10 CG iterations.
+Time step 131 at t=1.31
+     10 CG iterations.
+Time step 132 at t=1.32
+     10 CG iterations.
+Time step 133 at t=1.33
+     10 CG iterations.
+Time step 134 at t=1.34
+     10 CG iterations.
+Time step 135 at t=1.35
+     10 CG iterations.
+Time step 136 at t=1.36
+     10 CG iterations.
+Time step 137 at t=1.37
+     10 CG iterations.
+Time step 138 at t=1.38
+     10 CG iterations.
+Time step 139 at t=1.39
+     10 CG iterations.
+Time step 140 at t=1.4
+     10 CG iterations.
+Time step 141 at t=1.41
+     10 CG iterations.
+Time step 142 at t=1.42
+     10 CG iterations.
+Time step 143 at t=1.43
+     10 CG iterations.
+Time step 144 at t=1.44
+     10 CG iterations.
+Time step 145 at t=1.45
+     10 CG iterations.
+Time step 146 at t=1.46
+     10 CG iterations.
+Time step 147 at t=1.47
+     10 CG iterations.
+Time step 148 at t=1.48
+     10 CG iterations.
+Time step 149 at t=1.49
+     10 CG iterations.
+Time step 150 at t=1.5
+     10 CG iterations.
+Time step 151 at t=1.51
+     10 CG iterations.
+Time step 152 at t=1.52
+     10 CG iterations.
+Time step 153 at t=1.53
+     10 CG iterations.
+Time step 154 at t=1.54
+     10 CG iterations.
+Time step 155 at t=1.55
+     10 CG iterations.
+Time step 156 at t=1.56
+     10 CG iterations.
+Time step 157 at t=1.57
+     10 CG iterations.
+Time step 158 at t=1.58
+     10 CG iterations.
+Time step 159 at t=1.59
+     10 CG iterations.
+Time step 160 at t=1.6
+     10 CG iterations.
+Time step 161 at t=1.61
+     10 CG iterations.
+Time step 162 at t=1.62
+     10 CG iterations.
+Time step 163 at t=1.63
+     10 CG iterations.
+Time step 164 at t=1.64
+     10 CG iterations.
+Time step 165 at t=1.65
+     10 CG iterations.
+Time step 166 at t=1.66
+     10 CG iterations.
+Time step 167 at t=1.67
+     10 CG iterations.
+Time step 168 at t=1.68
+     10 CG iterations.
+Time step 169 at t=1.69
+     10 CG iterations.
+Time step 170 at t=1.7
+     10 CG iterations.
+Time step 171 at t=1.71
+     10 CG iterations.
+Time step 172 at t=1.72
+     10 CG iterations.
+Time step 173 at t=1.73
+     10 CG iterations.
+Time step 174 at t=1.74
+     10 CG iterations.
+Time step 175 at t=1.75
+     10 CG iterations.
+Time step 176 at t=1.76
+     10 CG iterations.
+Time step 177 at t=1.77
+     9 CG iterations.
+Time step 178 at t=1.78
+     9 CG iterations.
+Time step 179 at t=1.79
+     9 CG iterations.
+Time step 180 at t=1.8
+     9 CG iterations.
+Time step 181 at t=1.81
+     9 CG iterations.
+Time step 182 at t=1.82
+     9 CG iterations.
+Time step 183 at t=1.83
+     9 CG iterations.
+Time step 184 at t=1.84
+     9 CG iterations.
+Time step 185 at t=1.85
+     9 CG iterations.
+Time step 186 at t=1.86
+     9 CG iterations.
+Time step 187 at t=1.87
+     9 CG iterations.
+Time step 188 at t=1.88
+     9 CG iterations.
+Time step 189 at t=1.89
+     9 CG iterations.
+Time step 190 at t=1.9
+     9 CG iterations.
+Time step 191 at t=1.91
+     9 CG iterations.
+Time step 192 at t=1.92
+     9 CG iterations.
+Time step 193 at t=1.93
+     9 CG iterations.
+Time step 194 at t=1.94
+     9 CG iterations.
+Time step 195 at t=1.95
+     9 CG iterations.
+Time step 196 at t=1.96
+     9 CG iterations.
+Time step 197 at t=1.97
+     9 CG iterations.
+Time step 198 at t=1.98
+     9 CG iterations.
+Time step 199 at t=1.99
+     9 CG iterations.
+Time step 200 at t=2
+     9 CG iterations.
+Time step 201 at t=2.01
+     9 CG iterations.
+Time step 202 at t=2.02
+     9 CG iterations.
+Time step 203 at t=2.03
+     9 CG iterations.
+Time step 204 at t=2.04
+     9 CG iterations.
+Time step 205 at t=2.05
+     9 CG iterations.
+Time step 206 at t=2.06
+     9 CG iterations.
+Time step 207 at t=2.07
+     9 CG iterations.
+Time step 208 at t=2.08
+     9 CG iterations.
+Time step 209 at t=2.09
+     9 CG iterations.
+Time step 210 at t=2.1
+     9 CG iterations.
+Time step 211 at t=2.11
+     9 CG iterations.
+Time step 212 at t=2.12
+     9 CG iterations.
+Time step 213 at t=2.13
+     9 CG iterations.
+Time step 214 at t=2.14
+     9 CG iterations.
+Time step 215 at t=2.15
+     9 CG iterations.
+Time step 216 at t=2.16
+     9 CG iterations.
+Time step 217 at t=2.17
+     9 CG iterations.
+Time step 218 at t=2.18
+     9 CG iterations.
+Time step 219 at t=2.19
+     9 CG iterations.
+Time step 220 at t=2.2
+     9 CG iterations.
+Time step 221 at t=2.21
+     9 CG iterations.
+Time step 222 at t=2.22
+     9 CG iterations.
+Time step 223 at t=2.23
+     9 CG iterations.
+Time step 224 at t=2.24
+     9 CG iterations.
+Time step 225 at t=2.25
+     9 CG iterations.
+Time step 226 at t=2.26
+     9 CG iterations.
+Time step 227 at t=2.27
+     9 CG iterations.
+Time step 228 at t=2.28
+     9 CG iterations.
+Time step 229 at t=2.29
+     9 CG iterations.
+Time step 230 at t=2.3
+     9 CG iterations.
+Time step 231 at t=2.31
+     9 CG iterations.
+Time step 232 at t=2.32
+     9 CG iterations.
+Time step 233 at t=2.33
+     8 CG iterations.
+Time step 234 at t=2.34
+     8 CG iterations.
+Time step 235 at t=2.35
+     8 CG iterations.
+Time step 236 at t=2.36
+     8 CG iterations.
+Time step 237 at t=2.37
+     8 CG iterations.
+Time step 238 at t=2.38
+     8 CG iterations.
+Time step 239 at t=2.39
+     8 CG iterations.
+Time step 240 at t=2.4
+     8 CG iterations.
+Time step 241 at t=2.41
+     8 CG iterations.
+Time step 242 at t=2.42
+     8 CG iterations.
+Time step 243 at t=2.43
+     8 CG iterations.
+Time step 244 at t=2.44
+     8 CG iterations.
+Time step 245 at t=2.45
+     8 CG iterations.
+Time step 246 at t=2.46
+     8 CG iterations.
+Time step 247 at t=2.47
+     8 CG iterations.
+Time step 248 at t=2.48
+     8 CG iterations.
+Time step 249 at t=2.49
+     8 CG iterations.
+Time step 250 at t=2.5
+     8 CG iterations.
+Time step 251 at t=2.51
+     8 CG iterations.
+Time step 252 at t=2.52
+     8 CG iterations.
+Time step 253 at t=2.53
+     8 CG iterations.
+Time step 254 at t=2.54
+     8 CG iterations.
+Time step 255 at t=2.55
+     8 CG iterations.
+Time step 256 at t=2.56
+     8 CG iterations.
+Time step 257 at t=2.57
+     8 CG iterations.
+Time step 258 at t=2.58
+     8 CG iterations.
+Time step 259 at t=2.59
+     8 CG iterations.
+Time step 260 at t=2.6
+     8 CG iterations.
+Time step 261 at t=2.61
+     8 CG iterations.
+Time step 262 at t=2.62
+     8 CG iterations.
+Time step 263 at t=2.63
+     8 CG iterations.
+Time step 264 at t=2.64
+     8 CG iterations.
+Time step 265 at t=2.65
+     8 CG iterations.
+Time step 266 at t=2.66
+     7 CG iterations.
+Time step 267 at t=2.67
+     7 CG iterations.
+Time step 268 at t=2.68
+     7 CG iterations.
+Time step 269 at t=2.69
+     7 CG iterations.
+Time step 270 at t=2.7
+     7 CG iterations.
+Time step 271 at t=2.71
+     7 CG iterations.
+Time step 272 at t=2.72
+     7 CG iterations.
+Time step 273 at t=2.73
+     7 CG iterations.
+Time step 274 at t=2.74
+     7 CG iterations.
+Time step 275 at t=2.75
+     7 CG iterations.
+Time step 276 at t=2.76
+     7 CG iterations.
+Time step 277 at t=2.77
+     7 CG iterations.
+Time step 278 at t=2.78
+     7 CG iterations.
+Time step 279 at t=2.79
+     7 CG iterations.
+Time step 280 at t=2.8
+     7 CG iterations.
+Time step 281 at t=2.81
+     7 CG iterations.
+Time step 282 at t=2.82
+     7 CG iterations.
+Time step 283 at t=2.83
+     7 CG iterations.
+Time step 284 at t=2.84
+     7 CG iterations.
+Time step 285 at t=2.85
+     7 CG iterations.
+Time step 286 at t=2.86
+     7 CG iterations.
+Time step 287 at t=2.87
+     7 CG iterations.
+Time step 288 at t=2.88
+     7 CG iterations.
+Time step 289 at t=2.89
+     7 CG iterations.
+Time step 290 at t=2.9
+     7 CG iterations.
+Time step 291 at t=2.91
+     7 CG iterations.
+Time step 292 at t=2.92
+     7 CG iterations.
+Time step 293 at t=2.93
+     7 CG iterations.
+Time step 294 at t=2.94
+     7 CG iterations.
+Time step 295 at t=2.95
+     7 CG iterations.
+Time step 296 at t=2.96
+     7 CG iterations.
+Time step 297 at t=2.97
+     7 CG iterations.
+Time step 298 at t=2.98
+     7 CG iterations.
+Time step 299 at t=2.99
+     7 CG iterations.
+Time step 300 at t=3
+     7 CG iterations.
+Time step 301 at t=3.01
+     7 CG iterations.
+Time step 302 at t=3.02
+     7 CG iterations.
+Time step 303 at t=3.03
+     7 CG iterations.
+Time step 304 at t=3.04
+     7 CG iterations.
+Time step 305 at t=3.05
+     7 CG iterations.
+Time step 306 at t=3.06
+     7 CG iterations.
+Time step 307 at t=3.07
+     7 CG iterations.
+Time step 308 at t=3.08
+     7 CG iterations.
+Time step 309 at t=3.09
+     7 CG iterations.
+Time step 310 at t=3.1
+     7 CG iterations.
+Time step 311 at t=3.11
+     7 CG iterations.
+Time step 312 at t=3.12
+     7 CG iterations.
+Time step 313 at t=3.13
+     7 CG iterations.
+Time step 314 at t=3.14
+     7 CG iterations.
+Time step 315 at t=3.15
+     7 CG iterations.
+Time step 316 at t=3.16
+     6 CG iterations.
+Time step 317 at t=3.17
+     6 CG iterations.
+Time step 318 at t=3.18
+     6 CG iterations.
+Time step 319 at t=3.19
+     6 CG iterations.
+Time step 320 at t=3.2
+     6 CG iterations.
+Time step 321 at t=3.21
+     6 CG iterations.
+Time step 322 at t=3.22
+     6 CG iterations.
+Time step 323 at t=3.23
+     6 CG iterations.
+Time step 324 at t=3.24
+     6 CG iterations.
+Time step 325 at t=3.25
+     6 CG iterations.
+Time step 326 at t=3.26
+     6 CG iterations.
+Time step 327 at t=3.27
+     6 CG iterations.
+Time step 328 at t=3.28
+     6 CG iterations.
+Time step 329 at t=3.29
+     6 CG iterations.
+Time step 330 at t=3.3
+     6 CG iterations.
+Time step 331 at t=3.31
+     6 CG iterations.
+Time step 332 at t=3.32
+     6 CG iterations.
+Time step 333 at t=3.33
+     6 CG iterations.
+Time step 334 at t=3.34
+     6 CG iterations.
+Time step 335 at t=3.35
+     6 CG iterations.
+Time step 336 at t=3.36
+     6 CG iterations.
+Time step 337 at t=3.37
+     6 CG iterations.
+Time step 338 at t=3.38
+     6 CG iterations.
+Time step 339 at t=3.39
+     6 CG iterations.
+Time step 340 at t=3.4
+     6 CG iterations.
+Time step 341 at t=3.41
+     6 CG iterations.
+Time step 342 at t=3.42
+     6 CG iterations.
+Time step 343 at t=3.43
+     6 CG iterations.
+Time step 344 at t=3.44
+     6 CG iterations.
+Time step 345 at t=3.45
+     6 CG iterations.
+Time step 346 at t=3.46
+     6 CG iterations.
+Time step 347 at t=3.47
+     6 CG iterations.
+Time step 348 at t=3.48
+     6 CG iterations.
+Time step 349 at t=3.49
+     6 CG iterations.
+Time step 350 at t=3.5
+     6 CG iterations.
+Time step 351 at t=3.51
+     6 CG iterations.
+Time step 352 at t=3.52
+     6 CG iterations.
+Time step 353 at t=3.53
+     6 CG iterations.
+Time step 354 at t=3.54
+     6 CG iterations.
+Time step 355 at t=3.55
+     6 CG iterations.
+Time step 356 at t=3.56
+     6 CG iterations.
+Time step 357 at t=3.57
+     6 CG iterations.
+Time step 358 at t=3.58
+     6 CG iterations.
+Time step 359 at t=3.59
+     6 CG iterations.
+Time step 360 at t=3.6
+     6 CG iterations.
+Time step 361 at t=3.61
+     5 CG iterations.
+Time step 362 at t=3.62
+     5 CG iterations.
+Time step 363 at t=3.63
+     5 CG iterations.
+Time step 364 at t=3.64
+     5 CG iterations.
+Time step 365 at t=3.65
+     5 CG iterations.
+Time step 366 at t=3.66
+     5 CG iterations.
+Time step 367 at t=3.67
+     5 CG iterations.
+Time step 368 at t=3.68
+     5 CG iterations.
+Time step 369 at t=3.69
+     5 CG iterations.
+Time step 370 at t=3.7
+     5 CG iterations.
+Time step 371 at t=3.71
+     5 CG iterations.
+Time step 372 at t=3.72
+     5 CG iterations.
+Time step 373 at t=3.73
+     5 CG iterations.
+Time step 374 at t=3.74
+     5 CG iterations.
+Time step 375 at t=3.75
+     5 CG iterations.
+Time step 376 at t=3.76
+     5 CG iterations.
+Time step 377 at t=3.77
+     5 CG iterations.
+Time step 378 at t=3.78
+     5 CG iterations.
+Time step 379 at t=3.79
+     5 CG iterations.
+Time step 380 at t=3.8
+     5 CG iterations.
+Time step 381 at t=3.81
+     5 CG iterations.
+Time step 382 at t=3.82
+     5 CG iterations.
+Time step 383 at t=3.83
+     5 CG iterations.
+Time step 384 at t=3.84
+     5 CG iterations.
+Time step 385 at t=3.85
+     5 CG iterations.
+Time step 386 at t=3.86
+     5 CG iterations.
+Time step 387 at t=3.87
+     5 CG iterations.
+Time step 388 at t=3.88
+     5 CG iterations.
+Time step 389 at t=3.89
+     5 CG iterations.
+Time step 390 at t=3.9
+     5 CG iterations.
+Time step 391 at t=3.91
+     5 CG iterations.
+Time step 392 at t=3.92
+     5 CG iterations.
+Time step 393 at t=3.93
+     5 CG iterations.
+Time step 394 at t=3.94
+     5 CG iterations.
+Time step 395 at t=3.95
+     5 CG iterations.
+Time step 396 at t=3.96
+     5 CG iterations.
+Time step 397 at t=3.97
+     5 CG iterations.
+Time step 398 at t=3.98
+     5 CG iterations.
+Time step 399 at t=3.99
+     5 CG iterations.
+Time step 400 at t=4
+     5 CG iterations.
+Time step 401 at t=4.01
+     5 CG iterations.
+Time step 402 at t=4.02
+     5 CG iterations.
+Time step 403 at t=4.03
+     5 CG iterations.
+Time step 404 at t=4.04
+     5 CG iterations.
+Time step 405 at t=4.05
+     5 CG iterations.
+Time step 406 at t=4.06
+     5 CG iterations.
+Time step 407 at t=4.07
+     5 CG iterations.
+Time step 408 at t=4.08
+     5 CG iterations.
+Time step 409 at t=4.09
+     5 CG iterations.
+Time step 410 at t=4.1
+     5 CG iterations.
+Time step 411 at t=4.11
+     5 CG iterations.
+Time step 412 at t=4.12
+     5 CG iterations.
+Time step 413 at t=4.13
+     5 CG iterations.
+Time step 414 at t=4.14
+     5 CG iterations.
+Time step 415 at t=4.15
+     5 CG iterations.
+Time step 416 at t=4.16
+     4 CG iterations.
+Time step 417 at t=4.17
+     4 CG iterations.
+Time step 418 at t=4.18
+     4 CG iterations.
+Time step 419 at t=4.19
+     4 CG iterations.
+Time step 420 at t=4.2
+     4 CG iterations.
+Time step 421 at t=4.21
+     4 CG iterations.
+Time step 422 at t=4.22
+     4 CG iterations.
+Time step 423 at t=4.23
+     4 CG iterations.
+Time step 424 at t=4.24
+     4 CG iterations.
+Time step 425 at t=4.25
+     4 CG iterations.
+Time step 426 at t=4.26
+     4 CG iterations.
+Time step 427 at t=4.27
+     4 CG iterations.
+Time step 428 at t=4.28
+     4 CG iterations.
+Time step 429 at t=4.29
+     4 CG iterations.
+Time step 430 at t=4.3
+     4 CG iterations.
+Time step 431 at t=4.31
+     4 CG iterations.
+Time step 432 at t=4.32
+     4 CG iterations.
+Time step 433 at t=4.33
+     4 CG iterations.
+Time step 434 at t=4.34
+     4 CG iterations.
+Time step 435 at t=4.35
+     4 CG iterations.
+Time step 436 at t=4.36
+     4 CG iterations.
+Time step 437 at t=4.37
+     4 CG iterations.
+Time step 438 at t=4.38
+     4 CG iterations.
+Time step 439 at t=4.39
+     4 CG iterations.
+Time step 440 at t=4.4
+     4 CG iterations.
+Time step 441 at t=4.41
+     4 CG iterations.
+Time step 442 at t=4.42
+     4 CG iterations.
+Time step 443 at t=4.43
+     4 CG iterations.
+Time step 444 at t=4.44
+     4 CG iterations.
+Time step 445 at t=4.45
+     4 CG iterations.
+Time step 446 at t=4.46
+     4 CG iterations.
+Time step 447 at t=4.47
+     4 CG iterations.
+Time step 448 at t=4.48
+     4 CG iterations.
+Time step 449 at t=4.49
+     4 CG iterations.
+Time step 450 at t=4.5
+     4 CG iterations.
+Time step 451 at t=4.51
+     4 CG iterations.
+Time step 452 at t=4.52
+     4 CG iterations.
+Time step 453 at t=4.53
+     4 CG iterations.
+Time step 454 at t=4.54
+     4 CG iterations.
+Time step 455 at t=4.55
+     4 CG iterations.
+Time step 456 at t=4.56
+     4 CG iterations.
+Time step 457 at t=4.57
+     4 CG iterations.
+Time step 458 at t=4.58
+     4 CG iterations.
+Time step 459 at t=4.59
+     4 CG iterations.
+Time step 460 at t=4.6
+     4 CG iterations.
+Time step 461 at t=4.61
+     4 CG iterations.
+Time step 462 at t=4.62
+     4 CG iterations.
+Time step 463 at t=4.63
+     4 CG iterations.
+Time step 464 at t=4.64
+     4 CG iterations.
+Time step 465 at t=4.65
+     4 CG iterations.
+Time step 466 at t=4.66
+     4 CG iterations.
+Time step 467 at t=4.67
+     4 CG iterations.
+Time step 468 at t=4.68
+     4 CG iterations.
+Time step 469 at t=4.69
+     4 CG iterations.
+Time step 470 at t=4.7
+     4 CG iterations.
+Time step 471 at t=4.71
+     4 CG iterations.
+Time step 472 at t=4.72
+     3 CG iterations.
+Time step 473 at t=4.73
+     3 CG iterations.
+Time step 474 at t=4.74
+     3 CG iterations.
+Time step 475 at t=4.75
+     3 CG iterations.
+Time step 476 at t=4.76
+     3 CG iterations.
+Time step 477 at t=4.77
+     3 CG iterations.
+Time step 478 at t=4.78
+     3 CG iterations.
+Time step 479 at t=4.79
+     3 CG iterations.
+Time step 480 at t=4.8
+     3 CG iterations.
+Time step 481 at t=4.81
+     3 CG iterations.
+Time step 482 at t=4.82
+     3 CG iterations.
+Time step 483 at t=4.83
+     3 CG iterations.
+Time step 484 at t=4.84
+     3 CG iterations.
+Time step 485 at t=4.85
+     3 CG iterations.
+Time step 486 at t=4.86
+     3 CG iterations.
+Time step 487 at t=4.87
+     3 CG iterations.
+Time step 488 at t=4.88
+     3 CG iterations.
+Time step 489 at t=4.89
+     3 CG iterations.
+Time step 490 at t=4.9
+     3 CG iterations.
+Time step 491 at t=4.91
+     3 CG iterations.
+Time step 492 at t=4.92
+     3 CG iterations.
+Time step 493 at t=4.93
+     3 CG iterations.
+Time step 494 at t=4.94
+     3 CG iterations.
+Time step 495 at t=4.95
+     3 CG iterations.
+Time step 496 at t=4.96
+     3 CG iterations.
+Time step 497 at t=4.97
+     3 CG iterations.
+Time step 498 at t=4.98
+     3 CG iterations.
+Time step 499 at t=4.99
+     3 CG iterations.
+Time step 500 at t=5
+     3 CG iterations.
+Time step 501 at t=5.01
+     3 CG iterations.
+Time step 502 at t=5.02
+     3 CG iterations.
+Time step 503 at t=5.03
+     3 CG iterations.
+Time step 504 at t=5.04
+     3 CG iterations.
+Time step 505 at t=5.05
+     3 CG iterations.
+Time step 506 at t=5.06
+     3 CG iterations.
+Time step 507 at t=5.07
+     3 CG iterations.
+Time step 508 at t=5.08
+     3 CG iterations.
+Time step 509 at t=5.09
+     3 CG iterations.
+Time step 510 at t=5.1
+     3 CG iterations.
+Time step 511 at t=5.11
+     3 CG iterations.
+Time step 512 at t=5.12
+     3 CG iterations.
+Time step 513 at t=5.13
+     3 CG iterations.
+Time step 514 at t=5.14
+     3 CG iterations.
+Time step 515 at t=5.15
+     3 CG iterations.
+Time step 516 at t=5.16
+     3 CG iterations.
+Time step 517 at t=5.17
+     3 CG iterations.
+Time step 518 at t=5.18
+     3 CG iterations.
+Time step 519 at t=5.19
+     3 CG iterations.
+Time step 520 at t=5.2
+     3 CG iterations.
+Time step 521 at t=5.21
+     3 CG iterations.
+Time step 522 at t=5.22
+     3 CG iterations.
+Time step 523 at t=5.23
+     3 CG iterations.
+Time step 524 at t=5.24
+     2 CG iterations.
+Time step 525 at t=5.25
+     2 CG iterations.
+Time step 526 at t=5.26
+     2 CG iterations.
+Time step 527 at t=5.27
+     2 CG iterations.
+Time step 528 at t=5.28
+     2 CG iterations.
+Time step 529 at t=5.29
+     2 CG iterations.
+Time step 530 at t=5.3
+     2 CG iterations.
+Time step 531 at t=5.31
+     2 CG iterations.
+Time step 532 at t=5.32
+     2 CG iterations.
+Time step 533 at t=5.33
+     2 CG iterations.
+Time step 534 at t=5.34
+     2 CG iterations.
+Time step 535 at t=5.35
+     2 CG iterations.
+Time step 536 at t=5.36
+     2 CG iterations.
+Time step 537 at t=5.37
+     2 CG iterations.
+Time step 538 at t=5.38
+     2 CG iterations.
+Time step 539 at t=5.39
+     2 CG iterations.
+Time step 540 at t=5.4
+     2 CG iterations.
+Time step 541 at t=5.41
+     2 CG iterations.
+Time step 542 at t=5.42
+     2 CG iterations.
+Time step 543 at t=5.43
+     2 CG iterations.
+Time step 544 at t=5.44
+     2 CG iterations.
+Time step 545 at t=5.45
+     2 CG iterations.
+Time step 546 at t=5.46
+     2 CG iterations.
+Time step 547 at t=5.47
+     2 CG iterations.
+Time step 548 at t=5.48
+     2 CG iterations.
+Time step 549 at t=5.49
+     2 CG iterations.
+Time step 550 at t=5.5
+     2 CG iterations.
+Time step 551 at t=5.51
+     2 CG iterations.
+Time step 552 at t=5.52
+     2 CG iterations.
+Time step 553 at t=5.53
+     2 CG iterations.
+Time step 554 at t=5.54
+     2 CG iterations.
+Time step 555 at t=5.55
+     2 CG iterations.
+Time step 556 at t=5.56
+     2 CG iterations.
+Time step 557 at t=5.57
+     2 CG iterations.
+Time step 558 at t=5.58
+     2 CG iterations.
+Time step 559 at t=5.59
+     2 CG iterations.
+Time step 560 at t=5.6
+     2 CG iterations.
+Time step 561 at t=5.61
+     2 CG iterations.
+Time step 562 at t=5.62
+     2 CG iterations.
+Time step 563 at t=5.63
+     2 CG iterations.
+Time step 564 at t=5.64
+     2 CG iterations.
+Time step 565 at t=5.65
+     2 CG iterations.
+Time step 566 at t=5.66
+     2 CG iterations.
+Time step 567 at t=5.67
+     2 CG iterations.
+Time step 568 at t=5.68
+     2 CG iterations.
+Time step 569 at t=5.69
+     2 CG iterations.
+Time step 570 at t=5.7
+     2 CG iterations.
+Time step 571 at t=5.71
+     2 CG iterations.
+Time step 572 at t=5.72
+     2 CG iterations.
+Time step 573 at t=5.73
+     2 CG iterations.
+Time step 574 at t=5.74
+     2 CG iterations.
+Time step 575 at t=5.75
+     2 CG iterations.
+Time step 576 at t=5.76
+     2 CG iterations.
+Time step 577 at t=5.77
+     2 CG iterations.
+Time step 578 at t=5.78
+     2 CG iterations.
+Time step 579 at t=5.79
+     2 CG iterations.
+Time step 580 at t=5.8
+     2 CG iterations.
+Time step 581 at t=5.81
+     2 CG iterations.
+Time step 582 at t=5.82
+     2 CG iterations.
+Time step 583 at t=5.83
+     2 CG iterations.
+Time step 584 at t=5.84
+     2 CG iterations.
+Time step 585 at t=5.85
+     2 CG iterations.
+Time step 586 at t=5.86
+     2 CG iterations.
+Time step 587 at t=5.87
+     2 CG iterations.
+Time step 588 at t=5.88
+     2 CG iterations.
+Time step 589 at t=5.89
+     2 CG iterations.
+Time step 590 at t=5.9
+     2 CG iterations.
+Time step 591 at t=5.91
+     2 CG iterations.
+Time step 592 at t=5.92
+     2 CG iterations.
+Time step 593 at t=5.93
+     1 CG iterations.
+Time step 594 at t=5.94
+     1 CG iterations.
+Time step 595 at t=5.95
+     1 CG iterations.
+Time step 596 at t=5.96
+     1 CG iterations.
+Time step 597 at t=5.97
+     1 CG iterations.
+Time step 598 at t=5.98
+     1 CG iterations.
+Time step 599 at t=5.99
+     1 CG iterations.
+Time step 600 at t=6
+     1 CG iterations.
+Time step 601 at t=6.01
+     1 CG iterations.
+Time step 602 at t=6.02
+     1 CG iterations.
+Time step 603 at t=6.03
+     1 CG iterations.
+Time step 604 at t=6.04
+     1 CG iterations.
+Time step 605 at t=6.05
+     1 CG iterations.
+Time step 606 at t=6.06
+     1 CG iterations.
+Time step 607 at t=6.07
+     1 CG iterations.
+Time step 608 at t=6.08
+     1 CG iterations.
+Time step 609 at t=6.09
+     1 CG iterations.
+Time step 610 at t=6.1
+     1 CG iterations.
+Time step 611 at t=6.11
+     1 CG iterations.
+Time step 612 at t=6.12
+     1 CG iterations.
+Time step 613 at t=6.13
+     1 CG iterations.
+Time step 614 at t=6.14
+     1 CG iterations.
+Time step 615 at t=6.15
+     1 CG iterations.
+Time step 616 at t=6.16
+     1 CG iterations.
+Time step 617 at t=6.17
+     1 CG iterations.
+Time step 618 at t=6.18
+     1 CG iterations.
+Time step 619 at t=6.19
+     1 CG iterations.
+Time step 620 at t=6.2
+     1 CG iterations.
+Time step 621 at t=6.21
+     1 CG iterations.
+Time step 622 at t=6.22
+     1 CG iterations.
+Time step 623 at t=6.23
+     1 CG iterations.
+Time step 624 at t=6.24
+     1 CG iterations.
+Time step 625 at t=6.25
+     0 CG iterations.
+Time step 626 at t=6.26
+     0 CG iterations.
+Time step 627 at t=6.27
+     0 CG iterations.
+Time step 628 at t=6.28
+     0 CG iterations.
+Time step 629 at t=6.29
+     0 CG iterations.
+Time step 630 at t=6.3
+     0 CG iterations.
+Time step 631 at t=6.31
+     0 CG iterations.
+Time step 632 at t=6.32
+     0 CG iterations.
+Time step 633 at t=6.33
+     0 CG iterations.
+Time step 634 at t=6.34
+     0 CG iterations.
+Time step 635 at t=6.35
+     0 CG iterations.
+Time step 636 at t=6.36
+     0 CG iterations.
+Time step 637 at t=6.37
+     0 CG iterations.
+Time step 638 at t=6.38
+     0 CG iterations.
+Time step 639 at t=6.39
+     0 CG iterations.
+Time step 640 at t=6.4
+     0 CG iterations.
+Time step 641 at t=6.41
+     0 CG iterations.
+Time step 642 at t=6.42
+     0 CG iterations.
+Time step 643 at t=6.43
+     0 CG iterations.
+Time step 644 at t=6.44
+     0 CG iterations.
+Time step 645 at t=6.45
+     0 CG iterations.
+Time step 646 at t=6.46
+     0 CG iterations.
+Time step 647 at t=6.47
+     0 CG iterations.
+Time step 648 at t=6.48
+     0 CG iterations.
+Time step 649 at t=6.49
+     0 CG iterations.
+Time step 650 at t=6.5
+     0 CG iterations.
+Time step 651 at t=6.51
+     0 CG iterations.
+Time step 652 at t=6.52
+     0 CG iterations.
+Time step 653 at t=6.53
+     0 CG iterations.
+Time step 654 at t=6.54
+     0 CG iterations.
+Time step 655 at t=6.55
+     0 CG iterations.
+Time step 656 at t=6.56
+     0 CG iterations.
+Time step 657 at t=6.57
+     0 CG iterations.
+Time step 658 at t=6.58
+     0 CG iterations.
+Time step 659 at t=6.59
+     0 CG iterations.
+Time step 660 at t=6.6
+     0 CG iterations.
+Time step 661 at t=6.61
+     0 CG iterations.
+Time step 662 at t=6.62
+     0 CG iterations.
+Time step 663 at t=6.63
+     0 CG iterations.
+Time step 664 at t=6.64
+     0 CG iterations.
+Time step 665 at t=6.65
+     0 CG iterations.
+Time step 666 at t=6.66
+     0 CG iterations.
+Time step 667 at t=6.67
+     0 CG iterations.
+Time step 668 at t=6.68
+     0 CG iterations.
+Time step 669 at t=6.69
+     0 CG iterations.
+Time step 670 at t=6.7
+     0 CG iterations.
+Time step 671 at t=6.71
+     0 CG iterations.
+Time step 672 at t=6.72
+     0 CG iterations.
+Time step 673 at t=6.73
+     0 CG iterations.
+Time step 674 at t=6.74
+     0 CG iterations.
+Time step 675 at t=6.75
+     0 CG iterations.
+Time step 676 at t=6.76
+     0 CG iterations.
+Time step 677 at t=6.77
+     0 CG iterations.
+Time step 678 at t=6.78
+     0 CG iterations.
+Time step 679 at t=6.79
+     0 CG iterations.
+Time step 680 at t=6.8
+     0 CG iterations.
+Time step 681 at t=6.81
+     0 CG iterations.
+Time step 682 at t=6.82
+     0 CG iterations.
+Time step 683 at t=6.83
+     0 CG iterations.
+Time step 684 at t=6.84
+     0 CG iterations.
+Time step 685 at t=6.85
+     0 CG iterations.
+Time step 686 at t=6.86
+     0 CG iterations.
+Time step 687 at t=6.87
+     0 CG iterations.
+Time step 688 at t=6.88
+     0 CG iterations.
+Time step 689 at t=6.89
+     0 CG iterations.
+Time step 690 at t=6.9
+     0 CG iterations.
+Time step 691 at t=6.91
+     0 CG iterations.
+Time step 692 at t=6.92
+     0 CG iterations.
+Time step 693 at t=6.93
+     0 CG iterations.
+Time step 694 at t=6.94
+     0 CG iterations.
+Time step 695 at t=6.95
+     0 CG iterations.
+Time step 696 at t=6.96
+     0 CG iterations.
+Time step 697 at t=6.97
+     0 CG iterations.
+Time step 698 at t=6.98
+     0 CG iterations.
+Time step 699 at t=6.99
+     0 CG iterations.
+Time step 700 at t=7
+     0 CG iterations.
+Time step 701 at t=7.01
+     0 CG iterations.
+Time step 702 at t=7.02
+     0 CG iterations.
+Time step 703 at t=7.03
+     0 CG iterations.
+Time step 704 at t=7.04
+     0 CG iterations.
+Time step 705 at t=7.05
+     0 CG iterations.
+Time step 706 at t=7.06
+     0 CG iterations.
+Time step 707 at t=7.07
+     0 CG iterations.
+Time step 708 at t=7.08
+     0 CG iterations.
+Time step 709 at t=7.09
+     0 CG iterations.
+Time step 710 at t=7.1
+     0 CG iterations.
+Time step 711 at t=7.11
+     0 CG iterations.
+Time step 712 at t=7.12
+     0 CG iterations.
+Time step 713 at t=7.13
+     0 CG iterations.
+Time step 714 at t=7.14
+     0 CG iterations.
+Time step 715 at t=7.15
+     0 CG iterations.
+Time step 716 at t=7.16
+     0 CG iterations.
+Time step 717 at t=7.17
+     0 CG iterations.
+Time step 718 at t=7.18
+     0 CG iterations.
+Time step 719 at t=7.19
+     0 CG iterations.
+Time step 720 at t=7.2
+     0 CG iterations.
+Time step 721 at t=7.21
+     0 CG iterations.
+Time step 722 at t=7.22
+     0 CG iterations.
+Time step 723 at t=7.23
+     0 CG iterations.
+Time step 724 at t=7.24
+     0 CG iterations.
+Time step 725 at t=7.25
+     0 CG iterations.
+Time step 726 at t=7.26
+     0 CG iterations.
+Time step 727 at t=7.27
+     0 CG iterations.
+Time step 728 at t=7.28
+     0 CG iterations.
+Time step 729 at t=7.29
+     0 CG iterations.
+Time step 730 at t=7.3
+     0 CG iterations.
+Time step 731 at t=7.31
+     0 CG iterations.
+Time step 732 at t=7.32
+     0 CG iterations.
+Time step 733 at t=7.33
+     0 CG iterations.
+Time step 734 at t=7.34
+     0 CG iterations.
+Time step 735 at t=7.35
+     0 CG iterations.
+Time step 736 at t=7.36
+     0 CG iterations.
+Time step 737 at t=7.37
+     0 CG iterations.
+Time step 738 at t=7.38
+     0 CG iterations.
+Time step 739 at t=7.39
+     0 CG iterations.
+Time step 740 at t=7.4
+     0 CG iterations.
+Time step 741 at t=7.41
+     0 CG iterations.
+Time step 742 at t=7.42
+     0 CG iterations.
+Time step 743 at t=7.43
+     0 CG iterations.
+Time step 744 at t=7.44
+     0 CG iterations.
+Time step 745 at t=7.45
+     0 CG iterations.
+Time step 746 at t=7.46
+     0 CG iterations.
+Time step 747 at t=7.47
+     0 CG iterations.
+Time step 748 at t=7.48
+     0 CG iterations.
+Time step 749 at t=7.49
+     0 CG iterations.
+Time step 750 at t=7.5
+     0 CG iterations.
+Time step 751 at t=7.51
+     0 CG iterations.
+Time step 752 at t=7.52
+     0 CG iterations.
+Time step 753 at t=7.53
+     0 CG iterations.
+Time step 754 at t=7.54
+     0 CG iterations.
+Time step 755 at t=7.55
+     0 CG iterations.
+Time step 756 at t=7.56
+     0 CG iterations.
+Time step 757 at t=7.57
+     0 CG iterations.
+Time step 758 at t=7.58
+     0 CG iterations.
+Time step 759 at t=7.59
+     0 CG iterations.
+Time step 760 at t=7.6
+     0 CG iterations.
+Time step 761 at t=7.61
+     0 CG iterations.
+Time step 762 at t=7.62
+     0 CG iterations.
+Time step 763 at t=7.63
+     0 CG iterations.
+Time step 764 at t=7.64
+     0 CG iterations.
+Time step 765 at t=7.65
+     0 CG iterations.
+Time step 766 at t=7.66
+     0 CG iterations.
+Time step 767 at t=7.67
+     0 CG iterations.
+Time step 768 at t=7.68
+     0 CG iterations.
+Time step 769 at t=7.69
+     0 CG iterations.
+Time step 770 at t=7.7
+     0 CG iterations.
+Time step 771 at t=7.71
+     0 CG iterations.
+Time step 772 at t=7.72
+     0 CG iterations.
+Time step 773 at t=7.73
+     0 CG iterations.
+Time step 774 at t=7.74
+     0 CG iterations.
+Time step 775 at t=7.75
+     0 CG iterations.
+Time step 776 at t=7.76
+     0 CG iterations.
+Time step 777 at t=7.77
+     0 CG iterations.
+Time step 778 at t=7.78
+     0 CG iterations.
+Time step 779 at t=7.79
+     0 CG iterations.
+Time step 780 at t=7.8
+     0 CG iterations.
+Time step 781 at t=7.81
+     0 CG iterations.
+Time step 782 at t=7.82
+     0 CG iterations.
+Time step 783 at t=7.83
+     0 CG iterations.
+Time step 784 at t=7.84
+     0 CG iterations.
+Time step 785 at t=7.85
+     0 CG iterations.
+Time step 786 at t=7.86
+     0 CG iterations.
+Time step 787 at t=7.87
+     0 CG iterations.
+Time step 788 at t=7.88
+     0 CG iterations.
+Time step 789 at t=7.89
+     0 CG iterations.
+Time step 790 at t=7.9
+     0 CG iterations.
+Time step 791 at t=7.91
+     0 CG iterations.
+Time step 792 at t=7.92
+     0 CG iterations.
+Time step 793 at t=7.93
+     0 CG iterations.
+Time step 794 at t=7.94
+     0 CG iterations.
+Time step 795 at t=7.95
+     0 CG iterations.
+Time step 796 at t=7.96
+     0 CG iterations.
+Time step 797 at t=7.97
+     0 CG iterations.
+Time step 798 at t=7.98
+     0 CG iterations.
+Time step 799 at t=7.99
+     0 CG iterations.
+Time step 800 at t=8
+     0 CG iterations.
+Time step 801 at t=8.01
+     0 CG iterations.
+Time step 802 at t=8.02
+     0 CG iterations.
+Time step 803 at t=8.03
+     0 CG iterations.
+Time step 804 at t=8.04
+     0 CG iterations.
+Time step 805 at t=8.05
+     0 CG iterations.
+Time step 806 at t=8.06
+     0 CG iterations.
+Time step 807 at t=8.07
+     0 CG iterations.
+Time step 808 at t=8.08
+     0 CG iterations.
+Time step 809 at t=8.09
+     0 CG iterations.
+Time step 810 at t=8.1
+     0 CG iterations.
+Time step 811 at t=8.11
+     0 CG iterations.
+Time step 812 at t=8.12
+     0 CG iterations.
+Time step 813 at t=8.13
+     0 CG iterations.
+Time step 814 at t=8.14
+     0 CG iterations.
+Time step 815 at t=8.15
+     0 CG iterations.
+Time step 816 at t=8.16
+     0 CG iterations.
+Time step 817 at t=8.17
+     0 CG iterations.
+Time step 818 at t=8.18
+     0 CG iterations.
+Time step 819 at t=8.19
+     0 CG iterations.
+Time step 820 at t=8.2
+     0 CG iterations.
+Time step 821 at t=8.21
+     0 CG iterations.
+Time step 822 at t=8.22
+     0 CG iterations.
+Time step 823 at t=8.23
+     0 CG iterations.
+Time step 824 at t=8.24
+     0 CG iterations.
+Time step 825 at t=8.25
+     0 CG iterations.
+Time step 826 at t=8.26
+     0 CG iterations.
+Time step 827 at t=8.27
+     0 CG iterations.
+Time step 828 at t=8.28
+     0 CG iterations.
+Time step 829 at t=8.29
+     0 CG iterations.
+Time step 830 at t=8.3
+     0 CG iterations.
+Time step 831 at t=8.31
+     0 CG iterations.
+Time step 832 at t=8.32
+     0 CG iterations.
+Time step 833 at t=8.33
+     0 CG iterations.
+Time step 834 at t=8.34
+     0 CG iterations.
+Time step 835 at t=8.35
+     0 CG iterations.
+Time step 836 at t=8.36
+     0 CG iterations.
+Time step 837 at t=8.37
+     0 CG iterations.
+Time step 838 at t=8.38
+     0 CG iterations.
+Time step 839 at t=8.39
+     0 CG iterations.
+Time step 840 at t=8.4
+     0 CG iterations.
+Time step 841 at t=8.41
+     0 CG iterations.
+Time step 842 at t=8.42
+     0 CG iterations.
+Time step 843 at t=8.43
+     0 CG iterations.
+Time step 844 at t=8.44
+     0 CG iterations.
+Time step 845 at t=8.45
+     0 CG iterations.
+Time step 846 at t=8.46
+     0 CG iterations.
+Time step 847 at t=8.47
+     0 CG iterations.
+Time step 848 at t=8.48
+     0 CG iterations.
+Time step 849 at t=8.49
+     0 CG iterations.
+Time step 850 at t=8.5
+     0 CG iterations.
+Time step 851 at t=8.51
+     0 CG iterations.
+Time step 852 at t=8.52
+     0 CG iterations.
+Time step 853 at t=8.53
+     0 CG iterations.
+Time step 854 at t=8.54
+     0 CG iterations.
+Time step 855 at t=8.55
+     0 CG iterations.
+Time step 856 at t=8.56
+     0 CG iterations.
+Time step 857 at t=8.57
+     0 CG iterations.
+Time step 858 at t=8.58
+     0 CG iterations.
+Time step 859 at t=8.59
+     0 CG iterations.
+Time step 860 at t=8.6
+     0 CG iterations.
+Time step 861 at t=8.61
+     0 CG iterations.
+Time step 862 at t=8.62
+     0 CG iterations.
+Time step 863 at t=8.63
+     0 CG iterations.
+Time step 864 at t=8.64
+     0 CG iterations.
+Time step 865 at t=8.65
+     0 CG iterations.
+Time step 866 at t=8.66
+     0 CG iterations.
+Time step 867 at t=8.67
+     0 CG iterations.
+Time step 868 at t=8.68
+     0 CG iterations.
+Time step 869 at t=8.69
+     0 CG iterations.
+Time step 870 at t=8.7
+     0 CG iterations.
+Time step 871 at t=8.71
+     0 CG iterations.
+Time step 872 at t=8.72
+     0 CG iterations.
+Time step 873 at t=8.73
+     0 CG iterations.
+Time step 874 at t=8.74
+     0 CG iterations.
+Time step 875 at t=8.75
+     0 CG iterations.
+Time step 876 at t=8.76
+     0 CG iterations.
+Time step 877 at t=8.77
+     0 CG iterations.
+Time step 878 at t=8.78
+     0 CG iterations.
+Time step 879 at t=8.79
+     0 CG iterations.
+Time step 880 at t=8.8
+     0 CG iterations.
+Time step 881 at t=8.81
+     0 CG iterations.
+Time step 882 at t=8.82
+     0 CG iterations.
+Time step 883 at t=8.83
+     0 CG iterations.
+Time step 884 at t=8.84
+     0 CG iterations.
+Time step 885 at t=8.85
+     0 CG iterations.
+Time step 886 at t=8.86
+     0 CG iterations.
+Time step 887 at t=8.87
+     0 CG iterations.
+Time step 888 at t=8.88
+     0 CG iterations.
+Time step 889 at t=8.89
+     0 CG iterations.
+Time step 890 at t=8.9
+     0 CG iterations.
+Time step 891 at t=8.91
+     0 CG iterations.
+Time step 892 at t=8.92
+     0 CG iterations.
+Time step 893 at t=8.93
+     0 CG iterations.
+Time step 894 at t=8.94
+     0 CG iterations.
+Time step 895 at t=8.95
+     0 CG iterations.
+Time step 896 at t=8.96
+     0 CG iterations.
+Time step 897 at t=8.97
+     0 CG iterations.
+Time step 898 at t=8.98
+     0 CG iterations.
+Time step 899 at t=8.99
+     0 CG iterations.
+Time step 900 at t=9
+     0 CG iterations.
+Time step 901 at t=9.01
+     0 CG iterations.
+Time step 902 at t=9.02
+     0 CG iterations.
+Time step 903 at t=9.03
+     0 CG iterations.
+Time step 904 at t=9.04
+     0 CG iterations.
+Time step 905 at t=9.05
+     0 CG iterations.
+Time step 906 at t=9.06
+     0 CG iterations.
+Time step 907 at t=9.07
+     0 CG iterations.
+Time step 908 at t=9.08
+     0 CG iterations.
+Time step 909 at t=9.09
+     0 CG iterations.
+Time step 910 at t=9.1
+     0 CG iterations.
+Time step 911 at t=9.11
+     0 CG iterations.
+Time step 912 at t=9.12
+     0 CG iterations.
+Time step 913 at t=9.13
+     0 CG iterations.
+Time step 914 at t=9.14
+     0 CG iterations.
+Time step 915 at t=9.15
+     0 CG iterations.
+Time step 916 at t=9.16
+     0 CG iterations.
+Time step 917 at t=9.17
+     0 CG iterations.
+Time step 918 at t=9.18
+     0 CG iterations.
+Time step 919 at t=9.19
+     0 CG iterations.
+Time step 920 at t=9.2
+     0 CG iterations.
+Time step 921 at t=9.21
+     0 CG iterations.
+Time step 922 at t=9.22
+     0 CG iterations.
+Time step 923 at t=9.23
+     0 CG iterations.
+Time step 924 at t=9.24
+     0 CG iterations.
+Time step 925 at t=9.25
+     0 CG iterations.
+Time step 926 at t=9.26
+     0 CG iterations.
+Time step 927 at t=9.27
+     0 CG iterations.
+Time step 928 at t=9.28
+     0 CG iterations.
+Time step 929 at t=9.29
+     0 CG iterations.
+Time step 930 at t=9.3
+     0 CG iterations.
+Time step 931 at t=9.31
+     0 CG iterations.
+Time step 932 at t=9.32
+     0 CG iterations.
+Time step 933 at t=9.33
+     0 CG iterations.
+Time step 934 at t=9.34
+     0 CG iterations.
+Time step 935 at t=9.35
+     0 CG iterations.
+Time step 936 at t=9.36
+     0 CG iterations.
+Time step 937 at t=9.37
+     0 CG iterations.
+Time step 938 at t=9.38
+     0 CG iterations.
+Time step 939 at t=9.39
+     0 CG iterations.
+Time step 940 at t=9.4
+     0 CG iterations.
+Time step 941 at t=9.41
+     0 CG iterations.
+Time step 942 at t=9.42
+     0 CG iterations.
+Time step 943 at t=9.43
+     0 CG iterations.
+Time step 944 at t=9.44
+     0 CG iterations.
+Time step 945 at t=9.45
+     0 CG iterations.
+Time step 946 at t=9.46
+     0 CG iterations.
+Time step 947 at t=9.47
+     0 CG iterations.
+Time step 948 at t=9.48
+     0 CG iterations.
+Time step 949 at t=9.49
+     0 CG iterations.
+Time step 950 at t=9.5
+     0 CG iterations.
+Time step 951 at t=9.51
+     0 CG iterations.
+Time step 952 at t=9.52
+     0 CG iterations.
+Time step 953 at t=9.53
+     0 CG iterations.
+Time step 954 at t=9.54
+     0 CG iterations.
+Time step 955 at t=9.55
+     0 CG iterations.
+Time step 956 at t=9.56
+     0 CG iterations.
+Time step 957 at t=9.57
+     0 CG iterations.
+Time step 958 at t=9.58
+     0 CG iterations.
+Time step 959 at t=9.59
+     0 CG iterations.
+Time step 960 at t=9.6
+     0 CG iterations.
+Time step 961 at t=9.61
+     0 CG iterations.
+Time step 962 at t=9.62
+     0 CG iterations.
+Time step 963 at t=9.63
+     0 CG iterations.
+Time step 964 at t=9.64
+     0 CG iterations.
+Time step 965 at t=9.65
+     0 CG iterations.
+Time step 966 at t=9.66
+     0 CG iterations.
+Time step 967 at t=9.67
+     0 CG iterations.
+Time step 968 at t=9.68
+     0 CG iterations.
+Time step 969 at t=9.69
+     0 CG iterations.
+Time step 970 at t=9.7
+     0 CG iterations.
+Time step 971 at t=9.71
+     0 CG iterations.
+Time step 972 at t=9.72
+     0 CG iterations.
+Time step 973 at t=9.73
+     0 CG iterations.
+Time step 974 at t=9.74
+     0 CG iterations.
+Time step 975 at t=9.75
+     0 CG iterations.
+Time step 976 at t=9.76
+     0 CG iterations.
+Time step 977 at t=9.77
+     0 CG iterations.
+Time step 978 at t=9.78
+     0 CG iterations.
+Time step 979 at t=9.79
+     0 CG iterations.
+Time step 980 at t=9.8
+     0 CG iterations.
+Time step 981 at t=9.81
+     0 CG iterations.
+Time step 982 at t=9.82
+     0 CG iterations.
+Time step 983 at t=9.83
+     0 CG iterations.
+Time step 984 at t=9.84
+     0 CG iterations.
+Time step 985 at t=9.85
+     0 CG iterations.
+Time step 986 at t=9.86
+     0 CG iterations.
+Time step 987 at t=9.87
+     0 CG iterations.
+Time step 988 at t=9.88
+     0 CG iterations.
+Time step 989 at t=9.89
+     0 CG iterations.
+Time step 990 at t=9.9
+     0 CG iterations.
+Time step 991 at t=9.91
+     0 CG iterations.
+Time step 992 at t=9.92
+     0 CG iterations.
+Time step 993 at t=9.93
+     0 CG iterations.
+Time step 994 at t=9.94
+     0 CG iterations.
+Time step 995 at t=9.95
+     0 CG iterations.
+Time step 996 at t=9.96
+     0 CG iterations.
+Time step 997 at t=9.97
+     0 CG iterations.
+Time step 998 at t=9.98
+     0 CG iterations.
+Time step 999 at t=9.99
+     0 CG iterations.
+Time step 1000 at t=10
+     0 CG iterations.

@@ -1,0 +1,63 @@
+# Listing of Parameters
+# ---------------------
+
+subsection geometry
+  set dim = 1
+  set grid_name = hyper_cube
+  set sizes = 0., 1.
+end
+
+
+subsection mms
+  set enabled = false
+end
+
+
+subsection output
+  set write_solution_table = true
+  set write_solution_vtk = false
+end
+
+
+subsection pde
+  set convection_velocity_function_name = constant
+  set convection_velocity_function_double_arguments = -1.
+  set reference_peclet_number = 1.
+end
+
+
+subsection initial_values
+    set function_name = constant
+    set function_double_arguments = -1.
+end
+
+
+subsection boundary_conditions
+
+    set implementation_types = natural, strong
+    
+    set function_names = constant, constant
+    
+    set function_double_arguments = 1.581976706869327, -1.
+    
+end
+
+
+subsection refinement
+  set boundaries_to_refine = 0
+  set initial_boundary_cycles = 0
+  set initial_global_cycles = 4
+end
+
+
+subsection time
+  set end_time = 10.
+  set step_size = 0.01
+  set semi_implicit_theta = 1.0
+end
+
+
+subsection solver
+  set normalize_tolerance = false
+  set tolerance           = 1e-12
+end
