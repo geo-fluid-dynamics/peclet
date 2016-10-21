@@ -1,6 +1,27 @@
-    // Convection velocity function
+    // Manufactured solution and auxiliary conditions
+    double mms_convection_velocity = this->params.mms.double_arguments.front();
+    this->params.mms.double_arguments.pop_front();
     
-    MMS::ConvectionVelocity<dim> mms_convection_velocity_function;
+    double mms_dirichlet_value = this->params.mms.double_arguments.front();
+    this->params.mms.double_arguments.pop_front();
+    
+    double mms_rate_to_steady = this->params.mms.double_arguments.front();
+    this->params.mms.double_arguments.pop_front();
+    
+    MMS::ConstantConvection1D::ManufacturedSolution<dim> mms_constant_convection_1D(
+            this->params.pde.reference_peclet_number,
+            mms_convection_velocity,
+            mms_dirichlet_value,
+            mms_rate_to_steady,
+            this->params.mms.initial_values_perturbation);
+            
+    if (this->params.mms.enabled)
+    {
+        assert(dim == 1); // @todo: Generalize MMS implementation
+        this->mms = &mms_constant_convection_1D;
+    }
+    
+    // Convection velocity function
     
     std::vector<double> constant_convection_velocity(dim);
     if (this->params.pde.convection_velocity_function_name == "constant")
@@ -16,12 +37,14 @@
     ConstantFunction<dim> 
         constant_convection_velocity_function(constant_convection_velocity);
     
-    if (params.pde.convection_velocity_function_name == "MMS")
+    if (this->params.pde.convection_velocity_function_name == "MMS")
     {
-        assert(params.mms.enabled);
-        this->convection_velocity_function = &mms_convection_velocity_function;
+        assert(this->params.mms.enabled);
+        assert(dim == 1);
+        this->convection_velocity_function = 
+            &this->mms->convection_velocity_function;
     }
-    else if (params.pde.convection_velocity_function_name == "constant")
+    else if (this->params.pde.convection_velocity_function_name == "constant")
     {
         this->convection_velocity_function = &constant_convection_velocity_function;
     }
@@ -35,11 +58,7 @@
     ConstantFunction<dim> constant_function(0.);
     
     Function<dim>* initial_values_function = &constant_function;
-    
-    MMS::ManufacturedSolution<dim>
-        mms_initial_values_function(params.mms.iv_perturbation);
-    mms_initial_values_function.set_time(0.);
-    
+
     Point<dim> ramp_start_point, ramp_end_point;
     
     double ramp_start_position = 0.,
@@ -47,31 +66,31 @@
            ramp_start_value = 0.,
            ramp_end_value = 0.;
             
-    if (params.initial_values.function_name == "ramp")
+    if (this->params.initial_values.function_name == "ramp")
     {
         for (unsigned int axis = 0; axis < dim; axis++)
         {
-            ramp_start_point[axis] = params.initial_values.function_double_arguments.front();
-            params.initial_values.function_double_arguments.pop_front();
+            ramp_start_point[axis] = this->params.initial_values.function_double_arguments.front();
+            this->params.initial_values.function_double_arguments.pop_front();
         }
         
         for (unsigned int axis = 0; axis < dim; axis++)
         {
-            ramp_end_point[axis] = params.initial_values.function_double_arguments.front();
-            params.initial_values.function_double_arguments.pop_front();
+            ramp_end_point[axis] = this->params.initial_values.function_double_arguments.front();
+            this->params.initial_values.function_double_arguments.pop_front();
         }
         
-        ramp_start_position = params.initial_values.function_double_arguments.front();
-        params.initial_values.function_double_arguments.pop_front();
+        ramp_start_position = this->params.initial_values.function_double_arguments.front();
+        this->params.initial_values.function_double_arguments.pop_front();
         
-        ramp_end_position = params.initial_values.function_double_arguments.front();
-        params.initial_values.function_double_arguments.pop_front();
+        ramp_end_position = this->params.initial_values.function_double_arguments.front();
+        this->params.initial_values.function_double_arguments.pop_front();
         
-        ramp_start_value = params.initial_values.function_double_arguments.front();
-        params.initial_values.function_double_arguments.pop_front();
+        ramp_start_value = this->params.initial_values.function_double_arguments.front();
+        this->params.initial_values.function_double_arguments.pop_front();
         
-        ramp_end_value = params.initial_values.function_double_arguments.front();
-        params.initial_values.function_double_arguments.pop_front();
+        ramp_end_value = this->params.initial_values.function_double_arguments.front();
+        this->params.initial_values.function_double_arguments.pop_front();
         
     }
     
@@ -88,7 +107,7 @@
     DoFHandler<dim> field_dof_handler(field_grid);
     Vector<double> field_solution;
     
-    if (params.initial_values.function_name != "interpolate_old_field")
+    if (this->params.initial_values.function_name != "interpolate_old_field")
     { // This will write files that need to exist.
         setup_system(true);
         FEFieldTools::save_field_parts(this->triangulation, this->dof_handler, this->solution); 
@@ -105,26 +124,26 @@
         field_solution);
     
 
-    if (params.initial_values.function_name == "interpolate_old_field")
+    if (this->params.initial_values.function_name == "interpolate_old_field")
     {
-        initial_values_function = & field_function;                      
+        initial_values_function = &field_function;                      
     }
-    else if (params.initial_values.function_name == "constant")
+    else if (this->params.initial_values.function_name == "constant")
     { 
         constant_function = ConstantFunction<dim,double>(
-            params.initial_values.function_double_arguments.front());
-        initial_values_function = & constant_function;
+            this->params.initial_values.function_double_arguments.front());
+        initial_values_function = &constant_function;
                         
     }
-    else if (params.initial_values.function_name == "ramp")
+    else if (this->params.initial_values.function_name == "ramp")
     {
-        initial_values_function =  & ramp_function;
+        initial_values_function =  &ramp_function;
         
     }
-    else if (params.initial_values.function_name == "MMS")
+    else if (this->params.initial_values.function_name == "MMS")
     { 
-        assert(params.mms.enabled);
-        initial_values_function = & mms_initial_values_function;
+        assert(this->params.mms.enabled);
+        initial_values_function = &this->mms->solution_function;
                         
     }
     
@@ -133,40 +152,29 @@
     
     Function<dim>* source_function = &zero_source_function;
     
-    MMS::Source<dim> mms_source_function(params.pde.reference_peclet_number);
-    
-    if (params.mms.enabled)
+    if (this->params.mms.enabled)
     {
-        source_function = &mms_source_function;
+        source_function = &this->mms->source_function;
     }
     
     
     // Make boundary functions
     
-    unsigned int boundary_count = params.boundary_conditions.implementation_types.size();
+    unsigned int boundary_count = this->params.boundary_conditions.implementation_types.size();
     
     assert(params.boundary_conditions.function_names.size() == boundary_count);
 
     std::vector<ConstantFunction<dim>> constant_functions;
     
-    MMS::ManufacturedSolution<dim> mms_dirichlet_function;
-    
-    HyperBallBoundary<dim,dim> mms_neumann_boundary(Point<dim>(), params.geometry.sizes[0]);
-    
-    MMS::NeumannBoundary<dim> mms_neumann_function(
-        this->triangulation,
-        mms_neumann_boundary,
-        this->reference_peclet_number);
-    
     for (unsigned int boundary = 0; boundary < boundary_count; boundary++)
     {
-        std::string boundary_type = params.boundary_conditions.implementation_types[boundary];
-        std::string function_name = params.boundary_conditions.function_names[boundary];
+        std::string boundary_type = this->params.boundary_conditions.implementation_types[boundary];
+        std::string function_name = this->params.boundary_conditions.function_names[boundary];
         
         if ((function_name == "constant"))
         {
-            double value = params.boundary_conditions.function_double_arguments.front();
-            params.boundary_conditions.function_double_arguments.pop_front();
+            double value = this->params.boundary_conditions.function_double_arguments.front();
+            this->params.boundary_conditions.function_double_arguments.pop_front();
             constant_functions.push_back(ConstantFunction<dim>(value));
         }
     }
@@ -178,8 +186,8 @@
     
     for (unsigned int boundary = 0; boundary < boundary_count; boundary++)        
     {
-        std::string boundary_type = params.boundary_conditions.implementation_types[boundary];
-        std::string function_name = params.boundary_conditions.function_names[boundary];
+        std::string boundary_type = this->params.boundary_conditions.implementation_types[boundary];
+        std::string function_name = this->params.boundary_conditions.function_names[boundary];
 
         if ((function_name == "constant"))
         {
@@ -189,14 +197,15 @@
         }
         else if ((function_name == "MMS"))
         {
-            assert(params.mms.enabled);
+            assert(this->params.mms.enabled);
             if (boundary_type == "strong")
             {
-                boundary_functions.push_back(&mms_dirichlet_function);
+                boundary_functions.push_back(&this->mms->solution_function);
             }
             else if (boundary_type == "natural")
             {
-                boundary_functions.push_back(&mms_neumann_function);
+                boundary_functions.push_back(
+                    &this->mms->neumann_boundary_function);
             }
 
         }

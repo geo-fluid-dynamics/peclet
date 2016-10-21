@@ -111,7 +111,9 @@ namespace PDE
         struct MMS
         {
             bool enabled;
-            double iv_perturbation;
+            double initial_values_perturbation;
+            std::string name;
+            std::list<double> double_arguments;
         };
         
         struct StructuredParameters
@@ -342,7 +344,14 @@ namespace PDE
             prm.enter_subsection("mms");
             {
                 prm.declare_entry("enabled", "true", Patterns::Bool());
-                prm.declare_entry("iv_perturbation", "1.001", Patterns::Double());
+                prm.declare_entry("initial_values_perturbation", "1.001",
+                    Patterns::Double());
+                prm.declare_entry("name", "ConstantConvection1D",
+                    Patterns::Selection("ConstantConvection1D"));
+                prm.declare_entry("double_arguments", "-1., -1., 10.",
+                    Patterns::List(Patterns::Double()),
+                    "ConstantConvection1D:"
+                    "\tdouble_arguments: convection_velocity, dirichlet_value, rate_to_steady");
             }
             prm.leave_subsection();
             
@@ -497,7 +506,18 @@ namespace PDE
             prm.enter_subsection("mms");
             {
                 p.mms.enabled = prm.get_bool("enabled");
-                p.mms.iv_perturbation = prm.get_double("iv_perturbation");
+                p.mms.initial_values_perturbation = 
+                    prm.get_double("initial_values_perturbation");
+                    
+                p.mms.name = prm.get("name");
+                
+                std::vector<double> vector = get_vector<double>(prm, "double_arguments");
+                
+                for (auto v : vector)
+                {
+                    p.mms.double_arguments.push_back(v)    ;
+                }
+
             }
             prm.leave_subsection();
             

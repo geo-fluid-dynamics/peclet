@@ -63,6 +63,7 @@
 #include "output.h"
 #include "my_matrix_creator.h"
 #include "my_vector_tools.h"
+#include "manufactured_solutions.h"
 
 
 namespace PDE
@@ -111,6 +112,9 @@ namespace PDE
     double reference_peclet_number;
     Function<dim>* convection_velocity_function;
     
+    // @todo: Generalize MMS (presently only MMS::ConstantConvection1D)
+    MMS::ConstantConvection1D::ManufacturedSolution<dim>* mms;
+    
     void mms_append_error_table();
     void mms_write_error_table();
     TableHandler mms_error_table;
@@ -134,7 +138,7 @@ namespace PDE
   template<int dim>
   void Model<dim>::read_parameters(std::string file_path)
   {
-    params = Parameters::get_parameters(file_path);
+    this->params = Parameters::get_parameters(file_path);
   }
   
   #include "pde_model_grid.h"
@@ -167,29 +171,30 @@ namespace PDE
     DynamicSparsityPattern dsp(dof_handler.n_dofs());
     
     DoFTools::make_sparsity_pattern(
-        dof_handler,
+        this->dof_handler,
         dsp,
-        constraints,
+        this->constraints,
         /*keep_constrained_dofs = */ true);
         
-    sparsity_pattern.copy_from(dsp);
+    this->sparsity_pattern.copy_from(dsp);
 
-    mass_matrix.reinit(sparsity_pattern);
+    this->mass_matrix.reinit(this->sparsity_pattern);
     
-    convection_diffusion_matrix.reinit(sparsity_pattern);
+    this->convection_diffusion_matrix.reinit(this->sparsity_pattern);
     
-    system_matrix.reinit(sparsity_pattern);
+    this->system_matrix.reinit(this->sparsity_pattern);
 
-    MatrixCreator::create_mass_matrix(dof_handler,
+    MatrixCreator::create_mass_matrix(this->dof_handler,
                                       QGauss<dim>(fe.degree+1),
-                                      mass_matrix);
+                                      this->mass_matrix);
                        
     /*
     In the unitless form of the convection-diffusion equation,
     the inverse of the Peclet Number replaces the momentum diffusivity (nu) 
     from the standard formulation.
     */
-    ConstantFunction<dim> inverse_reference_peclet_number_function(1./this->reference_peclet_number);
+    ConstantFunction<dim> 
+        inverse_reference_peclet_number_function(1./this->reference_peclet_number);
     
     MyMatrixCreator::create_convection_diffusion_matrix<dim>(
         this->dof_handler,
@@ -199,11 +204,11 @@ namespace PDE
         this->convection_velocity_function
         );
 
-    solution.reinit(dof_handler.n_dofs());
+    this->solution.reinit(dof_handler.n_dofs());
     
-    old_solution.reinit(dof_handler.n_dofs());
+    this->old_solution.reinit(dof_handler.n_dofs());
     
-    system_rhs.reinit(dof_handler.n_dofs());
+    this->system_rhs.reinit(dof_handler.n_dofs());
     
   }
 
@@ -274,22 +279,19 @@ namespace PDE
     
   }
   
-  #include "manufactured_solution.h"
-  
   template<int dim>
   void Model<dim>::mms_append_error_table()
   {
     assert(this->params.mms.enabled);
     
-    Vector<float> difference_per_cell(triangulation.n_active_cells());
+    this->mms->set_time(this->time);
     
-    MMS::ManufacturedSolution<dim> manufactured_solution;
-    manufactured_solution.set_time(this->time);
+    Vector<float> difference_per_cell(triangulation.n_active_cells());
     
     VectorTools::integrate_difference(
         this->dof_handler,
         this->solution,
-        manufactured_solution,
+        this->mms->solution_function,
         difference_per_cell,
         QGauss<dim>(3),
         VectorTools::L2_norm);
@@ -300,7 +302,7 @@ namespace PDE
     VectorTools::integrate_difference(
         this->dof_handler,
         this->solution,
-        manufactured_solution,
+        this->mms->solution_function,
         difference_per_cell,
         QGauss<dim>(3),
         VectorTools::L1_norm);
@@ -308,7 +310,7 @@ namespace PDE
     double L1_norm_error = difference_per_cell.l1_norm();
     
     /*
-        @todo: Implement gradient of solution for MMS and calculate H1 norm
+    @todo: Implement gradient of solution for MMS and calculate H1 norm
     VectorTools::integrate_difference(
         this->dof_handler,
         this->solution,
@@ -320,12 +322,12 @@ namespace PDE
     mms_error_table.add_value("H1_seminorm_error", H1_seminorm_error);
     */
     
-    mms_error_table.add_value("time_step_size", this->params.time.step_size);
-    mms_error_table.add_value("time", this->time);
-    mms_error_table.add_value("cells", this->triangulation.n_active_cells());
-    mms_error_table.add_value("dofs", this->dof_handler.n_dofs());
-    mms_error_table.add_value("L1_norm_error", L1_norm_error);
-    mms_error_table.add_value("L2_norm_error", L2_norm_error);
+    this->mms_error_table.add_value("time_step_size", this->params.time.step_size);
+    this->mms_error_table.add_value("time", this->time);
+    this->mms_error_table.add_value("cells", this->triangulation.n_active_cells());
+    this->mms_error_table.add_value("dofs", this->dof_handler.n_dofs());
+    this->mms_error_table.add_value("L1_norm_error", L1_norm_error);
+    this->mms_error_table.add_value("L2_norm_error", L2_norm_error);
     
   }
   
@@ -368,23 +370,23 @@ namespace PDE
     
     if (this->params.mms.enabled)
     {
-        std::remove(mms_error_table_file_name.c_str());
+        std::remove(this->mms_error_table_file_name.c_str());
     }
     
-    this->reference_peclet_number = params.pde.reference_peclet_number;
+    this->reference_peclet_number = this->params.pde.reference_peclet_number;
     
-    create_coarse_grid();
+    this->create_coarse_grid();
     
     // Attach manifolds
     assert(dim < 3); // @todo: 3D extension: For now the CylindricalManifold is being ommitted.
         // deal.II makes is impractical for a CylindricalManifold to exist in 2D.
-    SphericalManifold<dim> spherical_manifold(spherical_manifold_center);
+    SphericalManifold<dim> spherical_manifold(this->spherical_manifold_center);
     
     for (unsigned int i = 0; i < manifold_ids.size(); i++)
     {
         if (manifold_descriptors[i] == "spherical")
         {
-            triangulation.set_manifold(manifold_ids[i], spherical_manifold);      
+            this->triangulation.set_manifold(manifold_ids[i], spherical_manifold);      
         }
     }
     
@@ -394,15 +396,15 @@ namespace PDE
     
     // Initialize refinement
     
-    triangulation.refine_global(params.refinement.initial_global_cycles);
+    this->triangulation.refine_global(this->params.refinement.initial_global_cycles);
     
     Refinement::refine_mesh_near_boundaries(
-        triangulation,
-        params.refinement.boundaries_to_refine,
-        params.refinement.initial_boundary_cycles);
+        this->triangulation,
+        this->params.refinement.boundaries_to_refine,
+        this->params.refinement.initial_boundary_cycles);
         
     // Initialize system
-    setup_system();
+    this->setup_system();
 
     unsigned int pre_refinement_step = 0;
     Vector<double> tmp;
@@ -411,67 +413,68 @@ namespace PDE
     // Iterate
 start_time_iteration:
 
-    tmp.reinit (solution.size());
+    tmp.reinit(this->solution.size());
 
-    VectorTools::interpolate(dof_handler,
+    VectorTools::interpolate(this->dof_handler,
                              *initial_values_function,
-                             old_solution); 
+                             this->old_solution); 
     
-    solution = old_solution;
-    time_step_counter = 0; // @todo: Expose initial time step as a parameter
-    time            = 0; // @todo: Expose initial time as a parameter
+    this->solution = this->old_solution;
+    this->time_step_counter = 0;
+    this->time = 0;
     
     double theta = this->params.time.semi_implicit_theta;
     double Delta_t = this->params.time.step_size;
     
-    write_solution();
+    this->write_solution();
     bool final_time_step = false;
     double epsilon = 1e-14;
     do
     {
-        ++time_step_counter;
-        time = params.time.step_size*time_step_counter; // Incrementing the time directly would accumulate errors
-        final_time_step = time > params.time.end_time - epsilon;
-        std::cout << "Time step " << time_step_counter << " at t=" << time << std::endl;
+        ++this->time_step_counter;
+        time = this->params.time.step_size*time_step_counter; // Incrementing the time directly would accumulate errors
+        final_time_step = this->time > this->params.time.end_time - epsilon;
+        std::cout << "Time step " << this->time_step_counter 
+            << " at t=" << this->time << std::endl;
 
-        mass_matrix.vmult(system_rhs, old_solution);
+        this->mass_matrix.vmult(this->system_rhs, this->old_solution);
 
-        convection_diffusion_matrix.vmult(tmp, old_solution);
+        this->convection_diffusion_matrix.vmult(tmp, this->old_solution);
         
-        system_rhs.add(-(1. - theta) * Delta_t, tmp);
+        this->system_rhs.add(-(1. - theta) * Delta_t, tmp);
         
         // Add source terms
-        source_function->set_time(time);
-        VectorTools::create_right_hand_side(dof_handler,
+        source_function->set_time(this->time);
+        VectorTools::create_right_hand_side(this->dof_handler,
                                             QGauss<dim>(fe.degree+1),
                                             *source_function,
                                             tmp);
         forcing_terms = tmp;
         forcing_terms *= Delta_t * theta;
         
-        source_function->set_time(time - Delta_t);
-        VectorTools::create_right_hand_side(dof_handler,
+        source_function->set_time(this->time - Delta_t);
+        VectorTools::create_right_hand_side(this->dof_handler,
                                             QGauss<dim>(fe.degree+1),
                                             *source_function,
                                             tmp);
         forcing_terms.add(Delta_t * (1 - theta), tmp);
         
-        system_rhs += forcing_terms;
+        this->system_rhs += forcing_terms;
         
         // Add natural boundary conditions
         for (unsigned int boundary = 0; boundary < boundary_count; boundary++)
         {
-            if ((params.boundary_conditions.implementation_types[boundary] != "natural"))
+            if ((this->params.boundary_conditions.implementation_types[boundary] != "natural"))
             {
                 continue;
             }
             
             std::set<types::boundary_id> dealii_boundary_id = {boundary}; // @todo: This throws a warning
             
-            boundary_functions[boundary]->set_time(time);
+            boundary_functions[boundary]->set_time(this->time);
             
             MyVectorTools::my_create_boundary_right_hand_side(
-                dof_handler,
+                this->dof_handler,
                 QGauss<dim-1>(fe.degree+1),
                 *boundary_functions[boundary],
                 tmp,
@@ -479,9 +482,9 @@ start_time_iteration:
             forcing_terms = tmp;
             forcing_terms *= Delta_t * theta;
                 
-            boundary_functions[boundary]->set_time(time - Delta_t);
+            boundary_functions[boundary]->set_time(this->time - Delta_t);
             MyVectorTools::my_create_boundary_right_hand_side(
-                dof_handler,
+                this->dof_handler,
                 QGauss<dim-1>(fe.degree+1),
                 *boundary_functions[boundary],
                 tmp,
@@ -489,7 +492,8 @@ start_time_iteration:
              
             forcing_terms.add(Delta_t * (1. - theta), tmp);
             
-            system_rhs += forcing_terms;
+            this->system_rhs += forcing_terms;
+
         }
         
         //
@@ -504,7 +508,7 @@ start_time_iteration:
             std::map<types::global_dof_index, double> boundary_values;
             for (unsigned int boundary = 0; boundary < boundary_count; boundary++)
             {
-                if (params.boundary_conditions.implementation_types[boundary] != "strong") 
+                if (this->params.boundary_conditions.implementation_types[boundary] != "strong") 
                 {
                     continue;
                 }
@@ -526,27 +530,27 @@ start_time_iteration:
                 system_rhs);
         }
 
-        solve_time_step();
+        this->solve_time_step();
 
-        if ((params.output.time_step_interval == 1) ||
-            ((time_step_counter % params.output.time_step_interval) == 0) ||
+        if ((this->params.output.time_step_interval == 1) ||
+            ((time_step_counter % this->params.output.time_step_interval) == 0) ||
             final_time_step)
         {
-            write_solution();
+            this->write_solution();
         }
 
-        if (params.mms.enabled)
+        if (this->params.mms.enabled)
         {
-            mms_append_error_table();
+            this->mms_append_error_table();
         }
         
         if ((time_step_counter == 1) &&
-            (pre_refinement_step < params.refinement.adaptive.initial_cycles))
+            (pre_refinement_step < this->params.refinement.adaptive.initial_cycles))
         {
-            adaptive_refine();
+            this->adaptive_refine();
             ++pre_refinement_step;
 
-            tmp.reinit (solution.size());
+            tmp.reinit(this->solution.size());
 
             std::cout << std::endl;
 
@@ -559,21 +563,21 @@ start_time_iteration:
             for (unsigned int cycle = 0;
                  cycle < params.refinement.adaptive.cycles_at_interval; cycle++)
             {
-                adaptive_refine();
+                this->adaptive_refine();
             }
-            tmp.reinit (solution.size());
+            tmp.reinit(this->solution.size());
             
         }
-        old_solution = solution;
+        this->old_solution = this->solution;
     } while (!final_time_step);
     
     // Save data for FEFieldFunction so that it can be loaded for initialization
     FEFieldTools::save_field_parts(triangulation, dof_handler, solution);
     
     // Write error table
-    if (params.mms.enabled)
+    if (this->params.mms.enabled)
     {
-        mms_write_error_table();
+        this->mms_write_error_table();
     }
     
     // Write the solution table containing pointwise values for every timestep.
