@@ -151,12 +151,11 @@ namespace MMS
             const double g = this->dirichlet_value;
             const double beta = this->rate_to_steady;
             
-            double s = g/(exp(a*Pe) - 1.)*
-                (
-                  a*exp(a*Pe*x)*(exp(-beta*t*t) - 1.)*(1. - a*Pe) 
-                  - 2.*beta*t*exp(-beta*t*t)*(exp(a*Pe) + exp(a*Pe*x))
-                );
+            double temp = a*exp(Pe*a*x)*(exp(-beta*t*t) - 1.);
             
+            double s = g/(exp(Pe*a) - 1.)*(temp*(1. - Pe*a)
+                - 2.*beta*t*exp(-beta*t*t)*(exp(Pe*a) - exp(Pe*a*x)));
+
             return s;
         }
         
