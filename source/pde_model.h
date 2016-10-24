@@ -70,6 +70,9 @@ namespace PDE
 {
   using namespace dealii;
   
+  const double EPSILON = 1.e-14;
+  
+  
   template<int dim>
   class Model
   {
@@ -102,6 +105,7 @@ namespace PDE
     Vector<double>       system_rhs;
 
     double               time;
+    double               time_step_size;
     unsigned int         time_step_counter;
     
     Point<dim> spherical_manifold_center;
@@ -322,7 +326,7 @@ namespace PDE
     mms_error_table.add_value("H1_seminorm_error", H1_seminorm_error);
     */
     
-    this->mms_error_table.add_value("time_step_size", this->params.time.step_size);
+    this->mms_error_table.add_value("time_step_size", this->time_step_size);
     this->mms_error_table.add_value("time", this->time);
     this->mms_error_table.add_value("cells", this->triangulation.n_active_cells());
     this->mms_error_table.add_value("dofs", this->dof_handler.n_dofs());
@@ -424,7 +428,13 @@ start_time_iteration:
     this->time = 0;
     
     double theta = this->params.time.semi_implicit_theta;
-    double Delta_t = this->params.time.step_size;
+    this->time_step_size = this->params.time.step_size;
+    if (this->time_step_size < EPSILON)
+    {
+        this->time_step_size = this->params.time.end_time/
+            pow(2., this->params.time.global_refinement_levels);
+    }
+    double Delta_t = this->time_step_size;
     
     this->write_solution();
     bool final_time_step = false;
@@ -432,7 +442,7 @@ start_time_iteration:
     do
     {
         ++this->time_step_counter;
-        time = this->params.time.step_size*time_step_counter; // Incrementing the time directly would accumulate errors
+        time = Delta_t*time_step_counter; // Incrementing the time directly would accumulate errors
         final_time_step = this->time > this->params.time.end_time - epsilon;
         std::cout << "Time step " << this->time_step_counter 
             << " at t=" << this->time << std::endl;

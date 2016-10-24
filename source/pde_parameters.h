@@ -90,6 +90,7 @@ namespace PDE
         {
             double end_time;
             double step_size;
+            double global_refinement_levels;
             double semi_implicit_theta;
         };
         
@@ -293,9 +294,15 @@ namespace PDE
                     Patterns::Double(0.),
                     "End the time-dependent simulation once this time is reached.");
                     
-                prm.declare_entry("step_size", "0.01",
-                    Patterns::Double(1.e-16),
-                    "End the time-dependent simulation once this time is reached.");
+                prm.declare_entry("step_size", "0.",
+                    Patterns::Double(0.),
+                    "End the time-dependent simulation once this time is reached."
+                    "\nSet to zero to instead use global_refinement_levels");
+                    
+                prm.declare_entry("global_refinement_levels", "4",
+                    Patterns::Integer(0),
+                    "If step_size is set to zero, then compute "
+                    "step_size = end_time/(2^global_refinement_levels)");
                     
                 prm.declare_entry("semi_implicit_theta", "0.51",
                     Patterns::Double(0., 1.),
@@ -481,6 +488,8 @@ namespace PDE
             {
                 p.time.end_time = prm.get_double("end_time");
                 p.time.step_size = prm.get_double("step_size");
+                p.time.global_refinement_levels = 
+                    prm.get_integer("global_refinement_levels");
                 p.time.semi_implicit_theta = prm.get_double("semi_implicit_theta");
             }    
             prm.leave_subsection();

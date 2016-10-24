@@ -14,8 +14,7 @@
 namespace MMS
 {
     using namespace dealii;
- 
-    const double PI = numbers::PI;
+    
     const double EPSILON = 1.e-14;
     
     
@@ -96,12 +95,22 @@ namespace MMS
             const double x = point[0];
             const double t = this->get_time();
             const double a = this->convection_velocity;
-            const double Pe = this->reference_peclet_number;
+            const double Pe_r = this->reference_peclet_number;
             const double g = this->dirichlet_value;
             const double beta = this->rate_to_steady;
             
-            double u = g*(1. + (exp(a*Pe) - exp(a*Pe*x))/
-                (1. - exp(a*Pe))*(1. - exp(-beta*t*t)));
+            double u;
+            
+            if (abs(a) < EPSILON)
+            {
+                u = g*(((exp(-beta*t*t) - 1.)*(Pe_r - Pe_r*x))/Pe_r + 1.);
+            }
+            else
+            {
+                u = g*(((exp(Pe_r*a) - exp(Pe_r*a*x))*(exp(-beta*t*t) - 1.))/
+                    (exp(Pe_r*a) - 1.) + 1.);    
+            }
+            
             
             if (t < EPSILON)
             {
@@ -147,15 +156,22 @@ namespace MMS
             const double x = point[0];
             const double t = this->get_time();
             const double a = this->convection_velocity;
-            const double Pe = this->reference_peclet_number;
+            const double Pe_r = this->reference_peclet_number;
             const double g = this->dirichlet_value;
             const double beta = this->rate_to_steady;
             
-            double temp = a*exp(Pe*a*x)*(exp(-beta*t*t) - 1.);
+            double s ;
             
-            double s = g/(exp(Pe*a) - 1.)*(temp*(1. - Pe*a)
-                - 2.*beta*t*exp(-beta*t*t)*(exp(Pe*a) - exp(Pe*a*x)));
-
+            if (abs(a) < EPSILON)
+            {
+                s = -(2.*beta*g*t*exp(-beta*t*t)*(Pe_r - Pe_r*x))/Pe_r;
+            }
+            else
+            {
+                s = -(2.*beta*g*t*exp(-beta*t*t)*(exp(Pe_r*a) - exp(Pe_r*a*x)))/
+                    (exp(Pe_r*a) - 1.);
+            }
+            
             return s;
         }
         
@@ -197,12 +213,21 @@ namespace MMS
             
             const double t = this->get_time();
             const double a = this->convection_velocity;
-            const double Pe = this->reference_peclet_number;
+            const double Pe_r = this->reference_peclet_number;
             const double g = this->dirichlet_value;
             const double beta = this->rate_to_steady;
             
-            double h = a*Pe*g*(1. - exp(-beta*t*t))/(1. - exp(Pe*a));
+            double h;
             
+            if (abs(a) < EPSILON)
+            {
+                h = g*(exp(-beta*t*t) - 1.);
+            }
+            else
+            {
+                h = (Pe_r*a*g*(exp(-beta*t*t) - 1.))/(exp(Pe_r*a) - 1.);
+            }
+
             return h;
         }
         
