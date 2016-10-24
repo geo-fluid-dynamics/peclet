@@ -72,6 +72,10 @@ namespace PDE
   
   const double EPSILON = 1.e-14;
   
+  struct SolverStatus
+  {
+      unsigned int last_step;
+  };
   
   template<int dim>
   class Model
@@ -86,7 +90,7 @@ namespace PDE
     void create_coarse_grid();
     void adaptive_refine();
     void setup_system(bool quiet = false);
-    void solve_time_step();
+    SolverStatus solve_time_step(bool quiet = false);
     void write_solution();
     
     Triangulation<dim>   triangulation;
@@ -217,7 +221,7 @@ namespace PDE
   }
 
   template<int dim>
-  void Model<dim>::solve_time_step()
+  SolverStatus Model<dim>::solve_time_step(bool quiet)
   {
     double tolerance = params.solver.tolerance;
     if (params.solver.normalize_tolerance)
@@ -258,8 +262,17 @@ namespace PDE
 
     constraints.distribute(solution);
 
-    std::cout << "     " << solver_control.last_step()
+    if (!quiet)
+    {
+        std::cout << "     " << solver_control.last_step()
               << " " << solver_name << " iterations." << std::endl;
+    }
+    
+    SolverStatus status;
+    status.last_step = solver_control.last_step();
+    
+    return status;
+    
   }
   
   #include "pde_1D_solution_table.h"
@@ -438,22 +451,61 @@ start_time_iteration:
     
     this->write_solution();
     bool final_time_step = false;
+    bool output_this_step = true;
     double epsilon = 1e-14;
+    
+    SolverStatus solver_status;
+    
     do
     {
         ++this->time_step_counter;
         time = Delta_t*time_step_counter; // Incrementing the time directly would accumulate errors
+        
+        // Set some flags that will control output for this step.
         final_time_step = this->time > this->params.time.end_time - epsilon;
-        std::cout << "Time step " << this->time_step_counter 
-            << " at t=" << this->time << std::endl;
+        
+        bool at_interval = false;
+        
+        if (this->params.output.time_step_interval == 1)
+        {
+            at_interval = true;
+        }
+        else if (this->params.output.time_step_interval != 0)
+        {
+            if ((time_step_counter % this->params.output.time_step_interval) == 0)
+            {
+                at_interval = true;
+            }
+        }
+        else
+        {
+            at_interval = false;
+        }
+        
+        if (at_interval)
+        {
+            output_this_step = true;
+        }
+        else
+        {
+            output_this_step = false;
+        }
+        
+        // Run the time step
+        if (output_this_step)
+        {
+            std::cout << "Time step " << this->time_step_counter 
+                << " at t=" << this->time << std::endl;    
+        }
 
+        // Add mass and convection-diffusion matrix terms to RHS
         this->mass_matrix.vmult(this->system_rhs, this->old_solution);
 
         this->convection_diffusion_matrix.vmult(tmp, this->old_solution);
         
         this->system_rhs.add(-(1. - theta) * Delta_t, tmp);
         
-        // Add source terms
+        // Add source terms to RHS
         source_function->set_time(this->time);
         VectorTools::create_right_hand_side(this->dof_handler,
                                             QGauss<dim>(fe.degree+1),
@@ -471,7 +523,7 @@ start_time_iteration:
         
         this->system_rhs += forcing_terms;
         
-        // Add natural boundary conditions
+        // Add natural boundary conditions to RHS
         for (unsigned int boundary = 0; boundary < boundary_count; boundary++)
         {
             if ((this->params.boundary_conditions.implementation_types[boundary] != "natural"))
@@ -506,7 +558,7 @@ start_time_iteration:
 
         }
         
-        //
+        // Make the system matrix and apply constraints
         system_matrix.copy_from(mass_matrix);
         
         system_matrix.add(theta * Delta_t, convection_diffusion_matrix);
@@ -540,18 +592,24 @@ start_time_iteration:
                 system_rhs);
         }
 
-        this->solve_time_step();
-
-        if ((this->params.output.time_step_interval == 1) ||
-            ((time_step_counter % this->params.output.time_step_interval) == 0) ||
-            final_time_step)
+        solver_status = this->solve_time_step(!output_this_step);
+        
+        if ((this->params.time.stop_when_steady) & (solver_status.last_step == 0))
+        {
+            std::cout << "Reached steady state at t = " << this->time << std::endl;
+            final_time_step = true;
+            output_this_step = true;
+        }
+            
+        if (output_this_step)
         {
             this->write_solution();
-        }
-
-        if (this->params.mms.enabled)
-        {
-            this->mms_append_error_table();
+            
+            if (this->params.mms.enabled)
+            {
+                this->mms_append_error_table();
+            }
+            
         }
         
         if ((time_step_counter == 1) &&
@@ -578,7 +636,9 @@ start_time_iteration:
             tmp.reinit(this->solution.size());
             
         }
+        
         this->old_solution = this->solution;
+        
     } while (!final_time_step);
     
     // Save data for FEFieldFunction so that it can be loaded for initialization

@@ -92,6 +92,7 @@ namespace PDE
             double step_size;
             double global_refinement_levels;
             double semi_implicit_theta;
+            bool stop_when_steady;
         };
         
         struct IterativeSolver
@@ -312,6 +313,11 @@ namespace PDE
                     " 0 = fully explicit; 0.5 = 'Crank-Nicholson'"
                     " ; 1 = fully implicit");
                     
+                prm.declare_entry("stop_when_steady", "false",
+                    Patterns::Bool(),
+                    "If true, then stop when solver reports zero iterations"
+                    " instead of waiting for end_time");
+                    
             }
             prm.leave_subsection();
             
@@ -491,6 +497,7 @@ namespace PDE
                 p.time.global_refinement_levels = 
                     prm.get_integer("global_refinement_levels");
                 p.time.semi_implicit_theta = prm.get_double("semi_implicit_theta");
+                p.time.stop_when_steady = prm.get_bool("stop_when_steady");
             }    
             prm.leave_subsection();
             
