@@ -357,7 +357,7 @@ namespace PDE
             prm.enter_subsection("mms");
             {
                 prm.declare_entry("enabled", "true", Patterns::Bool());
-                prm.declare_entry("initial_values_perturbation", "1.001",
+                prm.declare_entry("initial_values_perturbation", "1.000000001",
                     Patterns::Double());
                 prm.declare_entry("name", "ConstantConvection1D",
                     Patterns::Selection("ConstantConvection1D"));

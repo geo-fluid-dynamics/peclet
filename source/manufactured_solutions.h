@@ -59,7 +59,7 @@ namespace MMS
                 const double _convection_velocity = -1.,
                 const double _dirichlet_value = -1.,
                 const double _rate_to_steady = 10.,
-                double _initial_values_perturbation = 1.01
+                double _initial_values_perturbation = 1.000000001
                 )
                 :
                 BaseFunction<dim>
@@ -103,12 +103,15 @@ namespace MMS
             
             if (abs(a) < EPSILON)
             {
-                u = g*(((exp(-beta*t*t) - 1.)*(Pe_r - Pe_r*x))/Pe_r + 1.);
+                //u = g*(1. - (1. - exp(-beta*t*t))(1. - x));
+                u = -g*((exp(-beta*t*t) - 1.)*(x - 1.) - 1.);
             }
             else
             {
-                u = g*(((exp(Pe_r*a) - exp(Pe_r*a*x))*(exp(-beta*t*t) - 1.))/
-                    (exp(Pe_r*a) - 1.) + 1.);    
+                //u = g*(1. + ((exp⁡(Pe_r*a*x) - 1.)/(exp⁡(Pe_r*a)  - 1.) - 1.)*
+                //    (1. - exp⁡(-beta*t*t)));
+                    
+                u = -g*(((exp(Pe_r*a*x) - 1.)/(exp(Pe_r*a) - 1.) - 1.)*(exp(-beta*t*t) - 1.) - 1.);
             }
             
             
@@ -164,12 +167,14 @@ namespace MMS
             
             if (abs(a) < EPSILON)
             {
-                s = -(2.*beta*g*t*exp(-beta*t*t)*(Pe_r - Pe_r*x))/Pe_r;
+                //s = 2.*beta*g*t*exp⁡(-beta*t*t)*(x - 1.);
+                s = 2.*beta*g*t*exp(-beta*t*t)*(x - 1.);
             }
             else
             {
-                s = -(2.*beta*g*t*exp(-beta*t*t)*(exp(Pe_r*a) - exp(Pe_r*a*x)))/
-                    (exp(Pe_r*a) - 1.);
+                //s = 2.*beta*g*t*exp⁡(-beta*t*t)*((exp⁡(Pe_r*a*x) - 1.)/
+                //    (exp⁡(Pe_r*a) - 1.) - 1.);
+                s = 2.*beta*g*t*exp(-beta*t*t)*((exp(Pe_r*a*x) - 1.)/(exp(Pe_r*a) - 1.) - 1.);
             }
             
             return s;
@@ -221,11 +226,13 @@ namespace MMS
             
             if (abs(a) < EPSILON)
             {
-                h = g*(exp(-beta*t*t) - 1.);
+                //h = g/Pe_r*(exp(-beta*t*t) - 1.);
+                h = (g*(exp(-beta*t*t) - 1.))/Pe_r;
             }
             else
             {
-                h = (Pe_r*a*g*(exp(-beta*t*t) - 1.))/(exp(Pe_r*a) - 1.);
+                //h = a*g*(1. - exp(-betat*t))/(1. - exp(Pe_r*a));
+                h = (a*g*(exp(-beta*t*t) - 1.))/(exp(Pe_r*a) - 1.);
             }
 
             return h;
@@ -241,7 +248,7 @@ namespace MMS
                 const double _convection_velocity = -1.,
                 const double _dirichlet_value = -1.,
                 const double _rate_to_steady = 10.,
-                const double _initial_values_perturbation = 1.01
+                const double _initial_values_perturbation = 1.000000001
                 )
             :  
             
