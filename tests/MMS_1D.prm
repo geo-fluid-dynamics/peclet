@@ -1,0 +1,61 @@
+# Listing of Parameters
+# ---------------------
+
+subsection geometry
+  set dim = 1
+  set grid_name = hyper_cube
+  set sizes = 0., 1.
+end
+
+
+subsection mms
+  set enabled = true
+  set initial_values_perturbation = 1.000000001
+  set name = ConstantConvection1D
+  set double_arguments = -5, -2, 10.
+end
+
+subsection output
+  set write_solution_table = true
+  set write_solution_vtk = false
+  set time_step_interval = 2
+end
+
+
+subsection pde
+  set convection_velocity_function_name = MMS
+  set convection_velocity_function_double_arguments = -5
+  set reference_peclet_number = 0.5
+end
+
+
+subsection initial_values
+    set function_name = MMS
+end
+
+
+subsection boundary_conditions
+    set implementation_types = natural, strong
+    set function_names = MMS, MMS
+end
+
+
+subsection refinement
+  set boundaries_to_refine = 0
+  set initial_boundary_cycles = 0
+  set initial_global_cycles = 6
+end
+
+
+subsection time
+  set end_time = 1.
+  set global_refinement_levels = 6
+  set semi_implicit_theta = 0.5
+end
+
+
+subsection solver
+  set max_iterations = 10000
+  set normalize_tolerance = false
+  set tolerance           = 1e-9
+end
