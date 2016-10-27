@@ -1,24 +1,25 @@
-    // Manufactured solution and auxiliary conditions
-    double mms_convection_velocity = this->params.mms.double_arguments.front();
-    this->params.mms.double_arguments.pop_front();
+    // Manufactured solution and auxiliary conditions    
+    MMS::ConstantConvection1D::ManufacturedSolution mms_constant_convection_1D;
+    mms_constant_convection_1D.initialize_functions(this->params.mms.constants);
     
-    double mms_dirichlet_value = this->params.mms.double_arguments.front();
-    this->params.mms.double_arguments.pop_front();
+    MMS::VariableConvection2D::ManufacturedSolution mms_variable_convection_2D;
+    mms_variable_convection_2D.initialize_functions(this->params.mms.constants);
     
-    double mms_rate_to_steady = this->params.mms.double_arguments.front();
-    this->params.mms.double_arguments.pop_front();
-    
-    MMS::ConstantConvection1D::ManufacturedSolution<dim> mms_constant_convection_1D(
-            this->params.pde.reference_peclet_number,
-            mms_convection_velocity,
-            mms_dirichlet_value,
-            mms_rate_to_steady,
-            this->params.mms.initial_values_perturbation);
-            
     if (this->params.mms.enabled)
     {
-        assert(dim == 1); // @todo: Generalize MMS implementation
-        this->mms = &mms_constant_convection_1D;
+        if (dim == 1)
+        {
+            this->mms = &mms_constant_convection_1D;
+        }
+        else if (dim == 2)
+        {
+            this->mms = &mms_variable_convection_2D;
+        }
+        else
+        {
+            Assert(false, ExcNotImplemented());
+        }
+        
     }
     
     // Convection velocity function

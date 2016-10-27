@@ -121,7 +121,7 @@ namespace PDE
     Function<dim>* convection_velocity_function;
     
     // @todo: Generalize MMS (presently only MMS::ConstantConvection1D)
-    MMS::ConstantConvection1D::ManufacturedSolution<dim>* mms;
+    MMS::BaseManufacturedSolution<dim>* mms;
     
     void mms_append_error_table();
     void mms_write_error_table();
@@ -314,7 +314,6 @@ namespace PDE
         VectorTools::L2_norm);
         
     double L2_norm_error = difference_per_cell.l2_norm();
-    // Note: Wolfgang discourages checking the L2 norm for the heat equation.
     
     VectorTools::integrate_difference(
         this->dof_handler,

@@ -1,4 +1,5 @@
 #include <deal.II/base/function.h>
+#include <deal.II/base/function_parser.h>
 #include <numeric>
 
 /*
@@ -16,282 +17,164 @@ namespace MMS
     using namespace dealii;
     
     const double EPSILON = 1.e-14;
+
+    template<int dim>
+    class InitialValuesFunction : public Function<dim>
+    {
+    public:
+        InitialValuesFunction<dim>()
+        :
+        Function<dim>()
+        {}
+        
+        FunctionParser<dim>* solution_function;
+        
+        double perturbation;
+            /*
+            Allow the user to perturb the initial values.
+            SAND2000-1444 says to multiply initial values by a factor 
+            "not too close to one" to avoid hiding coding mistakes.
+            */
+        
+        virtual double value(
+            const Point<dim> &point,
+            const unsigned int component = 0) const;
+    };
+    
+    template<int dim>
+    double InitialValuesFunction<dim>::value(
+        const Point<dim> &point,
+        const unsigned int /* component */) const
+    {
+        double u = this->solution_function->value(point);
+        u *= this->perturbation;
+        return u;
+    }
+    
+    
+    template <int dim>
+    class BaseManufacturedSolution
+    {
+    public:
+        BaseManufacturedSolution() {}
+        
+        FunctionParser<dim> solution_function;
+        FunctionParser<dim> source_function;
+        FunctionParser<dim> neumann_boundary_function;
+        FunctionParser<dim> convection_velocity_function(3);
+        
+        InitialValuesFunction<dim> initial_values_function;
+        
+        void set_time(const double t);
+        
+        virtual void initialize_functions(const std::vector<double> constants);
+    };
+
+    template <int dim>
+    void BaseManufacturedSolution<dim>::set_time(const double t)
+    {
+        this->solution_function.set_time(t);
+        this->source_function.set_time(t);
+        this->neumann_boundary_function.set_time(t);
+    }
     
     
     namespace ConstantConvection1D
     {
-        
-        template <int dim>
-        class BaseFunction : public Function<dim>
+        class ManufacturedSolution : public BaseManufacturedSolution<1>
         {
         public:
-            BaseFunction
-                (
-                double _reference_peclet_number = 1.,
-                double _convection_velocity = -1.,
-                double _dirichlet_value = -1.,
-                double _rate_to_steady = 10.
-                )
-                : 
-                Function<dim>(),
-                reference_peclet_number(_reference_peclet_number),
-                convection_velocity(_convection_velocity),
-                dirichlet_value(_dirichlet_value),
-                rate_to_steady(_rate_to_steady)
-            {}
-        
-        protected:
-            const double reference_peclet_number;
-            const double convection_velocity;
-            const double dirichlet_value;
-            const double rate_to_steady;
-        
+            ManufacturedSolution() : BaseManufacturedSolution<1>() {};
+            
+            virtual void initialize_functions(const std::vector<double> c);
         };
         
-        template <int dim>
-        class SolutionFunction : public BaseFunction<dim>
+        void ManufacturedSolution::initialize_functions(
+            const std::vector<double> c)
         {
-        public:
             
-            SolutionFunction
-                (
-                const double _reference_peclet_number = 1.,
-                const double _convection_velocity = -1.,
-                const double _dirichlet_value = -1.,
-                const double _rate_to_steady = 10.,
-                double _initial_values_perturbation = 1.000000001
-                )
-                :
-                BaseFunction<dim>
-                    (
-                    _reference_peclet_number,
-                    _convection_velocity,
-                    _dirichlet_value,
-                    _rate_to_steady
-                    ),
-                initial_values_perturbation(_initial_values_perturbation)
-            {}
+            std::string variables = "x,t";
+            std::string expression;
+            std::map<std::string,double> constants;
             
-            virtual double value(
-                const Point<dim> &point,
-                const unsigned int component = 0) const;
-                
-        private:
-            const double initial_values_perturbation;
-                /*
-                Allow the user to perturb the initial values.
-                SAND2000-1444 says to multiply initial values by a factor 
-                "not too close to one" to avoid hiding coding mistakes.
-                */
-        };
-
-        template <int dim>
-        double SolutionFunction<dim>::value
-            (
-            const Point<dim> &point,
-            const unsigned int /* component */
-            ) const
-        {
-            const double x = point[0];
-            const double t = this->get_time();
-            const double a = this->convection_velocity;
-            const double Pe_r = this->reference_peclet_number;
-            const double g = this->dirichlet_value;
-            const double beta = this->rate_to_steady;
+            constants["Per"] = c[0];
             
-            double u;
+            double convection_velocity = c[1];
+            constants["a"] = convection_velocity;
             
-            if (abs(a) < EPSILON)
-            {
-                //u = g*(1. - (1. - exp(-beta*t*t))(1. - x));
-                u = -g*((exp(-beta*t*t) - 1.)*(x - 1.) - 1.);
-            }
-            else
-            {
-                //u = g*(1. + ((exp⁡(Pe_r*a*x) - 1.)/(exp⁡(Pe_r*a)  - 1.) - 1.)*
-                //    (1. - exp⁡(-beta*t*t)));
-                    
-                u = -g*(((exp(Pe_r*a*x) - 1.)/(exp(Pe_r*a) - 1.) - 1.)*(exp(-beta*t*t) - 1.) - 1.);
-            }
+            constants["g"] = c[2];
+            constants["beta"] = c[3];
             
-            
-            if (t < EPSILON)
-            {
-                u *= this->initial_values_perturbation;    
-            }
-            
-            return u;
-        }
-        
-        template <int dim>
-        class SourceFunction : public BaseFunction<dim>
-        {
-        public:
-            SourceFunction
-                (
-                const double _reference_peclet_number = 1.,
-                const double _convection_velocity = -1.,
-                const double _dirichlet_value = -1.,
-                const double _rate_to_steady = 10.
-                )
-                :
-                BaseFunction<dim>
-                    (
-                    _reference_peclet_number,
-                    _convection_velocity,
-                    _dirichlet_value,
-                    _rate_to_steady
-                    )
-            {}
-        
-            virtual double value(
-                const Point<dim> &point,
-                const unsigned int component = 0) const;
-        };
-        
-        template <int dim>
-        double SourceFunction<dim>::value
-            (
-            const Point<dim> &point,
-            const unsigned int /* component */
-            ) const
-        {
-            const double x = point[0];
-            const double t = this->get_time();
-            const double a = this->convection_velocity;
-            const double Pe_r = this->reference_peclet_number;
-            const double g = this->dirichlet_value;
-            const double beta = this->rate_to_steady;
-            
-            double s ;
-            
-            if (abs(a) < EPSILON)
-            {
-                //s = 2.*beta*g*t*exp⁡(-beta*t*t)*(x - 1.);
-                s = 2.*beta*g*t*exp(-beta*t*t)*(x - 1.);
-            }
-            else
-            {
-                //s = 2.*beta*g*t*exp⁡(-beta*t*t)*((exp⁡(Pe_r*a*x) - 1.)/
-                //    (exp⁡(Pe_r*a) - 1.) - 1.);
-                s = 2.*beta*g*t*exp(-beta*t*t)*((exp(Pe_r*a*x) - 1.)/(exp(Pe_r*a) - 1.) - 1.);
-            }
-            
-            return s;
-        }
-        
-        template <int dim>
-        class NeumannBoundaryFunction : public BaseFunction<dim>
-        {
-        public:
-            NeumannBoundaryFunction
-                (
-                const double _reference_peclet_number = 1.,
-                const double _convection_velocity = -1.,
-                const double _dirichlet_value = -1.,
-                const double _rate_to_steady = 10.
-                )
-                :
-                BaseFunction<dim>
-                    (
-                    _reference_peclet_number,
-                    _convection_velocity,
-                    _dirichlet_value,
-                    _rate_to_steady
-                    )
-            {}
-            
-            virtual double value(
-                const Point<dim> &point,
-                const unsigned int component = 0) const;
-        };
-        
-        template <int dim>
-        double NeumannBoundaryFunction<dim>::value
-            (
-            const Point<dim> &point,
-            const unsigned int /* component */
-            ) const
-        {
-            const double x = point[0];
-            assert(x < EPSILON);
-            
-            const double t = this->get_time();
-            const double a = this->convection_velocity;
-            const double Pe_r = this->reference_peclet_number;
-            const double g = this->dirichlet_value;
-            const double beta = this->rate_to_steady;
-            
-            double h;
-            
-            if (abs(a) < EPSILON)
-            {
-                //h = g/Pe_r*(exp(-beta*t*t) - 1.);
-                h = (g*(exp(-beta*t*t) - 1.))/Pe_r;
-            }
-            else
-            {
-                //h = a*g*(1. - exp(-betat*t))/(1. - exp(Pe_r*a));
-                h = (a*g*(exp(-beta*t*t) - 1.))/(exp(Pe_r*a) - 1.);
-            }
-
-            return h;
-        }
-        
-        template <int dim>
-        class ManufacturedSolution
-        {
-        public:
-            ManufacturedSolution
-                (
-                const double _reference_peclet_number = 1.,
-                const double _convection_velocity = -1.,
-                const double _dirichlet_value = -1.,
-                const double _rate_to_steady = 10.,
-                const double _initial_values_perturbation = 1.000000001
-                )
-            :  
-            
-                solution_function(SolutionFunction<dim>(
-                    _reference_peclet_number,
-                    _convection_velocity,
-                    _dirichlet_value,
-                    _rate_to_steady,
-                    _initial_values_perturbation)),
-                    
-                source_function(SourceFunction<dim>(
-                    _reference_peclet_number,
-                    _convection_velocity,
-                    _dirichlet_value,
-                    _rate_to_steady)),
-                    
-                neumann_boundary_function(NeumannBoundaryFunction<dim>(
-                    _reference_peclet_number,
-                    _convection_velocity,
-                    _dirichlet_value,
-                    _rate_to_steady)),
-                    
-                convection_velocity_function(ConstantFunction<dim>(_convection_velocity))
-            {}  
-            
-            SolutionFunction<dim> solution_function;
-            SourceFunction<dim> source_function;
-            NeumannBoundaryFunction<dim> neumann_boundary_function;
-            
-            ConstantFunction<dim> convection_velocity_function;
-            
-            void set_time(double t);
-            
-        };
+            this->initial_values_function.perturbation = c[4];
     
-        template <int dim>
-        void ManufacturedSolution<dim>::set_time(double t)
-        {
-            this->solution_function.set_time(t);
-            this->source_function.set_time(t);
-            this->neumann_boundary_function.set_time(t);
+            // Solution values
+            if (abs(convection_velocity) < EPSILON)
+            {
+                expression = "-g*((exp(-beta*t^2) - 1)*(x - 1) - 1)";
+            }
+            else
+            {
+                expression = "-g*(((exp(Per*a*x) - 1)/(exp(Per*a) - 1) - 1)*"
+                    "(exp(-beta*t^2) - 1) - 1)";
+            }
+    
+            this->solution_function.initialize(variables, expression, constants, true);
+            
+            // Initial values function
+            this->initial_values_function.solution_function = &this->solution_function;
+            
+            // Source term
+            if (abs(convection_velocity) < EPSILON)
+            {
+                expression = "2*beta*g*t*exp(-beta*t^2)*(x - 1)";
+            }
+            else
+            {
+                expression = "2*beta*g*t*exp(-beta*t^2)*((exp(Per*a*x) - 1)/"
+                    "(exp(Per*a) - 1) - 1)";
+            }
+            
+            this->source_function.initialize(variables, expression, constants, true);
+            
+            // Neumann boundary values
+            if (abs(convection_velocity) < EPSILON)
+            {
+                expression = "(g*(exp(-beta*t^2) - 1))/Per";
+            }
+            else
+            {
+                expression = "(a*g*(exp(-beta*t^2) - 1))/(exp(Per*a) - 1)";
+            }
+            
+            this->neumann_boundary_function.initialize(variables, expression, 
+                constants, true);
+                
+            // Convection velocity
+            expression = "a; 0; 0";
+            this->convection_velocity_function.initialize(variables, expressions, constants);
+            
         }
+
+    }
+    
+    namespace VariableConvection2D
+    {
+        class ManufacturedSolution : public BaseManufacturedSolution<2>
+        {
+        public:
+            ManufacturedSolution() : BaseManufacturedSolution<2>() {};
+            
+            virtual void initialize_functions(const std::vector<double> c);
+        };
         
+        void ManufacturedSolution::initialize_functions(
+            const std::vector<double> c)
+        {
+            
+            Assert(false, ExcNotImplemented());
+            
+        }
+
     }
     
 }

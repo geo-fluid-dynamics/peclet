@@ -113,9 +113,8 @@ namespace PDE
         struct MMS
         {
             bool enabled;
-            double initial_values_perturbation;
             std::string name;
-            std::list<double> double_arguments;
+            std::vector<double> constants;
         };
         
         struct StructuredParameters
@@ -357,14 +356,14 @@ namespace PDE
             prm.enter_subsection("mms");
             {
                 prm.declare_entry("enabled", "true", Patterns::Bool());
-                prm.declare_entry("initial_values_perturbation", "1.000000001",
-                    Patterns::Double());
                 prm.declare_entry("name", "ConstantConvection1D",
                     Patterns::Selection("ConstantConvection1D"));
-                prm.declare_entry("double_arguments", "-1., -1., 10.",
+                prm.declare_entry("constants", "1., -1., -1., 10., 1.000000001",
                     Patterns::List(Patterns::Double()),
                     "ConstantConvection1D:"
-                    "\tdouble_arguments: convection_velocity, dirichlet_value, rate_to_steady");
+                    "\tdouble_arguments: reference_peclet_number, "
+                    "convection_velocity, dirichlet_value, rate_to_steady, "
+                    "initial_values_perturbation");
             }
             prm.leave_subsection();
             
@@ -522,18 +521,8 @@ namespace PDE
             prm.enter_subsection("mms");
             {
                 p.mms.enabled = prm.get_bool("enabled");
-                p.mms.initial_values_perturbation = 
-                    prm.get_double("initial_values_perturbation");
-                    
                 p.mms.name = prm.get("name");
-                
-                std::vector<double> vector = get_vector<double>(prm, "double_arguments");
-                
-                for (auto v : vector)
-                {
-                    p.mms.double_arguments.push_back(v)    ;
-                }
-
+                p.mms.constants = get_vector<double>(prm, "constants");
             }
             prm.leave_subsection();
             
