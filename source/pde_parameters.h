@@ -6,6 +6,7 @@
 #include <fstream>
 
 #include <deal.II/base/parameter_handler.h>
+#include <deal.II/base/parsed_function.h>
 
 /*
     
@@ -35,10 +36,17 @@ namespace PDE
 {
     // @todo: This should be a Parameters class instead.
     //        In the beginning I didn't realize how involved it would become.
+    
+    using namespace dealii;
+    
     namespace Parameters
     {   
-        using namespace dealii;
     
+        struct Meta
+        {
+            unsigned int dim;
+        };
+       
         struct ConvectionDiffusionEquation
         {
             double reference_peclet_number;
@@ -113,12 +121,12 @@ namespace PDE
         struct MMS
         {
             bool enabled;
-            std::string name;
-            std::vector<double> constants;
+            double initial_values_perturbation;
         };
         
         struct StructuredParameters
         {
+            Meta meta;
             ConvectionDiffusionEquation pde;
             BoundaryConditions boundary_conditions;
             InitialValues initial_values;
@@ -128,10 +136,17 @@ namespace PDE
             IterativeSolver solver;
             Output output;
             MMS mms;
-        };
-      
+        };    
+    
         void declare(ParameterHandler &prm)
         {
+            
+            prm.enter_subsection("meta");
+            {
+                prm.declare_entry("dim", "1", Patterns::Integer(1));
+            }
+            prm.leave_subsection();
+            
             prm.enter_subsection("pde");
             {
                 prm.declare_entry("reference_peclet_number", "1.",
@@ -227,7 +242,7 @@ namespace PDE
                     "\n\t- The function values will only be popped during initialization."
                     "\n\t- Boundaries will be handled in order of their ID's."
                     "\n\t- If a function needs a Point as an argument, then it will pop doubles to make the point in order."); 
-    
+
             }
             prm.leave_subsection ();
             
@@ -355,18 +370,12 @@ namespace PDE
             
             prm.enter_subsection("mms");
             {
-                prm.declare_entry("enabled", "true", Patterns::Bool());
-                prm.declare_entry("name", "ConstantConvection1D",
-                    Patterns::Selection("ConstantConvection1D"));
-                prm.declare_entry("constants", "1., -1., -1., 10., 1.000000001",
-                    Patterns::List(Patterns::Double()),
-                    "ConstantConvection1D:"
-                    "\tdouble_arguments: reference_peclet_number, "
-                    "convection_velocity, dirichlet_value, rate_to_steady, "
-                    "initial_values_perturbation");
+                prm.declare_entry("enabled", "false", Patterns::Bool());
+                prm.declare_entry("initial_values_perturbation", "1.000000001",
+                    Patterns::Double(0.));
             }
             prm.leave_subsection();
-            
+
         }
     
     
@@ -386,150 +395,63 @@ namespace PDE
         }    
         
         
-        StructuredParameters get_parameters(const std::string parameter_file="")
+        Meta read_meta_parameters(const std::string parameter_file="")
         {
+            Meta mp;
+            
             ParameterHandler prm;
             declare(prm);
+            
+            // Dummy parameters that are missing
+            Functions::ParsedFunction<1> dummy;
+            
+            prm.enter_subsection("mms");
+            {
+                prm.declare_entry("enabled", "true", Patterns::Bool());
+                
+                prm.enter_subsection("solution");
+                {
+                    dummy.declare_parameters(prm);
+                }
+                prm.leave_subsection();
+            
+                prm.enter_subsection("source");
+                {
+                    dummy.declare_parameters(prm);
+                }
+                prm.leave_subsection();
+                
+                prm.enter_subsection("neumann");
+                {
+                    dummy.declare_parameters(prm);
+                }
+                prm.leave_subsection();
+            
+                prm.enter_subsection("velocity");
+                {
+                    dummy.declare_parameters(prm);
+                }
+                prm.leave_subsection();
+            }
+            prm.leave_subsection();
+            
             
             if (parameter_file != "")
             {
                 prm.read_input(parameter_file);    
             }
-            
-            // Print a log file of all the ParameterHandler parameters
-            std::ofstream parameter_log_file("used_parameters.prm");
-            assert(parameter_log_file.good());
-            prm.print_parameters(parameter_log_file, ParameterHandler::Text);
-            
-            // Structure the parameters so that we can stop working with ParameterHandler
-            StructuredParameters p;
-            
-            
-            prm.enter_subsection("geometry");
-            {
-                p.geometry.dim = prm.get_integer("dim");
-                p.geometry.grid_name = prm.get("grid_name");
-                p.geometry.sizes = get_vector<double>(prm, "sizes");
-                p.geometry.transformations = get_vector<double>(prm, "transformations");    
-            }
-            prm.leave_subsection();
-            
-
-            prm.enter_subsection("pde");
-            {
-                p.pde.reference_peclet_number = 
-                    prm.get_double("reference_peclet_number");    
-                p.pde.convection_velocity_function_name = 
-                    prm.get("convection_velocity_function_name");
-                
-                std::vector<double> vector = get_vector<double>(
-                    prm, "convection_velocity_function_double_arguments");
-                
-                for (auto v : vector)
-                {
-                    p.pde.convection_velocity_function_double_arguments.push_back(v);
-                }
-
-            }
-            prm.leave_subsection();
-            
-            
-            prm.enter_subsection("boundary_conditions");
-            {
-                p.boundary_conditions.implementation_types = get_vector<std::string>(prm, "implementation_types");
-                p.boundary_conditions.function_names = get_vector<std::string>(prm, "function_names");
-                
-                std::vector<double> vector = get_vector<double>(prm, "function_double_arguments");
-                
-                for (auto v : vector)
-                {
-                    p.boundary_conditions.function_double_arguments.push_back(v);
-                }
-                
-            }    
-            prm.leave_subsection();
-            
-            
-            prm.enter_subsection("initial_values");
-            {               
-                p.initial_values.function_name = prm.get("function_name"); 
-                
-                std::vector<double> vector = get_vector<double>(prm, "function_double_arguments");
-                
-                for (auto v : vector)
-                {
-                    p.initial_values.function_double_arguments.push_back(v)    ;
-                }
-                
-            }    
-            prm.leave_subsection();
-            
-            
-            prm.enter_subsection("refinement");
-            {
-                
-                p.refinement.initial_global_cycles = prm.get_integer("initial_global_cycles");
-                p.refinement.initial_boundary_cycles = prm.get_integer("initial_boundary_cycles");
-                p.refinement.boundaries_to_refine = get_vector<unsigned int>(prm, "boundaries_to_refine");
-                
-                prm.enter_subsection("adaptive");
-                {
-                    p.refinement.adaptive.initial_cycles = prm.get_integer("initial_cycles");
-                    p.refinement.adaptive.max_level = prm.get_integer("max_level");
-                    p.refinement.adaptive.max_cells = prm.get_integer("max_cells");
-                    p.refinement.adaptive.interval = prm.get_integer("interval");
-                    p.refinement.adaptive.cycles_at_interval = prm.get_integer("cycles_at_interval");
-                    p.refinement.adaptive.refine_fraction = prm.get_double("refine_fraction");
-                    p.refinement.adaptive.coarsen_fraction = prm.get_double("coarsen_fraction");    
-                }        
-                
-                prm.leave_subsection();
-                
-            }
-            prm.leave_subsection();
-                
-                
-            prm.enter_subsection("time");
-            {
-                p.time.end_time = prm.get_double("end_time");
-                p.time.step_size = prm.get_double("step_size");
-                p.time.global_refinement_levels = 
-                    prm.get_integer("global_refinement_levels");
-                p.time.semi_implicit_theta = prm.get_double("semi_implicit_theta");
-                p.time.stop_when_steady = prm.get_bool("stop_when_steady");
-            }    
-            prm.leave_subsection();
-            
-            
-            prm.enter_subsection("solver");
-            {
-                p.solver.method = prm.get("method");
-                p.solver.max_iterations = prm.get_integer("max_iterations");
-                p.solver.tolerance = prm.get_double("tolerance");
-                p.solver.normalize_tolerance = prm.get_bool("normalize_tolerance");
-            }    
-            prm.leave_subsection(); 
-            
-            prm.enter_subsection("output");
-            {
-                p.output.write_solution_vtk = prm.get_bool("write_solution_vtk");
-                p.output.write_solution_table = prm.get_bool("write_solution_table");
-                p.output.time_step_interval = prm.get_integer("time_step_interval");
-            }
-            prm.leave_subsection();
-            
-            prm.enter_subsection("mms");
-            {
-                p.mms.enabled = prm.get_bool("enabled");
-                p.mms.name = prm.get("name");
-                p.mms.constants = get_vector<double>(prm, "constants");
-            }
-            prm.leave_subsection();
-            
-            return p;
-        }
      
-    }
+            
+            prm.enter_subsection("meta");
+            {
+                mp.dim = prm.get_integer("dim");  
+            }
+            prm.leave_subsection();
+
+            return mp;
+        }
+        
+    }    
     
 }
 

@@ -63,7 +63,6 @@
 #include "output.h"
 #include "my_matrix_creator.h"
 #include "my_vector_tools.h"
-#include "manufactured_solutions.h"
 
 
 namespace PDE
@@ -76,6 +75,8 @@ namespace PDE
   {
       unsigned int last_step;
   };
+  
+  #include "mms.h"
   
   template<int dim>
   class Model
@@ -120,8 +121,14 @@ namespace PDE
     double reference_peclet_number;
     Function<dim>* convection_velocity_function;
     
-    // @todo: Generalize MMS (presently only MMS::ConstantConvection1D)
-    MMS::BaseManufacturedSolution<dim>* mms;
+    Functions::ParsedFunction<dim> mms_solution;
+    MMS::InitialValuesFunction<dim> mms_initial_values;
+    Functions::ParsedFunction<dim> mms_source;
+    Functions::ParsedFunction<dim> mms_neumann;
+    Functions::ParsedFunction<dim>* mms_velocity;
+    Functions::ParsedFunction<dim> mms_velocity_1D;
+    Functions::ParsedFunction<dim> mms_velocity_2D;
+    Functions::ParsedFunction<dim> mms_velocity_3D;
     
     void mms_append_error_table();
     void mms_write_error_table();
@@ -135,18 +142,19 @@ namespace PDE
     
   };
 
+  #include "pde_model_read_parameters.h"
+  
   template<int dim>
   Model<dim>::Model()
     :
-    params(Parameters::get_parameters()),
     fe(1),
-    dof_handler(triangulation)
-  {}
-  
-  template<int dim>
-  void Model<dim>::read_parameters(std::string file_path)
+    dof_handler(this->triangulation),
+    mms_initial_values(&this->mms_solution),
+    mms_velocity_1D(1),
+    mms_velocity_2D(2),
+    mms_velocity_3D(3)
   {
-    this->params = Parameters::get_parameters(file_path);
+      this->read_parameters();
   }
   
   #include "pde_model_grid.h"
@@ -301,14 +309,14 @@ namespace PDE
   {
     assert(this->params.mms.enabled);
     
-    this->mms->set_time(this->time);
+    this->mms_solution.set_time(this->time);
     
     Vector<float> difference_per_cell(triangulation.n_active_cells());
     
     VectorTools::integrate_difference(
         this->dof_handler,
         this->solution,
-        this->mms->solution_function,
+        this->mms_solution,
         difference_per_cell,
         QGauss<dim>(3),
         VectorTools::L2_norm);
@@ -318,7 +326,7 @@ namespace PDE
     VectorTools::integrate_difference(
         this->dof_handler,
         this->solution,
-        this->mms->solution_function,
+        this->mms_solution,
         difference_per_cell,
         QGauss<dim>(3),
         VectorTools::L1_norm);

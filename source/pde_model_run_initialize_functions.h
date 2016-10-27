@@ -1,27 +1,4 @@
-    // Manufactured solution and auxiliary conditions    
-    MMS::ConstantConvection1D::ManufacturedSolution mms_constant_convection_1D;
-    mms_constant_convection_1D.initialize_functions(this->params.mms.constants);
-    
-    MMS::VariableConvection2D::ManufacturedSolution mms_variable_convection_2D;
-    mms_variable_convection_2D.initialize_functions(this->params.mms.constants);
-    
-    if (this->params.mms.enabled)
-    {
-        if (dim == 1)
-        {
-            this->mms = &mms_constant_convection_1D;
-        }
-        else if (dim == 2)
-        {
-            this->mms = &mms_variable_convection_2D;
-        }
-        else
-        {
-            Assert(false, ExcNotImplemented());
-        }
-        
-    }
-    
+ 
     // Convection velocity function
     
     std::vector<double> constant_convection_velocity(dim);
@@ -41,9 +18,7 @@
     if (this->params.pde.convection_velocity_function_name == "MMS")
     {
         assert(this->params.mms.enabled);
-        assert(dim == 1);
-        this->convection_velocity_function = 
-            &this->mms->convection_velocity_function;
+        this->convection_velocity_function = this->mms_velocity;
     }
     else if (this->params.pde.convection_velocity_function_name == "constant")
     {
@@ -144,7 +119,10 @@
     else if (this->params.initial_values.function_name == "MMS")
     { 
         assert(this->params.mms.enabled);
-        initial_values_function = &this->mms->solution_function;
+        // @todo: How to perturb initial values for MMS?
+        //        Need to scale this function by a factor.
+        initial_values_function = &this->mms_initial_values;
+        this->mms_initial_values.perturbation = this->params.mms.initial_values_perturbation;
                         
     }
     
@@ -155,7 +133,7 @@
     
     if (this->params.mms.enabled)
     {
-        source_function = &this->mms->source_function;
+        source_function = &this->mms_source;
     }
     
     
@@ -201,12 +179,11 @@
             assert(this->params.mms.enabled);
             if (boundary_type == "strong")
             {
-                boundary_functions.push_back(&this->mms->solution_function);
+                boundary_functions.push_back(&this->mms_solution);
             }
             else if (boundary_type == "natural")
             {
-                boundary_functions.push_back(
-                    &this->mms->neumann_boundary_function);
+                boundary_functions.push_back(&this->mms_neumann);
             }
 
         }
