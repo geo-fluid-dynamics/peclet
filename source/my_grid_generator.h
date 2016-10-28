@@ -339,6 +339,14 @@ namespace MyGridGenerator
                 sizes[1],
                 true);
         }
+        else if (grid_name == "hyper_rectangle")
+        {
+            GridGenerator::hyper_rectangle(
+                triangulation,
+                {sizes[0], sizes[1]},
+                {sizes[2], sizes[3]},
+                true);
+        }
         else if (grid_name == "hyper_shell")
         {
             Point<dim> center; 

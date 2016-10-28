@@ -167,7 +167,7 @@ namespace PDE
                     Patterns::Integer(1, 3));
                     
                 prm.declare_entry("grid_name", "hyper_shell",
-                     Patterns::Selection("hyper_cube | hyper_shell | hemisphere_cylinder_shell"
+                     Patterns::Selection("hyper_rectangle | hyper_cube | hyper_shell | hemisphere_cylinder_shell"
                                       " | cylinder | cylinder_with_split_boundaries"
                                       " | hyper_cube_with_cylindrical_hole"),
                      "Select the name of the geometry and grid to generate."
