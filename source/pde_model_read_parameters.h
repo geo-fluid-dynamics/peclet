@@ -15,7 +15,6 @@
         */
         prm.enter_subsection("mms");
         {
-            prm.declare_entry("enabled", "true", Patterns::Bool());
             
             prm.enter_subsection("solution");
             {
@@ -71,7 +70,6 @@
         
         prm.enter_subsection("geometry");
         {
-            this->params.geometry.dim = prm.get_integer("dim");
             this->params.geometry.grid_name = prm.get("grid_name");
             this->params.geometry.sizes = Parameters::get_vector<double>(prm, "sizes");
             this->params.geometry.transformations = 
@@ -84,17 +82,19 @@
         {
             this->params.pde.reference_peclet_number = 
                 prm.get_double("reference_peclet_number");    
+                
             this->params.pde.convection_velocity_function_name = 
                 prm.get("convection_velocity_function_name");
             
-            std::vector<double> vector = Parameters::get_vector<double>(
-                prm, "convection_velocity_function_double_arguments");
+            this->params.pde.convection_velocity_function_double_arguments = 
+                Parameters::get_vector<double>(prm, "convection_velocity_function_double_arguments");
+                
+            this->params.pde.source_function_name = 
+                prm.get("source_function_name");
             
-            for (auto v : vector)
-            {
-                this->params.pde.convection_velocity_function_double_arguments.push_back(v);
-            }
-
+            this->params.pde.source_function_double_arguments = 
+                Parameters::get_vector<double>(prm, "source_function_double_arguments");
+                
         }
         prm.leave_subsection();
         

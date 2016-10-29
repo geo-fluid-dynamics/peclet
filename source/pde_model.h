@@ -153,9 +153,7 @@ namespace PDE
     mms_velocity_1D(1),
     mms_velocity_2D(2),
     mms_velocity_3D(3)
-  {
-      this->read_parameters();
-  }
+  {}
   
   #include "pde_model_grid.h"
   

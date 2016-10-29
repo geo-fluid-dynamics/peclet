@@ -50,8 +50,12 @@ namespace PDE
         struct ConvectionDiffusionEquation
         {
             double reference_peclet_number;
+            
             std::string convection_velocity_function_name;
-            std::list<double> convection_velocity_function_double_arguments; 
+            std::vector<double> convection_velocity_function_double_arguments; 
+            
+            std::string source_function_name;
+            std::vector<double> source_function_double_arguments; 
         };
     
         struct BoundaryConditions
@@ -143,19 +147,24 @@ namespace PDE
             
             prm.enter_subsection("meta");
             {
-                prm.declare_entry("dim", "1", Patterns::Integer(1));
+                prm.declare_entry("dim", "1", Patterns::Integer(1, 3));
             }
             prm.leave_subsection();
             
             prm.enter_subsection("pde");
             {
-                prm.declare_entry("reference_peclet_number", "1.",
-                    Patterns::Double(0.));
+                prm.declare_entry("reference_peclet_number", "1.", Patterns::Double(0.));
                     
-                prm.declare_entry("convection_velocity_function_name", "MMS",
-                    Patterns::List(Patterns::Selection("MMS | constant | ramp")));
+                prm.declare_entry("convection_velocity_function_name", "constant",
+                    Patterns::List(Patterns::Selection("MMS | constant")));
                     
-                prm.declare_entry("convection_velocity_function_double_arguments", "",
+                prm.declare_entry("convection_velocity_function_double_arguments", "1.",
+                    Patterns::List(Patterns::Double()));
+                    
+                prm.declare_entry("source_function_name", "constant",
+                    Patterns::List(Patterns::Selection("MMS | constant")));
+                    
+                prm.declare_entry("source_function_double_arguments", "0.",
                     Patterns::List(Patterns::Double()));
             }
             prm.leave_subsection();
@@ -163,8 +172,6 @@ namespace PDE
             
             prm.enter_subsection ("geometry");
             {
-                prm.declare_entry("dim", "2",
-                    Patterns::Integer(1, 3));
                     
                 prm.declare_entry("grid_name", "hyper_shell",
                      Patterns::Selection("hyper_rectangle | hyper_cube | hyper_shell | hemisphere_cylinder_shell"
@@ -230,11 +237,11 @@ namespace PDE
                     Patterns::List(Patterns::Selection("natural | strong")),
                     "Type of boundary conditions to apply to each boundary");  
                     
-                prm.declare_entry("function_names", "MMS, MMS",
+                prm.declare_entry("function_names", "constant, constant",
                     Patterns::List(Patterns::Selection("constant | MMS | ramp ")),
                     "Names of functions to apply to each boundary");
                     
-                prm.declare_entry("function_double_arguments", "",
+                prm.declare_entry("function_double_arguments", "1., -1.",
                     Patterns::List(Patterns::Double()),
                     "This list of doubles will be popped from front to back as needed."
                     "\nThis puts some work on the user to greatly ease development."
@@ -249,12 +256,12 @@ namespace PDE
             
             prm.enter_subsection ("refinement");
             {
-                prm.declare_entry("initial_global_cycles", "2",
+                prm.declare_entry("initial_global_cycles", "4",
                     Patterns::Integer(),
                     "Initially globally refine the grid this many times "
                     "without using any error measure");
                     
-                prm.declare_entry("initial_boundary_cycles", "4",
+                prm.declare_entry("initial_boundary_cycles", "0",
                     Patterns::Integer(),
                     "Initially refine the grid this many times"
                     "near the boundaries that are listed for refinement");
@@ -319,7 +326,7 @@ namespace PDE
                     "If step_size is set to zero, then compute "
                     "step_size = end_time/(2^global_refinement_levels)");
                     
-                prm.declare_entry("semi_implicit_theta", "0.51",
+                prm.declare_entry("semi_implicit_theta", "0.5",
                     Patterns::Double(0., 1.),
                     "This is the theta parameter for the theta-family of "
                     "semi-implicit time integration schemes."
@@ -346,7 +353,7 @@ namespace PDE
                 prm.declare_entry("tolerance", "1e-8",
                     Patterns::Double(0.));
                     
-                prm.declare_entry("normalize_tolerance", "true",
+                prm.declare_entry("normalize_tolerance", "false",
                     Patterns::Bool(),
                     "If true, then the residual will be multiplied by the L2-norm of the RHS"
                     " before comparing to the tolerance.");
@@ -407,7 +414,6 @@ namespace PDE
             
             prm.enter_subsection("mms");
             {
-                prm.declare_entry("enabled", "true", Patterns::Bool());
                 
                 prm.enter_subsection("solution");
                 {

@@ -7,8 +7,7 @@
         for (unsigned int i = 0; i < dim; i++)
         {
             constant_convection_velocity[i] =
-                this->params.pde.convection_velocity_function_double_arguments.front();
-            this->params.pde.convection_velocity_function_double_arguments.pop_front();
+                this->params.pde.convection_velocity_function_double_arguments[i];
         }    
     }
     
@@ -27,7 +26,6 @@
     else
     {
         Assert(false, ExcNotImplemented());
-        // @todo: Implement ramp; shouldn't be much work
     }
 
     // Make initial values function
@@ -126,10 +124,17 @@
                         
     }
     
-    // Make RHS functions
-    ConstantFunction<dim> zero_source_function(0.);
+    // Make source functions
+    double constant_source_value = 0.;
     
-    Function<dim>* source_function = &zero_source_function;
+    if (!this->params.mms.enabled & (this->params.pde.source_function_name == "constant"))
+    {
+         constant_source_value = params.pde.source_function_double_arguments[0];
+    }
+    
+    ConstantFunction<dim> constant_source_function(constant_source_value);
+    
+    Function<dim>* source_function = &constant_source_function;
     
     if (this->params.mms.enabled)
     {
