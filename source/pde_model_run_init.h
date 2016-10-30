@@ -1,61 +1,25 @@
-    
-    template <int dim>
-    void Model<dim>::read_parameters(const std::string parameter_file="")
-    {
-        ParameterHandler prm;
-        Parameters::declare(prm);
-        
-        // Declare MMS stuff
         /*
-        This is separated from declare() because it is a class method.
-        The use of ParsedFunction with MMS in this project is new, and it is the first occurrence
-        of needing direct access to the Model class when declaring parameters. Maybe there is 
-        a better way to implement MMS that avoids all of this; but my other attempts
-        have been much more convoluted.
+        Originally this file just read input parameters and was named accordingly,
+        but it has become necessary to also instantitate some Functions that must survive
+        through run time, and so this file is generally named "init". This file needs to be merged
+        with pde_model_run_initialize_function.h and overhauled.
         */
-        prm.enter_subsection("mms");
-        {
-            
-            prm.enter_subsection("solution");
-            {
-                this->mms_solution.declare_parameters(prm);
-            }
-            prm.leave_subsection();
-            
-            
-            prm.enter_subsection("source");
-            {
-                this->mms_source.declare_parameters(prm);
-            }
-            prm.leave_subsection();
-            
-            
-            prm.enter_subsection("neumann");
-            {
-                this->mms_neumann.declare_parameters(prm);
-            }
-            prm.leave_subsection();
-            
-            
-            prm.enter_subsection("velocity");
-            {
-                if (dim == 1)
-                {
-                    this->mms_velocity = &this->mms_velocity_1D;
-                }
-                else if (dim == 2)
-                {
-                    this->mms_velocity = &this->mms_velocity_2D;
-                }
-                else if (dim == 3)
-                {
-                    this->mms_velocity = &this->mms_velocity_3D;
-                }
-                this->mms_velocity->declare_parameters(prm, dim);
-            }
-            prm.leave_subsection();
-        }
-        prm.leave_subsection();
+
+        ParameterHandler prm;
+        Parameters::declare<dim>(prm);
+        
+        /*
+        @todo
+        
+        In older versions there was a strict separation between the declaration and the
+        reading of parameters. Now there is no strict separation, primarily because often whether
+        or not some parameters should be declared depends on the input of other parameters.
+        There is still plenty of work to unify this new approach; e.g., as of this writing,
+        all of the adaptive grid refinement parameters are being declared even though adaptive
+        grid refinement hasn't been used in a very long time (because boundary layer refinement
+        has been strictly better).
+        
+        */
         
         //
         if (parameter_file != "")
@@ -68,6 +32,13 @@
         assert(parameter_log_file.good());
         prm.print_parameters(parameter_log_file, ParameterHandler::Text);
         
+        
+        Functions::ParsedFunction<dim> parsed_exact_solution_function;
+        Functions::ParsedFunction<dim> parsed_initial_values_function;
+        Functions::ParsedFunction<dim> parsed_source_function;
+        Functions::ParsedFunction<dim> parsed_boundary_function;
+        Functions::ParsedFunction<dim> parsed_velocity_function(dim);
+
         prm.enter_subsection("geometry");
         {
             this->params.geometry.grid_name = prm.get("grid_name");
@@ -80,24 +51,47 @@
 
         prm.enter_subsection("pde");
         {
-            this->params.pde.reference_peclet_number = 
-                prm.get_double("reference_peclet_number");    
-                
-            this->params.pde.convection_velocity_function_name = 
-                prm.get("convection_velocity_function_name");
+            this->params.pde.reference_peclet_number = prm.get_double("reference_peclet_number");    
             
-            this->params.pde.convection_velocity_function_double_arguments = 
-                Parameters::get_vector<double>(prm, "convection_velocity_function_double_arguments");
-                
-            this->params.pde.source_function_name = 
-                prm.get("source_function_name");
+            this->params.pde.velocity_function_name = prm.get("velocity_function_name");
+            
+            prm.enter_subsection("parsed_velocity_function");
+            {
+                parsed_velocity_function.parse_parameters(prm);    
+            }
+            prm.leave_subsection();
+            
+            this->params.pde.velocity_function_double_arguments = 
+                Parameters::get_vector<double>(prm, "velocity_function_double_arguments");
+
+            this->params.pde.source_function_name = prm.get("source_function_name");
+
+            prm.enter_subsection("parsed_source_function");
+            {
+                parsed_source_function.parse_parameters(prm);
+            }
+            prm.leave_subsection();
             
             this->params.pde.source_function_double_arguments = 
                 Parameters::get_vector<double>(prm, "source_function_double_arguments");
-                
+            
         }
         prm.leave_subsection();
         
+        prm.enter_subsection("verification");
+        {
+            this->params.verification.enabled = prm.get_bool("enabled");
+            
+            this->params.verification.exact_solution_function_name = 
+                    prm.get("exact_solution_function_name");
+                    
+            prm.enter_subsection("parsed_exact_solution_function");
+            {
+                parsed_exact_solution_function.parse_parameters(prm);    
+            }
+            prm.leave_subsection();
+        }
+        prm.leave_subsection();
         
         prm.enter_subsection("boundary_conditions");
         {
@@ -113,15 +107,26 @@
             {
                 this->params.boundary_conditions.function_double_arguments.push_back(v);
             }
+
+            prm.enter_subsection("parsed_function");
+            {
+                parsed_boundary_function.parse_parameters(prm);
+            }
+            prm.leave_subsection();
             
         }    
         prm.leave_subsection();
-        
         
         prm.enter_subsection("initial_values");
         {               
             this->params.initial_values.function_name = prm.get("function_name"); 
             
+            prm.enter_subsection("parsed_function");
+            {
+                parsed_initial_values_function.parse_parameters(prm);
+            }
+            prm.leave_subsection();
+
             std::vector<double> vector = 
                 Parameters::get_vector<double>(prm, "function_double_arguments");
             
@@ -187,41 +192,3 @@
             this->params.output.time_step_interval = prm.get_integer("time_step_interval");
         }
         prm.leave_subsection();
-        
-        prm.enter_subsection("mms");
-        {
-            this->params.mms.enabled = prm.get_bool("enabled");
-            
-            prm.enter_subsection("solution");
-            {
-                this->mms_solution.parse_parameters(prm);
-            }
-            prm.leave_subsection();
-            
-            
-            prm.enter_subsection("source");
-            {
-                this->mms_source.parse_parameters(prm);
-            }
-            prm.leave_subsection();
-            
-            
-            prm.enter_subsection("neumann");
-            {
-                this->mms_neumann.parse_parameters(prm);
-            }
-            prm.leave_subsection();
-            
-            
-            prm.enter_subsection("velocity");
-            {
-                this->mms_velocity->parse_parameters(prm);
-            }
-            prm.leave_subsection();
-            
-            this->params.mms.initial_values_perturbation =
-                prm.get_double("initial_values_perturbation");
-        }
-        prm.leave_subsection();
-
-    }

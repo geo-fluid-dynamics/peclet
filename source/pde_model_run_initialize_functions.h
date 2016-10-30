@@ -1,27 +1,38 @@
  
-    // Convection velocity function
+    /*
+    This file contains the initialization of many different types of functions that are needed
+    throughout the program. Working with deal.II's Function class has been interesting, and I'm 
+    sure many of my choices are unorthodox. The most important lesson learned has been that 
+    a Function<dim>* can point to any class derived from Function<dim>. The general design pattern
+    then is to instantitate all of the functions that might be needed, and then to point to the ones
+    actually being used. Since this looks quite messy and could distract from the rest of the program, this design pattern is mostly contained in this file.
     
-    std::vector<double> constant_convection_velocity(dim);
-    if (this->params.pde.convection_velocity_function_name == "constant")
+    Note that I recently discovered ParsedFunction, which obsoletes some of what I had been trying to do in this file, e.g. with manually implemented constant functions and ramp functions. Ultimately the ParsedFunction is not enough. For example this file contains the option for an initial values function that interpolates an old solution loaded from disk. So in most cases one should be able to use a ParsedFunction, but the generality of Function<dim>* (function pointers) allows for a standard way to account for any possible derived class of Function<dim>.
+    
+    Also this file contains most of what was needed to implement general boundary conditions. I think that the approach here is quite powerful and flexible.
+    */
+ 
+    // Velocity function
+    
+    std::vector<double> constant_velocity(dim);
+    if (this->params.pde.velocity_function_name == "constant")
     {
         for (unsigned int i = 0; i < dim; i++)
         {
-            constant_convection_velocity[i] =
-                this->params.pde.convection_velocity_function_double_arguments[i];
+            constant_velocity[i] =
+                this->params.pde.velocity_function_double_arguments[i];
         }    
     }
     
-    ConstantFunction<dim> 
-        constant_convection_velocity_function(constant_convection_velocity);
+    ConstantFunction<dim> constant_velocity_function(constant_velocity);
     
-    if (this->params.pde.convection_velocity_function_name == "MMS")
+    if (this->params.pde.velocity_function_name == "parsed")
     {
-        assert(this->params.mms.enabled);
-        this->convection_velocity_function = this->mms_velocity;
+        this->velocity_function = &parsed_velocity_function;
     }
-    else if (this->params.pde.convection_velocity_function_name == "constant")
+    else if (this->params.pde.velocity_function_name == "constant")
     {
-        this->convection_velocity_function = &constant_convection_velocity_function;
+        this->velocity_function = &constant_velocity_function;
     }
     else
     {
@@ -31,7 +42,7 @@
     // Make initial values function
     ConstantFunction<dim> constant_function(0.);
     
-    Function<dim>* initial_values_function = &constant_function;
+    initial_values_function = &constant_function;
 
     Point<dim> ramp_start_point, ramp_end_point;
     
@@ -100,47 +111,43 @@
 
     if (this->params.initial_values.function_name == "interpolate_old_field")
     {
-        initial_values_function = &field_function;                      
+        this->initial_values_function = &field_function;                      
     }
     else if (this->params.initial_values.function_name == "constant")
     { 
         constant_function = ConstantFunction<dim,double>(
             this->params.initial_values.function_double_arguments.front());
-        initial_values_function = &constant_function;
+        this->initial_values_function = &constant_function;
                         
     }
     else if (this->params.initial_values.function_name == "ramp")
     {
-        initial_values_function =  &ramp_function;
+        this->initial_values_function =  &ramp_function;
         
     }
-    else if (this->params.initial_values.function_name == "MMS")
+    else if (this->params.initial_values.function_name == "parsed")
     { 
-        assert(this->params.mms.enabled);
-        // @todo: How to perturb initial values for MMS?
-        //        Need to scale this function by a factor.
-        initial_values_function = &this->mms_initial_values;
-        this->mms_initial_values.perturbation = this->params.mms.initial_values_perturbation;
-                        
+        this->initial_values_function = &parsed_initial_values_function;
     }
     
     // Make source functions
     double constant_source_value = 0.;
     
-    if (!this->params.mms.enabled & (this->params.pde.source_function_name == "constant"))
+    if (this->params.pde.source_function_name == "constant")
     {
-         constant_source_value = params.pde.source_function_double_arguments[0];
+        constant_source_value = params.pde.source_function_double_arguments[0];
     }
     
     ConstantFunction<dim> constant_source_function(constant_source_value);
     
-    Function<dim>* source_function = &constant_source_function;
-    
-    if (this->params.mms.enabled)
+    if (this->params.pde.source_function_name == "parsed")
     {
-        source_function = &this->mms_source;
+        this->source_function = &parsed_source_function;
     }
-    
+    else if (this->params.pde.source_function_name == "constant")
+    {
+        this->source_function = &constant_source_function;
+    }
     
     // Make boundary functions
     
@@ -155,7 +162,7 @@
         std::string boundary_type = this->params.boundary_conditions.implementation_types[boundary];
         std::string function_name = this->params.boundary_conditions.function_names[boundary];
         
-        if ((function_name == "constant"))
+        if (function_name == "constant")
         {
             double value = this->params.boundary_conditions.function_double_arguments.front();
             this->params.boundary_conditions.function_double_arguments.pop_front();
@@ -165,7 +172,6 @@
         
     // Organize boundary functions to simplify application during the time loop
     
-    std::vector<Function<dim>*> boundary_functions;
     unsigned int constant_function_index = 0;
     
     for (unsigned int boundary = 0; boundary < boundary_count; boundary++)        
@@ -173,24 +179,29 @@
         std::string boundary_type = this->params.boundary_conditions.implementation_types[boundary];
         std::string function_name = this->params.boundary_conditions.function_names[boundary];
 
-        if ((function_name == "constant"))
+        if (function_name == "constant")
         {
             assert(constant_function_index < constant_functions.size());
-            boundary_functions.push_back(&constant_functions[constant_function_index]);
+            this->boundary_functions.push_back(&constant_functions[constant_function_index]);
             constant_function_index++;
         }
-        else if ((function_name == "MMS"))
+        else if (function_name == "parsed")
         {
-            assert(this->params.mms.enabled);
-            if (boundary_type == "strong")
-            {
-                boundary_functions.push_back(&this->mms_solution);
-            }
-            else if (boundary_type == "natural")
-            {
-                boundary_functions.push_back(&this->mms_neumann);
-            }
-
+            this->boundary_functions.push_back(&parsed_boundary_function);
+        }
+        
+    }
+    
+    // Verification
+    if (this->params.verification.enabled)
+    {
+        if (this->params.verification.exact_solution_function_name == "parsed")
+        {
+            this->exact_solution_function = &parsed_exact_solution_function;
+        }
+        else
+        {
+            Assert(false, ExcNotImplemented());
         }
         
     }

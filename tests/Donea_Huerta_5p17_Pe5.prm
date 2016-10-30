@@ -19,8 +19,8 @@ end
 
 subsection pde
 
-  set convection_velocity_function_name = constant
-  set convection_velocity_function_double_arguments = 1.
+  set velocity_function_name = constant
+  set velocity_function_double_arguments = 1.
   set source_function_name = constant
   set source_function_double_arguments = 1.
   

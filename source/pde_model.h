@@ -54,6 +54,7 @@
 #include <assert.h> 
 #include <deal.II/grid/manifold_lib.h>
 #include <deal.II/grid/tria_boundary_lib.h>
+#include <deal.II/base/parsed_function.h>
 
 #include "my_functions.h"
 #include "extrapolated_field.h"
@@ -76,16 +77,14 @@ namespace PDE
       unsigned int last_step;
   };
   
-  #include "mms.h"
-  
   template<int dim>
   class Model
   {
   public:
     Model();
     Parameters::StructuredParameters params;
-    void read_parameters(std::string file_path);
-    void run();
+    void init(std::string file_path);
+    void run(const std::string parameter_file = "");
 
   private:
     void create_coarse_grid();
@@ -119,21 +118,18 @@ namespace PDE
     std::vector<std::string> manifold_descriptors;
     
     double reference_peclet_number;
-    Function<dim>* convection_velocity_function;
+    Function<dim>* velocity_function;
+    Function<dim>* source_function;
+    std::vector<Function<dim>*> boundary_functions;
+    Function<dim>* initial_values_function;
+    Function<dim>* exact_solution_function;
     
-    Functions::ParsedFunction<dim> mms_solution;
-    MMS::InitialValuesFunction<dim> mms_initial_values;
-    Functions::ParsedFunction<dim> mms_source;
-    Functions::ParsedFunction<dim> mms_neumann;
-    Functions::ParsedFunction<dim>* mms_velocity;
-    Functions::ParsedFunction<dim> mms_velocity_1D;
-    Functions::ParsedFunction<dim> mms_velocity_2D;
-    Functions::ParsedFunction<dim> mms_velocity_3D;
     
-    void mms_append_error_table();
-    void mms_write_error_table();
-    TableHandler mms_error_table;
-    std::string mms_error_table_file_name = "mms_error_table.txt";
+    
+    void append_verification_table();
+    void write_verification_table();
+    TableHandler verification_table;
+    std::string verification_table_file_name = "verification_table.txt";
     
     void append_1D_solution_to_table();
     void write_1D_solution_table(std::string file_name);
@@ -141,18 +137,12 @@ namespace PDE
     std::string solution_table_1D_file_name = "1D_solution_table.txt";
     
   };
-
-  #include "pde_model_read_parameters.h"
   
   template<int dim>
   Model<dim>::Model()
     :
     fe(1),
-    dof_handler(this->triangulation),
-    mms_initial_values(&this->mms_solution),
-    mms_velocity_1D(1),
-    mms_velocity_2D(2),
-    mms_velocity_3D(3)
+    dof_handler(this->triangulation)
   {}
   
   #include "pde_model_grid.h"
@@ -215,7 +205,7 @@ namespace PDE
         QGauss<dim>(fe.degree+1),
         this->convection_diffusion_matrix,
         &inverse_reference_peclet_number_function, 
-        this->convection_velocity_function
+        this->velocity_function
         );
 
     this->solution.reinit(dof_handler.n_dofs());
@@ -303,18 +293,18 @@ namespace PDE
   }
   
   template<int dim>
-  void Model<dim>::mms_append_error_table()
+  void Model<dim>::append_verification_table()
   {
-    assert(this->params.mms.enabled);
+    assert(this->params.verification.enabled);
     
-    this->mms_solution.set_time(this->time);
+    this->exact_solution_function->set_time(this->time);
     
     Vector<float> difference_per_cell(triangulation.n_active_cells());
     
     VectorTools::integrate_difference(
         this->dof_handler,
         this->solution,
-        this->mms_solution,
+        *this->exact_solution_function,
         difference_per_cell,
         QGauss<dim>(3),
         VectorTools::L2_norm);
@@ -324,7 +314,7 @@ namespace PDE
     VectorTools::integrate_difference(
         this->dof_handler,
         this->solution,
-        this->mms_solution,
+        *this->exact_solution_function,
         difference_per_cell,
         QGauss<dim>(3),
         VectorTools::L1_norm);
@@ -341,58 +331,60 @@ namespace PDE
         QGauss<dim>(3),
         VectorTools::H1_seminorm);
     const double H1_seminorm_error = difference_per_cell.l2_norm();
-    mms_error_table.add_value("H1_seminorm_error", H1_seminorm_error);
+    verification_table.add_value("H1_seminorm_error", H1_seminorm_error);
     */
     
-    this->mms_error_table.add_value("time_step_size", this->time_step_size);
-    this->mms_error_table.add_value("time", this->time);
-    this->mms_error_table.add_value("cells", this->triangulation.n_active_cells());
-    this->mms_error_table.add_value("dofs", this->dof_handler.n_dofs());
-    this->mms_error_table.add_value("L1_norm_error", L1_norm_error);
-    this->mms_error_table.add_value("L2_norm_error", L2_norm_error);
+    this->verification_table.add_value("time_step_size", this->time_step_size);
+    this->verification_table.add_value("time", this->time);
+    this->verification_table.add_value("cells", this->triangulation.n_active_cells());
+    this->verification_table.add_value("dofs", this->dof_handler.n_dofs());
+    this->verification_table.add_value("L1_norm_error", L1_norm_error);
+    this->verification_table.add_value("L2_norm_error", L2_norm_error);
     
   }
   
   template<int dim>
-  void Model<dim>::mms_write_error_table()
+  void Model<dim>::write_verification_table()
   {
     const int precision = 14;
     
-    this->mms_error_table.set_precision("time", precision);
-    this->mms_error_table.set_scientific("time", true);
+    this->verification_table.set_precision("time", precision);
+    this->verification_table.set_scientific("time", true);
     
-    this->mms_error_table.set_precision("time_step_size", precision);
-    this->mms_error_table.set_scientific("time_step_size", true);
+    this->verification_table.set_precision("time_step_size", precision);
+    this->verification_table.set_scientific("time_step_size", true);
     
-    this->mms_error_table.set_precision("cells", precision);
-    this->mms_error_table.set_scientific("cells", true);
+    this->verification_table.set_precision("cells", precision);
+    this->verification_table.set_scientific("cells", true);
     
-    this->mms_error_table.set_precision("dofs", precision);
-    this->mms_error_table.set_scientific("dofs", true);
+    this->verification_table.set_precision("dofs", precision);
+    this->verification_table.set_scientific("dofs", true);
     
-    this->mms_error_table.set_precision("L2_norm_error", precision);
-    this->mms_error_table.set_scientific("L2_norm_error", true);
+    this->verification_table.set_precision("L2_norm_error", precision);
+    this->verification_table.set_scientific("L2_norm_error", true);
     
-    this->mms_error_table.set_precision("L1_norm_error", precision);
-    this->mms_error_table.set_scientific("L1_norm_error", true);
+    this->verification_table.set_precision("L1_norm_error", precision);
+    this->verification_table.set_scientific("L1_norm_error", true);
     
-    std::ofstream out_file(this->mms_error_table_file_name, std::fstream::app);
+    std::ofstream out_file(this->verification_table_file_name, std::fstream::app);
     assert(out_file.good());
-    this->mms_error_table.write_text(out_file);
+    this->verification_table.write_text(out_file);
     out_file.close(); 
   }
   
   template<int dim>
-  void Model<dim>::run()
+  void Model<dim>::run(const std::string parameter_file)
   {
+    #include "pde_model_run_init.h"  
+      
     if (dim == 1)
     {
         std::remove(solution_table_1D_file_name.c_str()); // In 1D, the solution will be appended here at every time step.    
     }        
     
-    if (this->params.mms.enabled)
+    if (this->params.verification.enabled)
     {
-        std::remove(this->mms_error_table_file_name.c_str());
+        std::remove(this->verification_table_file_name.c_str());
     }
     
     this->reference_peclet_number = this->params.pde.reference_peclet_number;
@@ -610,9 +602,9 @@ start_time_iteration:
         {
             this->write_solution();
             
-            if (this->params.mms.enabled)
+            if (this->params.verification.enabled)
             {
-                this->mms_append_error_table();
+                this->append_verification_table();
             }
             
         }
@@ -650,9 +642,9 @@ start_time_iteration:
     FEFieldTools::save_field_parts(triangulation, dof_handler, solution);
     
     // Write error table
-    if (this->params.mms.enabled)
+    if (this->params.verification.enabled)
     {
-        this->mms_write_error_table();
+        this->write_verification_table();
     }
     
     // Write the solution table containing pointwise values for every timestep.

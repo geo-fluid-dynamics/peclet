@@ -26,16 +26,13 @@ int main(int argc, char* argv[])
         switch (mp.dim)
         {
             case 1:
-                model_1D.read_parameters(parameter_input_file_path);
-                model_1D.run();
+                model_1D.run(parameter_input_file_path);
                 break;
             case 2:
-                model_2D.read_parameters(parameter_input_file_path);
-                model_2D.run();
+                model_2D.run(parameter_input_file_path);
                 break;
             case 3:
-                model_3D.read_parameters(parameter_input_file_path);
-                model_3D.run();
+                model_3D.run(parameter_input_file_path);
                 break;
         }
 

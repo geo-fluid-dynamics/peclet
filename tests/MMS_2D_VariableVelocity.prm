@@ -7,43 +7,66 @@ subsection geometry
     set grid_name = hyper_rectangle
     set sizes = 0., 0., 1., 1.
 end
-subsection mms
-    set enabled = true    
-    subsection solution
+subsection verification
+    set enabled = true
+    
+    set exact_solution_function_name = parsed    
+    subsection parsed_exact_solution_function
         set Function constants = epsilon=1.e-14, Per=0.5, amax=-5, g=-2, beta=10
-                set Function expression = if(y < epsilon,g + (g - g*x)*(exp(-beta*t^2) - 1),g + (g - (g*(exp(Per*amax*x*y) - 1))/(exp(Per*amax*y) - 1))*(exp(-beta*t^2) - 1))
-                set Variable names = x,y,t
-    end
-    subsection source
-        set Function constants = epsilon=1.e-14, Per=0.5, amax=-5, g=-2, beta=10
-        set Function expression = if(y<epsilon,(g*exp(-beta*t^2)*(x - 1)*(12*beta*t + 2*Per*amax^2*x^2 - Per*amax^2*x - 2*Per*amax^2*x^2*exp(beta*t^2) + Per*amax^2*x*exp(beta*t^2)))/6,((exp(-beta*t^2) - 1)*((Per^2*amax^2*g*x^2*exp(Per*amax*x*y))/(exp(Per*amax*y) - 1) - (Per^2*amax^2*g*exp(Per*amax*y)*(exp(Per*amax*x*y) - 1))/(exp(Per*amax*y) - 1)^2 + (2*Per^2*amax^2*g*exp(2*Per*amax*y)*(exp(Per*amax*x*y) - 1))/(exp(Per*amax*y) - 1)^3 - (2*Per^2*amax^2*g*x*exp(Per*amax*x*y)*exp(Per*amax*y))/(exp(Per*amax*y) - 1)^2) + (Per^2*amax^2*g*y^2*exp(Per*amax*x*y)*(exp(-beta*t^2) - 1))/(exp(Per*amax*y) - 1))/Per - 2*beta*t*exp(-beta*t^2)*(g - (g*(exp(Per*amax*x*y) - 1))/(exp(Per*amax*y) - 1)) - (Per*amax^2*g*y^2*exp(Per*amax*x*y)*(exp(-beta*t^2) - 1))/(exp(Per*amax*y) - 1))
-        set Variable names = x,y,t
-    end
-    subsection neumann
-        set Function constants = epsilon=1.e-14, Per=0.5, amax=-5, g=-2, beta=10
-        set Function expression = if(x<epsilon,(amax*g*y*(exp(-beta*t^2) - 1))/(exp(Per*amax*y) - 1),if(y<epsilon,((exp(-beta*t^2) - 1)*(Per*amax*g*x^2 - ((g*Per^3*amax^3*x^2)/2 + g*Per^3*amax^3*x)/(Per^2*amax^2) + (Per*amax*g*x)/2))/Per,-((exp(-beta*t^2) - 1)*((Per*amax*g*x*exp(Per*amax*x))/(exp(Per*amax) - 1) - (Per*amax*g*exp(Per*amax)*(exp(Per*amax*x) - 1))/(exp(Per*amax) - 1)^2))/Per))
-        set Variable names = x,y,t
-    end
-    subsection velocity
-        set Function constants = amax=-5
-        set Function expression = amax*y; 0
-        set Variable names = x,y
-    end
-    set initial_values_perturbation = 1.000000001    
-end
-subsection output
-    set write_solution_vtk = false
+        
+        set Function expression = if(y < epsilon,g + (g - g*x)*(exp(-beta*t^2) - 1),g + (g - (g*(exp(Per*amax*x*y) - 1))/(exp(Per*amax*y) - 1))*(exp(-beta*t^2) - 1))
+    end        
 end
 subsection pde
-    set convection_velocity_function_name = MMS
+    
     set reference_peclet_number = 0.5
+    
+    set velocity_function_name = parsed
+    
+    subsection parsed_velocity_function
+        set Function constants = amax=-5
+        set Function expression = amax*y; 0
+    end
+    
+    set source_function_name = parsed
+    
+    subsection parsed_source_function
+
+        set Function constants = epsilon=1.e-14, Per=0.5, amax=-5, g=-2, beta=10
+
+        set Function expression = if(y<epsilon,(g*exp(-beta*t^2)*(x - 1)*(12*beta*t + 2*Per*amax^2*x^2 - Per*amax^2*x - 2*Per*amax^2*x^2*exp(beta*t^2) + Per*amax^2*x*exp(beta*t^2)))/6,((exp(-beta*t^2) - 1)*((Per^2*amax^2*g*x^2*exp(Per*amax*x*y))/(exp(Per*amax*y) - 1) - (Per^2*amax^2*g*exp(Per*amax*y)*(exp(Per*amax*x*y) - 1))/(exp(Per*amax*y) - 1)^2 + (2*Per^2*amax^2*g*exp(2*Per*amax*y)*(exp(Per*amax*x*y) - 1))/(exp(Per*amax*y) - 1)^3 - (2*Per^2*amax^2*g*x*exp(Per*amax*x*y)*exp(Per*amax*y))/(exp(Per*amax*y) - 1)^2) + (Per^2*amax^2*g*y^2*exp(Per*amax*x*y)*(exp(-beta*t^2) - 1))/(exp(Per*amax*y) - 1))/Per - 2*beta*t*exp(-beta*t^2)*(g - (g*(exp(Per*amax*x*y) - 1))/(exp(Per*amax*y) - 1)) - (Per*amax^2*g*y^2*exp(Per*amax*x*y)*(exp(-beta*t^2) - 1))/(exp(Per*amax*y) - 1))
+
+    end
+    
 end
 subsection initial_values
-    set function_name = MMS
+    
+    set function_name = parsed
+    
+    subsection parsed_function
+    
+        set Function expression = -2*1.000000001
+        
+    end
+    
 end
 subsection boundary_conditions
+    
     set implementation_types = natural, strong, natural, natural
-    set function_names = MMS, MMS, MMS, MMS
+    
+    set function_names = parsed, constant, parsed, parsed
+    
+    set function_double_arguments = -2
+    
+    
+    subsection parsed_function
+
+        set Function constants = epsilon=1.e-14, Per=0.5, amax=-5, g=-2, beta=10
+
+        set Function expression = if(x<epsilon,(amax*g*y*(exp(-beta*t^2) - 1))/(exp(Per*amax*y) - 1),if(y<epsilon,((exp(-beta*t^2) - 1)*(Per*amax*g*x^2 - ((g*Per^3*amax^3*x^2)/2 + g*Per^3*amax^3*x)/(Per^2*amax^2) + (Per*amax*g*x)/2))/Per,-((exp(-beta*t^2) - 1)*((Per*amax*g*x*exp(Per*amax*x))/(exp(Per*amax) - 1) - (Per*amax*g*exp(Per*amax)*(exp(Per*amax*x) - 1))/(exp(Per*amax) - 1)^2))/Per))
+    
+    end
+    
 end
 subsection refinement
     set boundaries_to_refine = 0
@@ -59,4 +82,8 @@ subsection solver
     set max_iterations = 10000
     set normalize_tolerance = false
     set tolerance           = 1e-9
+end
+
+subsection output
+    set write_solution_vtk = false
 end

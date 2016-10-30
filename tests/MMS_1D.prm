@@ -5,43 +5,23 @@ subsection meta
     set dim = 1
 end
 
-
 subsection geometry
     set grid_name = hyper_cube
     set sizes = 0., 1.
 end
 
-
-subsection mms
-
+subsection verification
     set enabled = true
-  
-    subsection solution
+
+    set exact_solution_function_name = parsed
+    
+    subsection parsed_exact_solution_function
         set Function constants = Per=0.5, a=-5, g=-2, beta=10
         set Function expression = -g*(((exp(Per*a*x) - 1)/(exp(Per*a) - 1) - 1)*(exp(-beta*t^2) - 1) - 1)
-        set Variable names = x,t
     end
-  
-    subsection source
-        set Function constants = Per=0.5, a=-5, g=-2, beta=10
-        set Function expression = 2*beta*g*t*exp(-beta*t^2)*((exp(Per*a*x) - 1)/(exp(Per*a) - 1) - 1)
-        set Variable names = x,t
-    end
-  
-    subsection neumann
-        set Function constants = Per=0.5, a=-5, g=-2, beta=10
-        set Function expression = (a*g*(exp(-beta*t^2) - 1))/(exp(Per*a) - 1)
-        set Variable names = x,t
-    end
-  
-    subsection velocity
-        set Function constants = a=-5
-        set Function expression = a
-    end
-  
-    set initial_values_perturbation = 1.000000001
-  
+
 end
+
 
 subsection output
   set write_solution_table = true
@@ -51,20 +31,48 @@ end
 
 
 subsection pde
-  set convection_velocity_function_name = MMS
-  set convection_velocity_function_double_arguments = -5
-  set reference_peclet_number = 0.5
+    set reference_peclet_number = 0.5
+    
+    set velocity_function_name = parsed
+    
+    subsection parsed_velocity_function
+        set Function constants = a=-5
+        set Function expression = a
+    end
+    
+    set source_function_name = parsed
+    
+    subsection parsed_source_function
+        set Function constants = Per=0.5, a=-5, g=-2, beta=10
+        set Function expression = 2*beta*g*t*exp(-beta*t^2)*((exp(Per*a*x) - 1)/(exp(Per*a) - 1) - 1)
+    end
+    
 end
 
 
 subsection initial_values
-    set function_name = MMS
+
+    set function_name = parsed
+    
+    subsection parsed_function
+    
+        set Function expression = -2*1.000000001
+        
+    end
+
 end
 
 
 subsection boundary_conditions
     set implementation_types = natural, strong
-    set function_names = MMS, MMS
+    set function_names = parsed, constant
+    set function_double_arguments = -2.
+
+    subsection parsed_function
+        set Function constants = Per=0.5, a=-5, g=-2, beta=10
+        set Function expression = (a*g*(exp(-beta*t^2) - 1))/(exp(Per*a) - 1)
+    end
+
 end
 
 

@@ -6,7 +6,6 @@
 #include <fstream>
 
 #include <deal.II/base/parameter_handler.h>
-#include <deal.II/base/parsed_function.h>
 
 /*
     
@@ -51,8 +50,8 @@ namespace PDE
         {
             double reference_peclet_number;
             
-            std::string convection_velocity_function_name;
-            std::vector<double> convection_velocity_function_double_arguments; 
+            std::string velocity_function_name;
+            std::vector<double> velocity_function_double_arguments; 
             
             std::string source_function_name;
             std::vector<double> source_function_double_arguments; 
@@ -122,10 +121,11 @@ namespace PDE
             int time_step_interval;
         };
         
-        struct MMS
+        struct Verification
         {
             bool enabled;
-            double initial_values_perturbation;
+            std::string exact_solution_function_name;
+            std::vector<double> exact_solution_function_double_arguments;
         };
         
         struct StructuredParameters
@@ -139,15 +139,16 @@ namespace PDE
             Time time;
             IterativeSolver solver;
             Output output;
-            MMS mms;
+            Verification verification;
         };    
     
+        template<int dim>
         void declare(ParameterHandler &prm)
         {
             
             prm.enter_subsection("meta");
             {
-                prm.declare_entry("dim", "1", Patterns::Integer(1, 3));
+                prm.declare_entry("dim", std::to_string(dim), Patterns::Integer(1, 3));
             }
             prm.leave_subsection();
             
@@ -155,17 +156,29 @@ namespace PDE
             {
                 prm.declare_entry("reference_peclet_number", "1.", Patterns::Double(0.));
                     
-                prm.declare_entry("convection_velocity_function_name", "constant",
-                    Patterns::List(Patterns::Selection("MMS | constant")));
+                prm.declare_entry("velocity_function_name", "constant",
+                    Patterns::List(Patterns::Selection("parsed | constant")));
                     
-                prm.declare_entry("convection_velocity_function_double_arguments", "1.",
+                prm.declare_entry("velocity_function_double_arguments", "1.",
                     Patterns::List(Patterns::Double()));
                     
+                prm.enter_subsection("parsed_velocity_function");
+                {
+                    Functions::ParsedFunction<dim>::declare_parameters(prm, dim);    
+                }
+                prm.leave_subsection();
+                
                 prm.declare_entry("source_function_name", "constant",
-                    Patterns::List(Patterns::Selection("MMS | constant")));
+                    Patterns::List(Patterns::Selection("parsed | constant")));
                     
                 prm.declare_entry("source_function_double_arguments", "0.",
                     Patterns::List(Patterns::Double()));
+                    
+                prm.enter_subsection("parsed_source_function");
+                {
+                    Functions::ParsedFunction<dim>::declare_parameters(prm);    
+                }
+                prm.leave_subsection();
             }
             prm.leave_subsection();
             
@@ -220,11 +233,17 @@ namespace PDE
             
             prm.enter_subsection ("initial_values");
             {
-                prm.declare_entry("function_name", "MMS",
-                    Patterns::List(Patterns::Selection("constant | MMS | ramp | interpolate_old_field")));
+                prm.declare_entry("function_name", "parsed",
+                    Patterns::List(Patterns::Selection("constant | parsed | ramp | interpolate_old_field")));
                     
                 prm.declare_entry("function_double_arguments", "",
                     Patterns::List(Patterns::Double())); 
+                    
+                prm.enter_subsection("parsed_function");
+                {
+                    Functions::ParsedFunction<dim>::declare_parameters(prm); 
+                }
+                prm.leave_subsection();
                     
             }
             prm.leave_subsection ();
@@ -238,7 +257,7 @@ namespace PDE
                     "Type of boundary conditions to apply to each boundary");  
                     
                 prm.declare_entry("function_names", "constant, constant",
-                    Patterns::List(Patterns::Selection("constant | MMS | ramp ")),
+                    Patterns::List(Patterns::Selection("constant | parsed | ramp ")),
                     "Names of functions to apply to each boundary");
                     
                 prm.declare_entry("function_double_arguments", "1., -1.",
@@ -249,6 +268,12 @@ namespace PDE
                     "\n\t- The function values will only be popped during initialization."
                     "\n\t- Boundaries will be handled in order of their ID's."
                     "\n\t- If a function needs a Point as an argument, then it will pop doubles to make the point in order."); 
+                    
+                prm.enter_subsection("parsed_function");
+                {
+                    Functions::ParsedFunction<dim>::declare_parameters(prm);    
+                }
+                prm.leave_subsection();
 
             }
             prm.leave_subsection ();
@@ -375,11 +400,17 @@ namespace PDE
             }
             prm.leave_subsection();
             
-            prm.enter_subsection("mms");
+            prm.enter_subsection("verification");
             {
                 prm.declare_entry("enabled", "false", Patterns::Bool());
-                prm.declare_entry("initial_values_perturbation", "1.000000001",
-                    Patterns::Double(0.));
+                prm.declare_entry("exact_solution_function_name", "parsed", 
+                    Patterns::Selection("parsed"));
+                
+                prm.enter_subsection("parsed_exact_solution_function");
+                {
+                    Functions::ParsedFunction<dim>::declare_parameters(prm);    
+                }
+                prm.leave_subsection();
             }
             prm.leave_subsection();
 
@@ -407,46 +438,12 @@ namespace PDE
             Meta mp;
             
             ParameterHandler prm;
-            declare(prm);
-            
-            // Dummy parameters that are missing
-            Functions::ParsedFunction<1> dummy;
-            
-            prm.enter_subsection("mms");
-            {
-                
-                prm.enter_subsection("solution");
-                {
-                    dummy.declare_parameters(prm);
-                }
-                prm.leave_subsection();
-            
-                prm.enter_subsection("source");
-                {
-                    dummy.declare_parameters(prm);
-                }
-                prm.leave_subsection();
-                
-                prm.enter_subsection("neumann");
-                {
-                    dummy.declare_parameters(prm);
-                }
-                prm.leave_subsection();
-            
-                prm.enter_subsection("velocity");
-                {
-                    dummy.declare_parameters(prm);
-                }
-                prm.leave_subsection();
-            }
-            prm.leave_subsection();
-            
+            declare<1>(prm);
             
             if (parameter_file != "")
             {
                 prm.read_input(parameter_file);    
             }
-     
             
             prm.enter_subsection("meta");
             {
