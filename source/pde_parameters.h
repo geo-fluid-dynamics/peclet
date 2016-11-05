@@ -156,10 +156,10 @@ namespace PDE
             {
                 prm.declare_entry("reference_peclet_number", "1.", Patterns::Double(0.));
                     
-                prm.declare_entry("velocity_function_name", "constant",
+                prm.declare_entry("velocity_function_name", "parsed",
                     Patterns::List(Patterns::Selection("parsed | constant")));
                     
-                prm.declare_entry("velocity_function_double_arguments", "1.",
+                prm.declare_entry("velocity_function_double_arguments", "",
                     Patterns::List(Patterns::Double()));
                     
                 prm.enter_subsection("parsed_velocity_function");
@@ -168,10 +168,10 @@ namespace PDE
                 }
                 prm.leave_subsection();
                 
-                prm.declare_entry("source_function_name", "constant",
+                prm.declare_entry("source_function_name", "parsed",
                     Patterns::List(Patterns::Selection("parsed | constant")));
                     
-                prm.declare_entry("source_function_double_arguments", "0.",
+                prm.declare_entry("source_function_double_arguments", "",
                     Patterns::List(Patterns::Double()));
                     
                 prm.enter_subsection("parsed_source_function");
@@ -256,11 +256,11 @@ namespace PDE
                     Patterns::List(Patterns::Selection("natural | strong")),
                     "Type of boundary conditions to apply to each boundary");  
                     
-                prm.declare_entry("function_names", "constant, constant",
+                prm.declare_entry("function_names", "parsed, parsed",
                     Patterns::List(Patterns::Selection("constant | parsed | ramp ")),
                     "Names of functions to apply to each boundary");
                     
-                prm.declare_entry("function_double_arguments", "1., -1.",
+                prm.declare_entry("function_double_arguments", "",
                     Patterns::List(Patterns::Double()),
                     "This list of doubles will be popped from front to back as needed."
                     "\nThis puts some work on the user to greatly ease development."
