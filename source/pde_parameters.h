@@ -186,7 +186,7 @@ namespace PDE
             prm.enter_subsection ("geometry");
             {
                     
-                prm.declare_entry("grid_name", "hyper_shell",
+                prm.declare_entry("grid_name", "hyper_cube",
                      Patterns::Selection("hyper_rectangle | hyper_cube | hyper_shell | hemisphere_cylinder_shell"
                                       " | cylinder | cylinder_with_split_boundaries"
                                       " | hyper_cube_with_cylindrical_hole"),
@@ -208,7 +208,7 @@ namespace PDE
                      "\n\tOuter boundary ID = 0"
                      "\n\tInner spherical boundary ID = 1");
                      
-                prm.declare_entry("sizes", "0.5, 1.",
+                prm.declare_entry("sizes", "0., 1.",
                     Patterns::List(Patterns::Double(0.)),
                     "Set the sizes for the grid's geometry."
                     "\n hyper_shell:"
