@@ -6,27 +6,25 @@ end
 subsection geometry
     set grid_name = hyper_rectangle
     set sizes = 0., 0., 1., 1.
-end
-subsection pde
-    
-    set velocity_function_name = parsed    
-    subsection parsed_velocity_function
-        set Function constants = v0=-1, rc=1
-        set Function expression = v0*(y + rc - 0.5); 0
-    end
-    
-    set diffusivity_function_name = constant
-    set diffusivity_function_double_arguments = 0.14752
-    
-    set source_function_name = constant
-    set source_function_double_arguments = 0.
-    
 end
+subsection parsed_velocity_function
+    set Function constants = v0=-1, rc=1
+    set Function expression = v0*(y + rc - 0.5); 0
+end
+
+subsection parsed_diffusivity_function
+    set Function expression = 0.14752
+end
+
+subsection parsed_source_function
+    set Function expression = 0
+end
+
 subsection initial_values
-    
-    set function_name = constant
-    set function_double_arguments = -1.
-    
+    set function_name = parsed
+    subsection parsed_function
+        set Function expression = -1
+    end
 end
 subsection boundary_conditions
     

@@ -11,61 +11,8 @@
     
     Also this file contains most of what was needed to implement general boundary conditions. I think that the approach here is quite powerful and flexible.
     */
- 
-    // Velocity function
-    
-    std::vector<double> constant_velocity(dim);
-    if (this->params.pde.velocity_function_name == "constant")
-    {
-        for (unsigned int i = 0; i < dim; i++)
-        {
-            constant_velocity[i] =
-                this->params.pde.velocity_function_double_arguments[i];
-        }    
-    }
-    
-    ConstantFunction<dim> constant_velocity_function(constant_velocity);
-    
-    if (this->params.pde.velocity_function_name == "parsed")
-    {
-        this->velocity_function = &parsed_velocity_function;
-    }
-    else if (this->params.pde.velocity_function_name == "constant")
-    {
-        this->velocity_function = &constant_velocity_function;
-    }
-    else
-    {
-        Assert(false, ExcNotImplemented());
-    }
-    
-    // Diffusivity function
-    
-    double constant_diffusivity = 1.;
-    if (this->params.pde.diffusivity_function_name == "constant")
-    {
-        constant_diffusivity = this->params.pde.diffusivity_function_double_arguments[0];
-    }
-    
-    ConstantFunction<dim> constant_diffusivity_function(constant_diffusivity);
-    
-    if (this->params.pde.diffusivity_function_name == "parsed")
-    {
-        this->diffusivity_function = &parsed_diffusivity_function;
-    }
-    else if (this->params.pde.diffusivity_function_name == "constant")
-    {
-        this->diffusivity_function = &constant_diffusivity_function;
-    }
-    else
-    {
-        Assert(false, ExcNotImplemented());
-    }
 
     // Initial values function
-    ConstantFunction<dim> constant_function(0.);
-    
-    initial_values_function = &constant_function;    
     
     Triangulation<dim> field_grid;
     DoFHandler<dim> field_dof_handler(field_grid);
@@ -92,35 +39,9 @@
     {
         this->initial_values_function = &field_function;                      
     }
-    else if (this->params.initial_values.function_name == "constant")
-    { 
-        constant_function = ConstantFunction<dim,double>(
-            this->params.initial_values.function_double_arguments.front());
-        this->initial_values_function = &constant_function;
-                        
-    }
     else if (this->params.initial_values.function_name == "parsed")
     { 
         this->initial_values_function = &parsed_initial_values_function;
-    }
-    
-    // Source function
-    double constant_source_value = 0.;
-    
-    if (this->params.pde.source_function_name == "constant")
-    {
-        constant_source_value = params.pde.source_function_double_arguments[0];
-    }
-    
-    ConstantFunction<dim> constant_source_function(constant_source_value);
-    
-    if (this->params.pde.source_function_name == "parsed")
-    {
-        this->source_function = &parsed_source_function;
-    }
-    else if (this->params.pde.source_function_name == "constant")
-    {
-        this->source_function = &constant_source_function;
     }
     
     // Boundary functions
@@ -162,20 +83,6 @@
         else if (function_name == "parsed")
         {
             this->boundary_functions.push_back(&parsed_boundary_function);
-        }
-        
-    }
-    
-    // Verification
-    if (this->params.verification.enabled)
-    {
-        if (this->params.verification.exact_solution_function_name == "parsed")
-        {
-            this->exact_solution_function = &parsed_exact_solution_function;
-        }
-        else
-        {
-            Assert(false, ExcNotImplemented());
         }
         
     }

@@ -192,8 +192,7 @@ namespace Peclet
         QGauss<dim>(fe.degree+1),
         this->convection_diffusion_matrix,
         this->diffusivity_function, 
-        this->velocity_function
-        );
+        this->velocity_function);
 
     this->solution.reinit(dof_handler.n_dofs());
     
@@ -354,12 +353,13 @@ namespace Peclet
     The design of ParsedFunction forces us to instantitate them here rather than being able
     to include them as members of the Peclet class.
     */
-    Functions::ParsedFunction<dim> parsed_velocity_function(dim);
-    Functions::ParsedFunction<dim> parsed_diffusivity_function;
-    Functions::ParsedFunction<dim> parsed_source_function;
-    Functions::ParsedFunction<dim> parsed_boundary_function;
-    Functions::ParsedFunction<dim> parsed_exact_solution_function;
-    Functions::ParsedFunction<dim> parsed_initial_values_function;  
+
+    Functions::ParsedFunction<dim> parsed_velocity_function(dim),
+        parsed_diffusivity_function,
+        parsed_source_function,
+        parsed_boundary_function,
+        parsed_initial_values_function,
+        parsed_exact_solution_function; 
     
     this->params = Parameters::read<dim>(
         parameter_file,
@@ -372,6 +372,13 @@ namespace Peclet
     
     this->create_coarse_grid();
     
+    this->velocity_function = &parsed_velocity_function;
+    this->diffusivity_function = &parsed_diffusivity_function;
+    this->source_function = &parsed_source_function;
+    this->exact_solution_function = &parsed_exact_solution_function;
+    /*
+    Generalizing the handling of auxiliary functions is complicated and distracts from the flow of this program, so this section of code has been moved to the following file.
+    */
     #include "peclet_run_initialize_functions.h"
     
     if (dim == 1)

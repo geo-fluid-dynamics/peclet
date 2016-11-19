@@ -47,18 +47,6 @@ namespace Peclet
         {
             unsigned int dim;
         };
-       
-        struct ConvectionDiffusionEquation
-        {            
-            std::string velocity_function_name;
-            std::vector<double> velocity_function_double_arguments;
-            
-            std::string diffusivity_function_name;
-            std::vector<double> diffusivity_function_double_arguments; 
-            
-            std::string source_function_name;
-            std::vector<double> source_function_double_arguments; 
-        };
 
         struct BoundaryConditions
         {
@@ -134,7 +122,6 @@ namespace Peclet
         struct StructuredParameters
         {
             Meta meta;
-            ConvectionDiffusionEquation pde;
             BoundaryConditions boundary_conditions;
             InitialValues initial_values;
             Geometry geometry;
@@ -155,47 +142,26 @@ namespace Peclet
             }
             prm.leave_subsection();
             
-            prm.enter_subsection("pde");
+            
+            prm.enter_subsection("parsed_velocity_function");
             {
-                prm.declare_entry("velocity_function_name", "parsed",
-                    Patterns::List(Patterns::Selection("parsed | constant")));
-                    
-                prm.declare_entry("velocity_function_double_arguments", "",
-                    Patterns::List(Patterns::Double()));
-                    
-                prm.enter_subsection("parsed_velocity_function");
-                {
-                    Functions::ParsedFunction<dim>::declare_parameters(prm, dim);    
-                }
-                prm.leave_subsection();
-
-                
-                prm.declare_entry("diffusivity_function_name", "parsed",
-                Patterns::List(Patterns::Selection("parsed | constant")));
-                    
-                prm.declare_entry("diffusivity_function_double_arguments", "",
-                    Patterns::List(Patterns::Double()));
-                    
-                prm.enter_subsection("parsed_diffusivity_function");
-                {
-                    Functions::ParsedFunction<dim>::declare_parameters(prm);    
-                }
-                prm.leave_subsection();
-                
-                
-                prm.declare_entry("source_function_name", "parsed",
-                    Patterns::List(Patterns::Selection("parsed | constant")));
-                    
-                prm.declare_entry("source_function_double_arguments", "",
-                    Patterns::List(Patterns::Double()));
-                    
-                prm.enter_subsection("parsed_source_function");
-                {
-                    Functions::ParsedFunction<dim>::declare_parameters(prm);    
-                }
-                prm.leave_subsection();
+                Functions::ParsedFunction<dim>::declare_parameters(prm, dim);    
             }
             prm.leave_subsection();
+
+            
+            prm.enter_subsection("parsed_diffusivity_function");
+            {
+                Functions::ParsedFunction<dim>::declare_parameters(prm);    
+            }
+            prm.leave_subsection();
+
+            
+            prm.enter_subsection("parsed_source_function");
+            {
+                Functions::ParsedFunction<dim>::declare_parameters(prm);    
+            }
+            prm.leave_subsection();  
             
             
             prm.enter_subsection ("geometry");
@@ -504,47 +470,27 @@ namespace Peclet
             }
             prm.leave_subsection();
             
-
-            prm.enter_subsection("pde");
-            {    
-                
-                params.pde.velocity_function_name = prm.get("velocity_function_name");
-                
-                prm.enter_subsection("parsed_velocity_function");
-                {
-                    parsed_velocity_function.parse_parameters(prm);    
-                }
-                prm.leave_subsection();
-                
-                params.pde.velocity_function_double_arguments = 
-                    Parameters::get_vector<double>(prm, "velocity_function_double_arguments");
-
-                    
-                params.pde.diffusivity_function_name = prm.get("diffusivity_function_name");
-                
-                prm.enter_subsection("parsed_diffusivity_function");
-                {
-                    parsed_diffusivity_function.parse_parameters(prm);    
-                }
-                prm.leave_subsection();
-                
-                params.pde.diffusivity_function_double_arguments = 
-                    Parameters::get_vector<double>(prm, "diffusivity_function_double_arguments");    
-                    
-                    
-                params.pde.source_function_name = prm.get("source_function_name");
-
-                prm.enter_subsection("parsed_source_function");
-                {
-                    parsed_source_function.parse_parameters(prm);
-                }
-                prm.leave_subsection();
-                
-                params.pde.source_function_double_arguments = 
-                    Parameters::get_vector<double>(prm, "source_function_double_arguments");
-                
+            
+            prm.enter_subsection("parsed_velocity_function");
+            {
+                parsed_velocity_function.parse_parameters(prm);    
             }
             prm.leave_subsection();
+            
+            
+            prm.enter_subsection("parsed_diffusivity_function");
+            {
+                parsed_diffusivity_function.parse_parameters(prm);    
+            }
+            prm.leave_subsection();
+
+            
+            prm.enter_subsection("parsed_source_function");
+            {
+                parsed_source_function.parse_parameters(prm);
+            }
+            prm.leave_subsection();
+                
             
             prm.enter_subsection("verification");
             {
@@ -594,15 +540,7 @@ namespace Peclet
                     parsed_initial_values_function.parse_parameters(prm);
                 }
                 prm.leave_subsection();
-
-                std::vector<double> vector = 
-                    Parameters::get_vector<double>(prm, "function_double_arguments");
-                
-                for (auto v : vector)
-                {
-                    params.initial_values.function_double_arguments.push_back(v);
-                }
-                
+              
             }    
             prm.leave_subsection();
             

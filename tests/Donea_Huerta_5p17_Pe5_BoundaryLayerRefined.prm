@@ -16,30 +16,23 @@ subsection output
     set time_step_interval = 100
 end
 
-
-subsection pde
-  
-    subsection parsed_velocity_function
-        set Function expression = 1.
-    end
-
-    subsection parsed_diffusivity_function
-        set Function expression = 0.01
-    end
-
-    subsection parsed_source_function
-        set Function expression = 1.
-    end
-  
+subsection parsed_velocity_function
+    set Function expression = 1.
 end
 
+subsection parsed_diffusivity_function
+    set Function expression = 0.01
+end
+
+subsection parsed_source_function
+    set Function expression = 1.
+end
 
 subsection initial_values
     subsection parsed_function
         set Function expression = 0.
     end
 end
-
 
 subsection boundary_conditions
     set implementation_types = strong, strong
@@ -48,13 +41,11 @@ subsection boundary_conditions
     end
 end
 
-
 subsection refinement
   set boundaries_to_refine = 1
   set initial_boundary_cycles = 3
   set initial_global_cycles = 3
 end
-
 
 subsection time
   set end_time = 1.2
@@ -62,7 +53,6 @@ subsection time
   set step_size = 0.001
   set semi_implicit_theta = 0.5
 end
-
 
 subsection solver
   set max_iterations = 1000

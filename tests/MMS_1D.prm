@@ -22,42 +22,27 @@ subsection verification
 
 end
 
-
 subsection output
   set write_solution_table = true
   set write_solution_vtk = false
   set time_step_interval = 2
 end
 
-
-subsection pde
-    
-    set velocity_function_name = parsed
-    
-    subsection parsed_velocity_function
-        set Function constants = v=-5
-        set Function expression = v
-    end
-    
-    
-    set diffusivity_function_name = parsed
-    
-    subsection parsed_diffusivity_function
-        set Function constants = alpha=2
-        set Function expression = alpha
-    end
-    
-    
-    set source_function_name = parsed
-    
-    subsection parsed_source_function
-        set Function constants = alpha=2, v=-5, g=-2, beta=10
-        set Function expression = 2*beta*g*t*exp(-beta*t^2)*((exp((v*x)/alpha) - 1)/(exp(v/alpha) - 1) - 1)
-    end
-    
+subsection parsed_velocity_function
+    set Function constants = v=-5
+    set Function expression = v
 end
 
+subsection parsed_diffusivity_function
+    set Function constants = alpha=2
+    set Function expression = alpha
+end
 
+subsection parsed_source_function
+    set Function constants = alpha=2, v=-5, g=-2, beta=10
+    set Function expression = 2*beta*g*t*exp(-beta*t^2)*((exp((v*x)/alpha) - 1)/(exp(v/alpha) - 1) - 1)
+end
+    
 subsection initial_values
 
     set function_name = parsed
@@ -71,7 +56,6 @@ subsection initial_values
 
 end
 
-
 subsection boundary_conditions
     set implementation_types = natural, strong
     set function_names = parsed, constant
@@ -84,20 +68,17 @@ subsection boundary_conditions
 
 end
 
-
 subsection refinement
   set boundaries_to_refine = 0
   set initial_boundary_cycles = 0
   set initial_global_cycles = 6
 end
 
-
 subsection time
   set end_time = 1.
   set global_refinement_levels = 6
   set semi_implicit_theta = 0.5
 end
-
 
 subsection solver
   set max_iterations = 10000
