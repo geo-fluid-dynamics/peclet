@@ -3,18 +3,22 @@
  *
  * @detail
  *
- *  This solves the unsteady convection-diffusion problem equation.
+ *  This solves the unsteady convection-diffusion equation.
  *
- *  Matrix assembly and time stepping are based on deal.II Tutorial 26 by Wolfgang Bangerth, Texas A&M University, 2013
+ *  System assembly and time stepping are based on deal.II Tutorial 26 by Wolfgang Bangerth, Texas A&M University, 2013
  *
  *  Some of the more notable extensions include:
- *  - Builds convection-diffusion matrix instead of Laplace matrix.
- *  - Supports time-dependent non-zero Dirichlet and Neumann boundary condition.
- *  - Decomposed the classes and methods into multiple files.
+ *  - Builds convection-diffusion matrix instead of Laplace matrix
+ *  - Supports time-dependent non-zero Dirichlet and Neumann boundary condition
  *  - Re-designed parmameter handling
  *  - Generalized boundary condition handling via the parameter input file
  *  - Writes FEFieldFunction to disk, and can read it from disk to initialize a restart
- *  - Added verification via MMS (Method of Manufactured Solutions) with error table based on approach from Tutorial 7
+ *  - Extended the FEFieldFunction class for extrapolation
+ *  - Added verification via Method of Manufactured Solutions (MMS) with error table based on approach from Tutorial 7
+ *  - Added test suite using ctest and the standard deal.II approach
+ *  - Added a parameteric sphere-cylinder grid
+ *  - Added a boundary grid refinement routine
+ *  - Added a output option for 1D solutions in tabular format
  *
  * @author Alexander Zimmerman <zimmerman@aices.rwth-aachen.de>, RWTH AAchen University, 2016
  */
