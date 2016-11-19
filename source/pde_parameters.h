@@ -47,11 +47,12 @@ namespace PDE
         };
        
         struct ConvectionDiffusionEquation
-        {
-            double reference_peclet_number;
-            
+        {            
             std::string velocity_function_name;
-            std::vector<double> velocity_function_double_arguments; 
+            std::vector<double> velocity_function_double_arguments;
+            
+            std::string diffusivity_function_name;
+            std::vector<double> diffusivity_function_double_arguments; 
             
             std::string source_function_name;
             std::vector<double> source_function_double_arguments; 
@@ -154,8 +155,6 @@ namespace PDE
             
             prm.enter_subsection("pde");
             {
-                prm.declare_entry("reference_peclet_number", "1.", Patterns::Double(0.));
-                    
                 prm.declare_entry("velocity_function_name", "parsed",
                     Patterns::List(Patterns::Selection("parsed | constant")));
                     
@@ -167,6 +166,20 @@ namespace PDE
                     Functions::ParsedFunction<dim>::declare_parameters(prm, dim);    
                 }
                 prm.leave_subsection();
+
+                
+                prm.declare_entry("diffusivity_function_name", "parsed",
+                Patterns::List(Patterns::Selection("parsed | constant")));
+                    
+                prm.declare_entry("diffusivity_function_double_arguments", "",
+                    Patterns::List(Patterns::Double()));
+                    
+                prm.enter_subsection("parsed_diffusivity_function");
+                {
+                    Functions::ParsedFunction<dim>::declare_parameters(prm);    
+                }
+                prm.leave_subsection();
+                
                 
                 prm.declare_entry("source_function_name", "parsed",
                     Patterns::List(Patterns::Selection("parsed | constant")));

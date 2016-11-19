@@ -3,9 +3,7 @@
  *
  * @detail
  *
- *  This solves the dimensionless form of the unsteady convection-diffusion problem,
- *  with space and time dependent convection velocity, but constant diffusivity.
- *  The reference Peclet Number Pe_r = x_r*a_r/nu
+ *  This solves the unsteady convection-diffusion problem equation.
  *
  *  Matrix assembly and time stepping are based on deal.II Tutorial 26 by Wolfgang Bangerth, Texas A&M University, 2013
  *
@@ -117,8 +115,8 @@ namespace PDE
     std::vector<unsigned int> manifold_ids;
     std::vector<std::string> manifold_descriptors;
     
-    double reference_peclet_number;
     Function<dim>* velocity_function;
+    Function<dim>* diffusivity_function;
     Function<dim>* source_function;
     std::vector<Function<dim>*> boundary_functions;
     Function<dim>* initial_values_function;
@@ -191,20 +189,12 @@ namespace PDE
     MatrixCreator::create_mass_matrix(this->dof_handler,
                                       QGauss<dim>(fe.degree+1),
                                       this->mass_matrix);
-                       
-    /*
-    In the unitless form of the convection-diffusion equation,
-    the inverse of the Peclet Number replaces the momentum diffusivity (nu) 
-    from the standard formulation.
-    */
-    ConstantFunction<dim> 
-        inverse_reference_peclet_number_function(1./this->reference_peclet_number);
-    
+                          
     MyMatrixCreator::create_convection_diffusion_matrix<dim>(
         this->dof_handler,
         QGauss<dim>(fe.degree+1),
         this->convection_diffusion_matrix,
-        &inverse_reference_peclet_number_function, 
+        this->diffusivity_function, 
         this->velocity_function
         );
 
@@ -386,8 +376,6 @@ namespace PDE
     {
         std::remove(this->verification_table_file_name.c_str());
     }
-    
-    this->reference_peclet_number = this->params.pde.reference_peclet_number;
     
     this->create_coarse_grid();
     

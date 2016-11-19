@@ -5,7 +5,6 @@ subsection meta
   set dim = 1
 end
 
-
 subsection geometry
   set grid_name = hyper_cube
   set sizes = 0., 1.
@@ -19,9 +18,11 @@ end
 
 
 subsection pde
-  set velocity_function_name = constant
-  set velocity_function_double_arguments = 0.
-  set reference_peclet_number = 1.
+    set velocity_function_name = constant
+    set velocity_function_double_arguments = -1.
+
+    set diffusivity_function_name = constant
+    set diffusivity_function_double_arguments = 1.
 end
 
 
@@ -37,7 +38,7 @@ subsection boundary_conditions
     
     set function_names = constant, constant
     
-    set function_double_arguments = 1., -1.
+    set function_double_arguments = 1.581976706869327, -1.
     
 end
 
@@ -50,8 +51,8 @@ end
 
 
 subsection time
-  set end_time = 20.
-  set step_size = 0.1
+  set end_time = 10.
+  set step_size = 0.01
   set semi_implicit_theta = 1.0
 end
 

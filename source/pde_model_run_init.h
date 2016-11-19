@@ -32,13 +32,13 @@
         assert(parameter_log_file.good());
         prm.print_parameters(parameter_log_file, ParameterHandler::Text);
         
-        
-        Functions::ParsedFunction<dim> parsed_exact_solution_function;
-        Functions::ParsedFunction<dim> parsed_initial_values_function;
+        Functions::ParsedFunction<dim> parsed_velocity_function(dim);
+        Functions::ParsedFunction<dim> parsed_diffusivity_function;
         Functions::ParsedFunction<dim> parsed_source_function;
         Functions::ParsedFunction<dim> parsed_boundary_function;
-        Functions::ParsedFunction<dim> parsed_velocity_function(dim);
-
+        Functions::ParsedFunction<dim> parsed_exact_solution_function;
+        Functions::ParsedFunction<dim> parsed_initial_values_function;
+        
         prm.enter_subsection("geometry");
         {
             this->params.geometry.grid_name = prm.get("grid_name");
@@ -50,8 +50,7 @@
         
 
         prm.enter_subsection("pde");
-        {
-            this->params.pde.reference_peclet_number = prm.get_double("reference_peclet_number");    
+        {    
             
             this->params.pde.velocity_function_name = prm.get("velocity_function_name");
             
@@ -64,6 +63,19 @@
             this->params.pde.velocity_function_double_arguments = 
                 Parameters::get_vector<double>(prm, "velocity_function_double_arguments");
 
+                
+            this->params.pde.diffusivity_function_name = prm.get("diffusivity_function_name");
+            
+            prm.enter_subsection("parsed_diffusivity_function");
+            {
+                parsed_diffusivity_function.parse_parameters(prm);    
+            }
+            prm.leave_subsection();
+            
+            this->params.pde.diffusivity_function_double_arguments = 
+                Parameters::get_vector<double>(prm, "diffusivity_function_double_arguments");    
+                
+                
             this->params.pde.source_function_name = prm.get("source_function_name");
 
             prm.enter_subsection("parsed_source_function");

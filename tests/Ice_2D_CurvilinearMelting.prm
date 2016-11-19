@@ -9,14 +9,14 @@ subsection geometry
 end
 subsection pde
     
-    set reference_peclet_number = 6.7789
-    
-    set velocity_function_name = parsed
-    
+    set velocity_function_name = parsed    
     subsection parsed_velocity_function
-        set Function constants = a0=-1, rc=1
-        set Function expression = a0*(y + rc - 0.5); 0
+        set Function constants = v0=-1, rc=1
+        set Function expression = v0*(y + rc - 0.5); 0
     end
+    
+    set diffusivity_function_name = constant
+    set diffusivity_function_double_arguments = 0.14752
     
     set source_function_name = constant
     set source_function_double_arguments = 0.
@@ -36,9 +36,9 @@ subsection boundary_conditions
     
     subsection parsed_function
 
-        set Function constants = a0=-1, rc=1, g=-1, Per=6.7789
+        set Function constants = v0=-1, rc=1, g=-1, alpha=0.14752
 
-        set Function expression = a0*(y + rc - 0.5)*g/(1 - exp(a0*(y + rc - 0.5)*Per))
+        set Function expression = v0*(y + rc - 0.5)*g/(1 - exp(v0*(y + rc - 0.5)/alpha))
     
     end
     

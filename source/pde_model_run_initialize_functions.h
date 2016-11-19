@@ -38,6 +38,29 @@
     {
         Assert(false, ExcNotImplemented());
     }
+    
+    // Diffusivity function
+    
+    double constant_diffusivity;
+    if (this->params.pde.diffusivity_function_name == "constant")
+    {
+        constant_diffusivity = this->params.pde.diffusivity_function_double_arguments[0];
+    }
+    
+    ConstantFunction<dim> constant_diffusivity_function(constant_diffusivity);
+    
+    if (this->params.pde.diffusivity_function_name == "parsed")
+    {
+        this->diffusivity_function = &parsed_diffusivity_function;
+    }
+    else if (this->params.pde.diffusivity_function_name == "constant")
+    {
+        this->diffusivity_function = &constant_diffusivity_function;
+    }
+    else
+    {
+        Assert(false, ExcNotImplemented());
+    }
 
     // Make initial values function
     ConstantFunction<dim> constant_function(0.);

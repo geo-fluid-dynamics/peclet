@@ -9,13 +9,13 @@ subsection geometry
 end
 subsection pde
     
-    set reference_peclet_number = 6.7789
-    
     set velocity_function_name = parsed
-    
     subsection parsed_velocity_function
         set Function expression = -1; 0
     end
+    
+    set diffusivity_function_name = constant
+    set diffusivity_function_double_arguments = 0.14752
     
     set source_function_name = constant
     set source_function_double_arguments = 0.
