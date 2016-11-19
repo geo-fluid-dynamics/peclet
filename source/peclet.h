@@ -348,12 +348,26 @@ namespace Peclet
   template<int dim>
   void Peclet<dim>::run(const std::string parameter_file)
   {
-      
+    
+    // Clean up the files in the working directory
+    
+    if (dim == 1)
+    {
+        std::remove(solution_table_1D_file_name.c_str()); // In 1D, the solution will be appended here at every time step.    
+    }        
+    
+    if (this->params.verification.enabled)
+    {
+        std::remove(this->verification_table_file_name.c_str());
+    }
+    
     /*
-    The design of ParsedFunction forces us to instantitate them here rather than being able
-    to include them as members of the Peclet class.
+    Working with deal.II's Function class has been interesting, and I'm 
+    sure many of my choices are unorthodox. The most important lesson learned has been that 
+    a Function<dim>* can point to any class derived from Function<dim>. The general design pattern
+    then is to instantitate all of the functions that might be needed, and then to point to the ones
+    actually being used.
     */
-
     Functions::ParsedFunction<dim> parsed_velocity_function(dim),
         parsed_diffusivity_function,
         parsed_source_function,
@@ -376,22 +390,91 @@ namespace Peclet
     this->diffusivity_function = &parsed_diffusivity_function;
     this->source_function = &parsed_source_function;
     this->exact_solution_function = &parsed_exact_solution_function;
+    
     /*
-    Generalizing the handling of auxiliary functions is complicated and distracts from the flow of this program, so this section of code has been moved to the following file.
+    Generalizing the handling of auxiliary functions is complicated. In most cases one should be able to use a ParsedFunction, but the generality of Function<dim>* allows for a standard way to account for any possible derived class of Function<dim>. 
+    For example this allows for....
+        - an optional initial values function that interpolates an old solution loaded from disk. 
+        - flexibily implementing general boundary conditions
     */
-    #include "peclet_run_initialize_functions.h"
+
+    // Initial values function
     
-    if (dim == 1)
-    {
-        std::remove(solution_table_1D_file_name.c_str()); // In 1D, the solution will be appended here at every time step.    
-    }        
+    Triangulation<dim> field_grid;
+    DoFHandler<dim> field_dof_handler(field_grid);
+    Vector<double> field_solution;
     
-    if (this->params.verification.enabled)
+    if (this->params.initial_values.function_name != "interpolate_old_field")
+    { // This will write files that need to exist.
+        this->setup_system(true);
+        FEFieldTools::save_field_parts(this->triangulation, this->dof_handler, this->solution); 
+    }
+    
+    FEFieldTools::load_field_parts(
+        field_grid,
+        field_dof_handler,
+        field_solution,
+        this->fe);
+    
+    MyFunctions::ExtrapolatedField<dim> field_function(
+        field_dof_handler,
+        field_solution);
+    
+
+    if (this->params.initial_values.function_name == "interpolate_old_field")
     {
-        std::remove(this->verification_table_file_name.c_str());
+        this->initial_values_function = &field_function;                      
+    }
+    else if (this->params.initial_values.function_name == "parsed")
+    { 
+        this->initial_values_function = &parsed_initial_values_function;
+    }
+    
+    // Boundary condition functions
+    
+    unsigned int boundary_count = this->params.boundary_conditions.implementation_types.size();
+    
+    assert(params.boundary_conditions.function_names.size() == boundary_count);
+
+    std::vector<ConstantFunction<dim>> constant_functions;
+    
+    for (unsigned int boundary = 0; boundary < boundary_count; boundary++)
+    {
+        std::string boundary_type = this->params.boundary_conditions.implementation_types[boundary];
+        std::string function_name = this->params.boundary_conditions.function_names[boundary];
+        
+        if (function_name == "constant")
+        {
+            double value = this->params.boundary_conditions.function_double_arguments.front();
+            this->params.boundary_conditions.function_double_arguments.pop_front();
+            constant_functions.push_back(ConstantFunction<dim>(value));
+        }
+    }
+        
+    // Organize boundary functions to simplify application during the time loop
+    
+    unsigned int constant_function_index = 0;
+    
+    for (unsigned int boundary = 0; boundary < boundary_count; boundary++)        
+    {
+        std::string boundary_type = this->params.boundary_conditions.implementation_types[boundary];
+        std::string function_name = this->params.boundary_conditions.function_names[boundary];
+
+        if (function_name == "constant")
+        {
+            assert(constant_function_index < constant_functions.size());
+            this->boundary_functions.push_back(&constant_functions[constant_function_index]);
+            constant_function_index++;
+        }
+        else if (function_name == "parsed")
+        {
+            this->boundary_functions.push_back(&parsed_boundary_function);
+        }
+        
     }
     
     // Attach manifolds
+    
     assert(dim < 3); // @todo: 3D extension: For now the CylindricalManifold is being ommitted.
         // deal.II makes is impractical for a CylindricalManifold to exist in 2D.
     SphericalManifold<dim> spherical_manifold(this->spherical_manifold_center);
