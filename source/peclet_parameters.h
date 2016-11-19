@@ -4,6 +4,7 @@
 #include <vector>
 #include <iostream>
 #include <fstream>
+#include <functional>
 
 #include <deal.II/base/parameter_handler.h>
 
@@ -37,14 +38,11 @@
 
 namespace Peclet
 {
-    // @todo: This should be a Parameters class instead.
-    //        In the beginning I didn't realize how involved it would become.
-    
-    using namespace dealii;
-    
     namespace Parameters
     {   
-    
+
+        using namespace dealii;
+
         struct Meta
         {
             unsigned int dim;
@@ -61,7 +59,7 @@ namespace Peclet
             std::string source_function_name;
             std::vector<double> source_function_double_arguments; 
         };
-    
+
         struct BoundaryConditions
         {
             std::vector<std::string> implementation_types;
@@ -146,7 +144,7 @@ namespace Peclet
             Output output;
             Verification verification;
         };    
-    
+
         template<int dim>
         void declare(ParameterHandler &prm)
         {
@@ -432,8 +430,8 @@ namespace Peclet
             prm.leave_subsection();
 
         }
-    
-    
+
+
         template<typename ItemType>
         std::vector<ItemType> get_vector(ParameterHandler &prm, std::string parameter_name)
         {
@@ -471,8 +469,204 @@ namespace Peclet
             return mp;
         }
         
+        template <int dim>
+        StructuredParameters read(
+                const std::string parameter_file,
+                Functions::ParsedFunction<dim> &parsed_velocity_function,
+                Functions::ParsedFunction<dim> &parsed_diffusivity_function,
+                Functions::ParsedFunction<dim> &parsed_source_function,
+                Functions::ParsedFunction<dim> &parsed_boundary_function,
+                Functions::ParsedFunction<dim> &parsed_exact_solution_function,
+                Functions::ParsedFunction<dim> &parsed_initial_values_function)
+        {
+
+            StructuredParameters params;
+            
+            ParameterHandler prm;
+            Parameters::declare<dim>(prm);
+
+            if (parameter_file != "")
+            {
+                prm.read_input(parameter_file);    
+            }
+            
+            // Print a log file of all the ParameterHandler parameters
+            std::ofstream parameter_log_file("used_parameters.prm");
+            assert(parameter_log_file.good());
+            prm.print_parameters(parameter_log_file, ParameterHandler::Text);
+            
+            prm.enter_subsection("geometry");
+            {
+                params.geometry.grid_name = prm.get("grid_name");
+                params.geometry.sizes = Parameters::get_vector<double>(prm, "sizes");
+                params.geometry.transformations = 
+                    Parameters::get_vector<double>(prm, "transformations");    
+            }
+            prm.leave_subsection();
+            
+
+            prm.enter_subsection("pde");
+            {    
+                
+                params.pde.velocity_function_name = prm.get("velocity_function_name");
+                
+                prm.enter_subsection("parsed_velocity_function");
+                {
+                    parsed_velocity_function.parse_parameters(prm);    
+                }
+                prm.leave_subsection();
+                
+                params.pde.velocity_function_double_arguments = 
+                    Parameters::get_vector<double>(prm, "velocity_function_double_arguments");
+
+                    
+                params.pde.diffusivity_function_name = prm.get("diffusivity_function_name");
+                
+                prm.enter_subsection("parsed_diffusivity_function");
+                {
+                    parsed_diffusivity_function.parse_parameters(prm);    
+                }
+                prm.leave_subsection();
+                
+                params.pde.diffusivity_function_double_arguments = 
+                    Parameters::get_vector<double>(prm, "diffusivity_function_double_arguments");    
+                    
+                    
+                params.pde.source_function_name = prm.get("source_function_name");
+
+                prm.enter_subsection("parsed_source_function");
+                {
+                    parsed_source_function.parse_parameters(prm);
+                }
+                prm.leave_subsection();
+                
+                params.pde.source_function_double_arguments = 
+                    Parameters::get_vector<double>(prm, "source_function_double_arguments");
+                
+            }
+            prm.leave_subsection();
+            
+            prm.enter_subsection("verification");
+            {
+                params.verification.enabled = prm.get_bool("enabled");
+                
+                params.verification.exact_solution_function_name = 
+                        prm.get("exact_solution_function_name");
+                        
+                prm.enter_subsection("parsed_exact_solution_function");
+                {
+                    parsed_exact_solution_function.parse_parameters(prm);    
+                }
+                prm.leave_subsection();
+            }
+            prm.leave_subsection();
+            
+            prm.enter_subsection("boundary_conditions");
+            {
+                params.boundary_conditions.implementation_types = 
+                    Parameters::get_vector<std::string>(prm, "implementation_types");
+                params.boundary_conditions.function_names = 
+                    Parameters::get_vector<std::string>(prm, "function_names");
+                
+                std::vector<double> vector = 
+                    Parameters::get_vector<double>(prm, "function_double_arguments");
+                
+                for (auto v : vector)
+                {
+                    params.boundary_conditions.function_double_arguments.push_back(v);
+                }
+
+                prm.enter_subsection("parsed_function");
+                {
+                    parsed_boundary_function.parse_parameters(prm);
+                }
+                prm.leave_subsection();
+                
+            }    
+            prm.leave_subsection();
+            
+            prm.enter_subsection("initial_values");
+            {               
+                params.initial_values.function_name = prm.get("function_name"); 
+                
+                prm.enter_subsection("parsed_function");
+                {
+                    parsed_initial_values_function.parse_parameters(prm);
+                }
+                prm.leave_subsection();
+
+                std::vector<double> vector = 
+                    Parameters::get_vector<double>(prm, "function_double_arguments");
+                
+                for (auto v : vector)
+                {
+                    params.initial_values.function_double_arguments.push_back(v);
+                }
+                
+            }    
+            prm.leave_subsection();
+            
+            
+            prm.enter_subsection("refinement");
+            {
+                
+                params.refinement.initial_global_cycles = prm.get_integer("initial_global_cycles");
+                params.refinement.initial_boundary_cycles = prm.get_integer("initial_boundary_cycles");
+                params.refinement.boundaries_to_refine = 
+                    Parameters::get_vector<unsigned int>(prm, "boundaries_to_refine");
+                
+                prm.enter_subsection("adaptive");
+                {
+                    params.refinement.adaptive.initial_cycles = prm.get_integer("initial_cycles");
+                    params.refinement.adaptive.max_level = prm.get_integer("max_level");
+                    params.refinement.adaptive.max_cells = prm.get_integer("max_cells");
+                    params.refinement.adaptive.interval = prm.get_integer("interval");
+                    params.refinement.adaptive.cycles_at_interval = prm.get_integer("cycles_at_interval");
+                    params.refinement.adaptive.refine_fraction = prm.get_double("refine_fraction");
+                    params.refinement.adaptive.coarsen_fraction = prm.get_double("coarsen_fraction");    
+                }        
+                
+                prm.leave_subsection();
+                
+            }
+            prm.leave_subsection();
+                
+                
+            prm.enter_subsection("time");
+            {
+                params.time.end_time = prm.get_double("end_time");
+                params.time.step_size = prm.get_double("step_size");
+                params.time.global_refinement_levels = 
+                    prm.get_integer("global_refinement_levels");
+                params.time.semi_implicit_theta = prm.get_double("semi_implicit_theta");
+                params.time.stop_when_steady = prm.get_bool("stop_when_steady");
+            }    
+            prm.leave_subsection();
+            
+            
+            prm.enter_subsection("solver");
+            {
+                params.solver.method = prm.get("method");
+                params.solver.max_iterations = prm.get_integer("max_iterations");
+                params.solver.tolerance = prm.get_double("tolerance");
+                params.solver.normalize_tolerance = prm.get_bool("normalize_tolerance");
+            }    
+            prm.leave_subsection(); 
+            
+            prm.enter_subsection("output");
+            {
+                params.output.write_solution_vtk = prm.get_bool("write_solution_vtk");
+                params.output.write_solution_table = prm.get_bool("write_solution_table");
+                params.output.time_step_interval = prm.get_integer("time_step_interval");
+            }
+            prm.leave_subsection();
+            
+            return params;
+        }
+
+        
     }    
-    
+
 }
 
 #endif

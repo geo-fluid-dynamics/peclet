@@ -121,8 +121,6 @@ namespace Peclet
     Function<dim>* initial_values_function;
     Function<dim>* exact_solution_function;
     
-    
-    
     void append_verification_table();
     void write_verification_table();
     TableHandler verification_table;
@@ -348,8 +346,6 @@ namespace Peclet
     out_file.close(); 
   }
   
-  
-  
   template<int dim>
   void Peclet<dim>::run(const std::string parameter_file)
   {
@@ -365,8 +361,14 @@ namespace Peclet
     Functions::ParsedFunction<dim> parsed_exact_solution_function;
     Functions::ParsedFunction<dim> parsed_initial_values_function;  
     
-    // @todo: Try encapsulating read_parameters by passing pointers to the ParsedFunctions
-    #include "peclet_run_read_parameters.h" 
+    this->params = Parameters::read<dim>(
+        parameter_file,
+        parsed_velocity_function,
+        parsed_diffusivity_function,
+        parsed_source_function,
+        parsed_boundary_function,
+        parsed_exact_solution_function,
+        parsed_initial_values_function);
     
     this->create_coarse_grid();
     
