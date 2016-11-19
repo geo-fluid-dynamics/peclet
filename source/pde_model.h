@@ -54,7 +54,6 @@
 #include <deal.II/grid/tria_boundary_lib.h>
 #include <deal.II/base/parsed_function.h>
 
-#include "my_functions.h"
 #include "extrapolated_field.h"
 #include "pde_parameters.h"
 #include "my_grid_generator.h"

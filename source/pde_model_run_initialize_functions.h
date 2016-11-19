@@ -7,7 +7,7 @@
     then is to instantitate all of the functions that might be needed, and then to point to the ones
     actually being used. Since this looks quite messy and could distract from the rest of the program, this design pattern is mostly contained in this file.
     
-    Note that I recently discovered ParsedFunction, which obsoletes some of what I had been trying to do in this file, e.g. with manually implemented constant functions and ramp functions. Ultimately the ParsedFunction is not enough. For example this file contains the option for an initial values function that interpolates an old solution loaded from disk. So in most cases one should be able to use a ParsedFunction, but the generality of Function<dim>* (function pointers) allows for a standard way to account for any possible derived class of Function<dim>.
+    In most cases one should be able to use a ParsedFunction, but the generality of Function<dim>* (function pointers) allows for a standard way to account for any possible derived class of Function<dim>. For example this file contains the option for an initial values function that interpolates an old solution loaded from disk. 
     
     Also this file contains most of what was needed to implement general boundary conditions. I think that the approach here is quite powerful and flexible.
     */
@@ -65,51 +65,7 @@
     // Make initial values function
     ConstantFunction<dim> constant_function(0.);
     
-    initial_values_function = &constant_function;
-
-    Point<dim> ramp_start_point, ramp_end_point;
-    
-    double ramp_start_position = 0.,
-           ramp_end_position = 0.,
-           ramp_start_value = 0.,
-           ramp_end_value = 0.;
-            
-    if (this->params.initial_values.function_name == "ramp")
-    {
-        for (unsigned int axis = 0; axis < dim; axis++)
-        {
-            ramp_start_point[axis] = this->params.initial_values.function_double_arguments.front();
-            this->params.initial_values.function_double_arguments.pop_front();
-        }
-        
-        for (unsigned int axis = 0; axis < dim; axis++)
-        {
-            ramp_end_point[axis] = this->params.initial_values.function_double_arguments.front();
-            this->params.initial_values.function_double_arguments.pop_front();
-        }
-        
-        ramp_start_position = this->params.initial_values.function_double_arguments.front();
-        this->params.initial_values.function_double_arguments.pop_front();
-        
-        ramp_end_position = this->params.initial_values.function_double_arguments.front();
-        this->params.initial_values.function_double_arguments.pop_front();
-        
-        ramp_start_value = this->params.initial_values.function_double_arguments.front();
-        this->params.initial_values.function_double_arguments.pop_front();
-        
-        ramp_end_value = this->params.initial_values.function_double_arguments.front();
-        this->params.initial_values.function_double_arguments.pop_front();
-        
-    }
-    
-    MyFunctions::RampFunctionAlongLine<dim> ramp_function(
-            ramp_start_point,
-            ramp_end_point,
-            ramp_start_position,
-            ramp_end_position,
-            ramp_start_value,
-            ramp_end_value);
-            
+    initial_values_function = &constant_function;    
     
     Triangulation<dim> field_grid;
     DoFHandler<dim> field_dof_handler(field_grid);
@@ -142,11 +98,6 @@
             this->params.initial_values.function_double_arguments.front());
         this->initial_values_function = &constant_function;
                         
-    }
-    else if (this->params.initial_values.function_name == "ramp")
-    {
-        this->initial_values_function =  &ramp_function;
-        
     }
     else if (this->params.initial_values.function_name == "parsed")
     { 

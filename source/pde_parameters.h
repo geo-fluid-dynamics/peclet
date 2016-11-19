@@ -247,7 +247,7 @@ namespace PDE
             prm.enter_subsection ("initial_values");
             {
                 prm.declare_entry("function_name", "parsed",
-                    Patterns::List(Patterns::Selection("constant | parsed | ramp | interpolate_old_field")));
+                    Patterns::List(Patterns::Selection("parsed | constant | interpolate_old_field")));
                     
                 prm.declare_entry("function_double_arguments", "",
                     Patterns::List(Patterns::Double())); 
@@ -270,7 +270,7 @@ namespace PDE
                     "Type of boundary conditions to apply to each boundary");  
                     
                 prm.declare_entry("function_names", "parsed, parsed",
-                    Patterns::List(Patterns::Selection("constant | parsed | ramp ")),
+                    Patterns::List(Patterns::Selection("parsed | constant")),
                     "Names of functions to apply to each boundary");
                     
                 prm.declare_entry("function_double_arguments", "",
