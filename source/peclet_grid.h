@@ -1,14 +1,14 @@
-#include "pde_refinement.h"
+#include "refinement.h"
 
 template<>
-void Model<1>::create_coarse_grid()
+void Peclet<1>::create_coarse_grid()
 {
     const unsigned int dim = 1;
     // Create grid
     MyGridGenerator::create_coarse_grid(
         this->triangulation,
         this->manifold_ids, this->manifold_descriptors,
-        params.geometry.grid_name, params.geometry.sizes);
+        this->params.geometry.grid_name, params.geometry.sizes);
     // Shift and rotate the grid.
     Point<dim> shifted_center;
     for (unsigned int i = 0; i < dim; i++)
@@ -20,7 +20,7 @@ void Model<1>::create_coarse_grid()
 }
 
 template <>
-void Model<2>::create_coarse_grid()
+void Peclet<2>::create_coarse_grid()
 {
     const unsigned int dim = 2;
     // Create grid
@@ -40,30 +40,30 @@ void Model<2>::create_coarse_grid()
 }
 
 template<>
-void Model<3>::create_coarse_grid()
+void Peclet<3>::create_coarse_grid()
 {
     Assert(false, ExcNotImplemented()); // Only missing a 3D rotation method
 }
 
 template<int dim>
-void Model<dim>::adaptive_refine()
+void Peclet<dim>::adaptive_refine()
 {
-    SolutionTransfer<dim> solution_trans(dof_handler);
+    SolutionTransfer<dim> solution_trans(this->dof_handler);
     Vector<double> previous_solution;
-    previous_solution = solution;
+    previous_solution = this->solution;
     Refinement::adaptive_refine_mesh(
-        triangulation,
-        dof_handler,
-        solution,
+        this->triangulation,
+        this->dof_handler,
+        this->solution,
         solution_trans,
-        fe,
-        params.refinement.initial_global_cycles + params.refinement.initial_boundary_cycles,
-        params.refinement.adaptive.max_level,
-        params.refinement.adaptive.max_cells,
-        params.refinement.adaptive.refine_fraction,
-        params.refinement.adaptive.coarsen_fraction);
-    setup_system();
-    solution_trans.interpolate(previous_solution, solution);
-    constraints.distribute(solution);
+        this->fe,
+        this->params.refinement.initial_global_cycles + params.refinement.initial_boundary_cycles,
+        this->params.refinement.adaptive.max_level,
+        this->params.refinement.adaptive.max_cells,
+        this->params.refinement.adaptive.refine_fraction,
+        this->params.refinement.adaptive.coarsen_fraction);
+    this->setup_system();
+    solution_trans.interpolate(previous_solution, this->solution);
+    this->constraints.distribute(this->solution);
 }
   

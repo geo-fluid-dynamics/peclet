@@ -41,7 +41,7 @@
     
     // Diffusivity function
     
-    double constant_diffusivity;
+    double constant_diffusivity = 1.;
     if (this->params.pde.diffusivity_function_name == "constant")
     {
         constant_diffusivity = this->params.pde.diffusivity_function_double_arguments[0];
@@ -62,7 +62,7 @@
         Assert(false, ExcNotImplemented());
     }
 
-    // Make initial values function
+    // Initial values function
     ConstantFunction<dim> constant_function(0.);
     
     initial_values_function = &constant_function;    
@@ -73,7 +73,7 @@
     
     if (this->params.initial_values.function_name != "interpolate_old_field")
     { // This will write files that need to exist.
-        setup_system(true);
+        this->setup_system(true);
         FEFieldTools::save_field_parts(this->triangulation, this->dof_handler, this->solution); 
     }
     
@@ -104,7 +104,7 @@
         this->initial_values_function = &parsed_initial_values_function;
     }
     
-    // Make source functions
+    // Source function
     double constant_source_value = 0.;
     
     if (this->params.pde.source_function_name == "constant")
@@ -123,7 +123,7 @@
         this->source_function = &constant_source_function;
     }
     
-    // Make boundary functions
+    // Boundary functions
     
     unsigned int boundary_count = this->params.boundary_conditions.implementation_types.size();
     

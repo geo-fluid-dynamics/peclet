@@ -55,15 +55,15 @@
 #include <deal.II/base/parsed_function.h>
 
 #include "extrapolated_field.h"
-#include "pde_parameters.h"
 #include "my_grid_generator.h"
 #include "fe_field_tools.h"
 #include "output.h"
 #include "my_matrix_creator.h"
 #include "my_vector_tools.h"
 
+#include "peclet_parameters.h"
 
-namespace PDE
+namespace Peclet
 {
   using namespace dealii;
   
@@ -75,10 +75,10 @@ namespace PDE
   };
   
   template<int dim>
-  class Model
+  class Peclet
   {
   public:
-    Model();
+    Peclet();
     Parameters::StructuredParameters params;
     void init(std::string file_path);
     void run(const std::string parameter_file = "");
@@ -136,16 +136,16 @@ namespace PDE
   };
   
   template<int dim>
-  Model<dim>::Model()
+  Peclet<dim>::Peclet()
     :
     fe(1),
     dof_handler(this->triangulation)
   {}
   
-  #include "pde_model_grid.h"
+  #include "peclet_grid.h"
   
   template<int dim>
-  void Model<dim>::setup_system(bool quiet)
+  void Peclet<dim>::setup_system(bool quiet)
   {
     dof_handler.distribute_dofs(fe);
 
@@ -206,15 +206,15 @@ namespace PDE
   }
 
   template<int dim>
-  SolverStatus Model<dim>::solve_time_step(bool quiet)
+  SolverStatus Peclet<dim>::solve_time_step(bool quiet)
   {
-    double tolerance = params.solver.tolerance;
-    if (params.solver.normalize_tolerance)
+    double tolerance = this->params.solver.tolerance;
+    if (this->params.solver.normalize_tolerance)
     {
-        tolerance *= system_rhs.l2_norm();
+        tolerance *= this->system_rhs.l2_norm();
     }
     SolverControl solver_control(
-        params.solver.max_iterations,
+        this->params.solver.max_iterations,
         tolerance);
        
     SolverCG<> solver_cg(solver_control);
@@ -222,30 +222,30 @@ namespace PDE
 
     PreconditionSSOR<> preconditioner;
     
-    preconditioner.initialize(system_matrix, 1.0);
+    preconditioner.initialize(this->system_matrix, 1.0);
 
     std::string solver_name;
     
-    if (params.solver.method == "CG")
+    if (this->params.solver.method == "CG")
     {
         solver_name = "CG";
         solver_cg.solve(
-            system_matrix,
-            solution,
-            system_rhs,
+            this->system_matrix,
+            this->solution,
+            this->system_rhs,
             preconditioner);    
     }
-    else if (params.solver.method == "BiCGStab")
+    else if (this->params.solver.method == "BiCGStab")
     {
         solver_name = "BiCGStab";
         solver_bicgstab.solve(
-            system_matrix,
-            solution,
-            system_rhs,
+            this->system_matrix,
+            this->solution,
+            this->system_rhs,
             preconditioner);
     }
 
-    constraints.distribute(solution);
+    this->constraints.distribute(this->solution);
 
     if (!quiet)
     {
@@ -260,16 +260,16 @@ namespace PDE
     
   }
   
-  #include "pde_1D_solution_table.h"
+  #include "peclet_1D_solution_table.h"
   
   template<int dim>
-  void Model<dim>::write_solution()
+  void Peclet<dim>::write_solution()
   {
       
-    if (params.output.write_solution_vtk)
+    if (this->params.output.write_solution_vtk)
     {
         Output::write_solution_to_vtk(
-            "solution-"+Utilities::int_to_string(time_step_counter)+".vtk",
+            "solution-"+Utilities::int_to_string(this->time_step_counter)+".vtk",
             this->dof_handler,
             this->solution);    
     }
@@ -282,7 +282,7 @@ namespace PDE
   }
   
   template<int dim>
-  void Model<dim>::append_verification_table()
+  void Peclet<dim>::append_verification_table()
   {
     assert(this->params.verification.enabled);
     
@@ -309,20 +309,7 @@ namespace PDE
         VectorTools::L1_norm);
         
     double L1_norm_error = difference_per_cell.l1_norm();
-    
-    /*
-    @todo: Implement gradient of solution for MMS and calculate H1 norm
-    VectorTools::integrate_difference(
-        this->dof_handler,
-        this->solution,
-        manufactured_solution,
-        difference_per_cell,
-        QGauss<dim>(3),
-        VectorTools::H1_seminorm);
-    const double H1_seminorm_error = difference_per_cell.l2_norm();
-    verification_table.add_value("H1_seminorm_error", H1_seminorm_error);
-    */
-    
+        
     this->verification_table.add_value("time_step_size", this->time_step_size);
     this->verification_table.add_value("time", this->time);
     this->verification_table.add_value("cells", this->triangulation.n_active_cells());
@@ -333,7 +320,7 @@ namespace PDE
   }
   
   template<int dim>
-  void Model<dim>::write_verification_table()
+  void Peclet<dim>::write_verification_table()
   {
     const int precision = 14;
     
@@ -361,11 +348,30 @@ namespace PDE
     out_file.close(); 
   }
   
+  
+  
   template<int dim>
-  void Model<dim>::run(const std::string parameter_file)
+  void Peclet<dim>::run(const std::string parameter_file)
   {
-    #include "pde_model_run_init.h"  
       
+    /*
+    The design of ParsedFunction forces us to instantitate them here rather than being able
+    to include them as members of the Peclet class.
+    */
+    Functions::ParsedFunction<dim> parsed_velocity_function(dim);
+    Functions::ParsedFunction<dim> parsed_diffusivity_function;
+    Functions::ParsedFunction<dim> parsed_source_function;
+    Functions::ParsedFunction<dim> parsed_boundary_function;
+    Functions::ParsedFunction<dim> parsed_exact_solution_function;
+    Functions::ParsedFunction<dim> parsed_initial_values_function;  
+    
+    // @todo: Try encapsulating read_parameters by passing pointers to the ParsedFunctions
+    #include "peclet_run_read_parameters.h" 
+    
+    this->create_coarse_grid();
+    
+    #include "peclet_run_initialize_functions.h"
+    
     if (dim == 1)
     {
         std::remove(solution_table_1D_file_name.c_str()); // In 1D, the solution will be appended here at every time step.    
@@ -375,8 +381,6 @@ namespace PDE
     {
         std::remove(this->verification_table_file_name.c_str());
     }
-    
-    this->create_coarse_grid();
     
     // Attach manifolds
     assert(dim < 3); // @todo: 3D extension: For now the CylindricalManifold is being ommitted.
@@ -391,11 +395,7 @@ namespace PDE
         }
     }
     
-    //
-    
-    #include "pde_model_run_initialize_functions.h"
-    
-    // Initialize refinement
+    // Run initial refinement cycles
     
     this->triangulation.refine_global(this->params.refinement.initial_global_cycles);
     
@@ -404,20 +404,22 @@ namespace PDE
         this->params.refinement.boundaries_to_refine,
         this->params.refinement.initial_boundary_cycles);
         
-    // Initialize system
-    this->setup_system();
+    // Initialize the linear system
+    
+    this->setup_system(); 
 
-    unsigned int pre_refinement_step = 0;
     Vector<double> tmp;
     Vector<double> forcing_terms;
     
     // Iterate
+    unsigned int pre_refinement_step = 0;
+    
 start_time_iteration:
 
     tmp.reinit(this->solution.size());
 
     VectorTools::interpolate(this->dof_handler,
-                             *initial_values_function,
+                             *this->initial_values_function,
                              this->old_solution); 
     
     this->solution = this->old_solution;
@@ -563,7 +565,7 @@ start_time_iteration:
                 
                 VectorTools::interpolate_boundary_values
                     (
-                    dof_handler,
+                    this->dof_handler,
                     boundary,
                     *boundary_functions[boundary],
                     boundary_values
@@ -571,9 +573,9 @@ start_time_iteration:
             }
             MatrixTools::apply_boundary_values(
                 boundary_values,
-                system_matrix,
-                solution,
-                system_rhs);
+                this->system_matrix,
+                this->solution,
+                this->system_rhs);
         }
 
         solver_status = this->solve_time_step(!output_this_step);

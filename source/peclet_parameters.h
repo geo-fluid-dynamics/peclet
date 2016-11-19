@@ -1,5 +1,5 @@
-#ifndef pde_parameters_h
-#define pde_parameters_h
+#ifndef peclet_parameters_h
+#define peclet_parameters_h
 
 #include <vector>
 #include <iostream>
@@ -9,9 +9,9 @@
 
 /*
     
-    @brief: Encapsulates parameter handling and paramter input file handling.
+    @brief Encapsulates parameter handling and paramter input file handling.
 
-    @detail:
+    @detail
     
         Originally the ParameterReader from deal.II's step-26 was used;
         but that was too prohibitive. The approach in this file isolates the details
@@ -26,12 +26,16 @@
 
         This also makes it simple to insantiate a PDE Model in a user program 
         and then change it's parameters directly without having to use any intermediate text files.
+        
+    @todo Allow for multiple parsed boundary functions.
+        This might not be possible.
+        This will obsolete the "constant" function option.
     
-    @author: A. Zimmerman <zimmerman@aices.rwth-aachen.de>
+    @author A. Zimmerman <zimmerman@aices.rwth-aachen.de>
     
 */
 
-namespace PDE
+namespace Peclet
 {
     // @todo: This should be a Parameters class instead.
     //        In the beginning I didn't realize how involved it would become.

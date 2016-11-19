@@ -7,21 +7,7 @@
 
         ParameterHandler prm;
         Parameters::declare<dim>(prm);
-        
-        /*
-        @todo
-        
-        In older versions there was a strict separation between the declaration and the
-        reading of parameters. Now there is no strict separation, primarily because often whether
-        or not some parameters should be declared depends on the input of other parameters.
-        There is still plenty of work to unify this new approach; e.g., as of this writing,
-        all of the adaptive grid refinement parameters are being declared even though adaptive
-        grid refinement hasn't been used in a very long time (because boundary layer refinement
-        has been strictly better).
-        
-        */
-        
-        //
+
         if (parameter_file != "")
         {
             prm.read_input(parameter_file);    
@@ -31,13 +17,6 @@
         std::ofstream parameter_log_file("used_parameters.prm");
         assert(parameter_log_file.good());
         prm.print_parameters(parameter_log_file, ParameterHandler::Text);
-        
-        Functions::ParsedFunction<dim> parsed_velocity_function(dim);
-        Functions::ParsedFunction<dim> parsed_diffusivity_function;
-        Functions::ParsedFunction<dim> parsed_source_function;
-        Functions::ParsedFunction<dim> parsed_boundary_function;
-        Functions::ParsedFunction<dim> parsed_exact_solution_function;
-        Functions::ParsedFunction<dim> parsed_initial_values_function;
         
         prm.enter_subsection("geometry");
         {

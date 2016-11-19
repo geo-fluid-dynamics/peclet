@@ -8,7 +8,7 @@ problems, causing hard to trace errors. So this is explicitly only named for 1D.
 */
 
 template<int dim>
-void Model<dim>::append_1D_solution_to_table()
+void Peclet<dim>::append_1D_solution_to_table()
 {
     
     assert(dim == 1);
@@ -42,7 +42,7 @@ void Model<dim>::append_1D_solution_to_table()
 }
 
 template<int dim>
-void Model<dim>::write_1D_solution_table(const std::string file_name)
+void Peclet<dim>::write_1D_solution_table(const std::string file_name)
 {
     
     assert(dim == 1);
