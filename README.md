@@ -1,15 +1,24 @@
 # peclet
 A convection-diffusion solver written in C++ and based on deal.II
 
+[![Build Status](https://travis-ci.org/alexanderzimmerman/nsb-pcm.svg?branch=master)](https://travis-ci.org/alexanderzimmerman/nsb-pcm) (<b>Continuous integration status</b>; click the button to go to Travis-CI)
+
 Author: Alexander G. Zimmerman <zimmerman@aices.rwth-aachen.de>
 
 Doxygen generated HTML documentation: https://alexanderzimmerman.github.io/peclet/
+
+# For users:
+## Run pre-built version on docker image
+
+Pull the image from https://hub.docker.com/r/zimmerman/peclet/
+
+    docker pull zimmerman/peclet
 
 # For developers:
 ## Versions
 
 This is currently being tested with the following builds of deal.II:
-- deal.II v8.4.2 built by candi (https://github.com/koecher/candi) on Ubuntu 14.04
+- deal.II v8.5.pre from docker image dealii/dealii:v8.5.pre.4-gcc-mpi-fulldepsmanual-debugrelease (as shown in peclet/Dockerfile)
 
 ## Build
 
