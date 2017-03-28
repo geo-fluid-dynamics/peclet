@@ -105,8 +105,6 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a023be1faf427eb33ac0c45680d98813a"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classPeclet_1_1Peclet.html#a023be1faf427eb33ac0c45680d98813a">Peclet</a> ()</td></tr>
 <tr class="separator:a023be1faf427eb33ac0c45680d98813a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:adfab441a2c2fda596e4ad6e49118bd14"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classPeclet_1_1Peclet.html#adfab441a2c2fda596e4ad6e49118bd14">init</a> (std::string file_path)</td></tr>
-<tr class="separator:adfab441a2c2fda596e4ad6e49118bd14"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9b0ed314603f27385c5d01d3edddc742"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classPeclet_1_1Peclet.html#a9b0ed314603f27385c5d01d3edddc742">run</a> (const std::string parameter_file=&quot;&quot;)</td></tr>
 <tr class="separator:a9b0ed314603f27385c5d01d3edddc742"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
@@ -304,7 +302,7 @@ template&lt;int dim&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Append 1D solution data to the table in memory </p>
+<p>Append 1D solution data to the table in memory. </p>
 
 </div>
 </div>
@@ -330,7 +328,7 @@ template&lt;int dim&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Append convergence/verification data to the table in memory</p>
+<p>Append convergence/verification data to the table in memory.</p>
 <p>This calculates both L2 and L1 norms based on a provided exact solution. </p>
 
 </div>
@@ -432,28 +430,10 @@ template&lt;int dim&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Set the coarse Triangulation, i.e. Peclet::triangulation</p>
+<p>Set the coarse Triangulation, i.e. Peclet::triangulation.</p>
 <p>In deal.II language, coarse means the coarsest available representation of the geometry. In combination with geometric manifolds, this can indeed be quite coarse, even for curved geometries. For example, see the hemisphere_cylinder_shell in <a class="el" href="namespaceMyGridGenerator.html">MyGridGenerator</a>.</p>
 <p>Unfortunately geometric manifold data is not contained by the Triangulation. This separation allows for flexibility, but also requires extra bookkeeping by the programmer.</p>
 <p><a class="el" href="namespaceMyGridGenerator.html#a6e23dfabfb50859751be8d4870d29d55">Peclet&lt;1&gt;::create_coarse_grid()</a>, <a class="el" href="namespaceMyGridGenerator.html#a6e23dfabfb50859751be8d4870d29d55">Peclet&lt;2&gt;::create_coarse_grid()</a>, and <a class="el" href="namespaceMyGridGenerator.html#a6e23dfabfb50859751be8d4870d29d55">Peclet&lt;3&gt;::create_coarse_grid()</a> had to be implemented separately because GridTools::rotate() has not be implemented for Triangulation&lt;1&gt;. </p>
-
-</div>
-</div>
-<a class="anchor" id="adfab441a2c2fda596e4ad6e49118bd14"></a>
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;int dim&gt; </div>
-      <table class="memname">
-        <tr>
-          <td class="memname">void <a class="el" href="classPeclet_1_1Peclet.html">Peclet::Peclet</a>&lt; dim &gt;::init </td>
-          <td>(</td>
-          <td class="paramtype">std::string&#160;</td>
-          <td class="paramname"><em>file_path</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
 
 </div>
 </div>
@@ -474,40 +454,6 @@ template&lt;int dim&gt; </div>
 </div><div class="memdoc">
 <p>Run the simulation.</p>
 <p>This is the main method of the class. </p>
-<p>Clean up the files in the working directory</p>
-<p>Working with deal.II's Function class has been interesting, and I'm sure many of my choices are unorthodox. The most important lesson learned has been that a Function&lt;dim&gt;* can point to any class derived from Function&lt;dim&gt;. This is generally true for derived classes in C++. In this code, the general design pattern then is to instantitate all of the functions that might be needed, and then to point to the ones actually being used. The extra instantiations don't cost us anything.</p>
-<p>Generalizing the handling of auxiliary functions is complicated. In most cases one should be able to use a ParsedFunction, but the generality of Function&lt;dim&gt;* allows for a standard way to account for any possible derived class of Function&lt;dim&gt;. For example this allows for....</p>
-<ul>
-<li>an optional initial values function that interpolates an old solution loaded from disk.</li>
-<li>flexibily implementing general boundary conditions</li>
-</ul>
-<p>Initial values function</p>
-<p>Boundary condition functions</p>
-<p>Organize boundary functions to simplify application during the time loop</p>
-<p>Attach manifolds for exact geometry</p>
-<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000002">Todo:</a></b></dt><dd>3D extension: For now the CylindricalManifold is being ommitted.</dd></dl>
-<p>deal.II makes is impractical for a CylindricalManifold to exist in 2D.</p>
-<p>Run initial grid refinement cycles</p>
-<p>Initialize the linear system and constraints </p>
-<pre class="fragment">Iterate through time steps
-</pre><p>A goto statement (to the start_time_iteration label) is used to handle pre-refinement. Generally goto's are a terrible idea; but the step-26 tutorial makes a case for it being instructive here. It would probably be better to redesign this without a goto.</p>
-<p>Write the initial values</p>
-<p>Typically you see something more like "time += Delta_t" in time-dependent codes, but that method accumulates finite-precision roundoff errors. This is a better way.</p>
-<p>Set some flags that will control output for this step.</p>
-<p>Report the time step index and time.</p>
-<p>Add mass and convection-diffusion matrix terms to the RHS.</p>
-<p>Add natural boundary conditions to RHS</p>
-<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000003">Todo:</a></b></dt><dd>: This throws a warning </dd></dl>
-<p>Make the system matrix and apply constraints.</p>
-<p>Apply strong boundary conditions</p>
-<p>Check if a steady state has been reached.</p>
-<p>Write the solution.</p>
-<p>Adaptively refine the grid.</p>
-<p>Write FEFieldFunction related data so that it can be used as initial values for another run.</p>
-<p>Write the convergence/verification table.</p>
-<p>Write the 1D solution table</p>
-<p>Clean up.</p>
-<p>Manifolds must be detached from Triangulations before leaving this scope.</p>
 
 </div>
 </div>
@@ -596,7 +542,7 @@ template&lt;int dim&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Write 1D solution data to disk </p>
+<p>Write 1D solution data to disk. </p>
 
 </div>
 </div>
@@ -622,7 +568,7 @@ template&lt;int dim&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Write the solution to files for visualization</p>
+<p>Write the solution to files for visualization.</p>
 <p>Only the VTK format is supported by this class; but deal.II makes it easy to use many other standard formats.</p>
 <p>Additionally for 1D problems, a simple table can be written for easy import into MATLAB. </p>
 
@@ -650,8 +596,7 @@ template&lt;int dim&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Write convergence/verification data to disk</p>
-<p>Append convergence/verification data to disk. </p>
+<p>Write convergence/verification data to disk. </p>
 
 </div>
 </div>
@@ -1316,7 +1261,7 @@ template&lt;int dim&gt; </div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Mar 28 2017 21:40:35 for peclet by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Mar 28 2017 21:49:06 for peclet by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

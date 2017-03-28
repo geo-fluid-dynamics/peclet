@@ -1,5 +1,7 @@
 var searchData=
 [
-  ['peclet',['Peclet',['../classPeclet_1_1Peclet.html#a023be1faf427eb33ac0c45680d98813a',1,'Peclet::Peclet']]],
-  ['plot',['plot',['../solve__ODE__1D__Steady_8m.html#aea81696734c33ffbb114af05f4ce1a74',1,'solve_ODE_1D_Steady.m']]]
+  ['read',['read',['../namespacePeclet_1_1Parameters.html#a1b11b06d43910746741c6b316a6d64bf',1,'Peclet::Parameters']]],
+  ['read_5fmeta_5fparameters',['read_meta_parameters',['../namespacePeclet_1_1Parameters.html#a154c56f8c014152584de528e3de12f3c',1,'Peclet::Parameters']]],
+  ['refine_5fmesh_5fnear_5fboundaries',['refine_mesh_near_boundaries',['../namespacePeclet_1_1Refinement.html#a10c6000a386b52c4fe05acaa77dbc668',1,'Peclet::Refinement::refine_mesh_near_boundaries()'],['../namespaceRefinement.html#a1ad0a552bf0eb365e462a87213fff1f0',1,'Refinement::refine_mesh_near_boundaries()']]],
+  ['run',['run',['../classPeclet_1_1Peclet.html#a9b0ed314603f27385c5d01d3edddc742',1,'Peclet::Peclet']]]
 ];

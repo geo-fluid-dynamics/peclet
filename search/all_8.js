@@ -3,7 +3,6 @@ var searchData=
   ['ia',['ia',['../solve__ODE__1D__Steady_8m.html#abbad05adcee4a68070494f1202fd2b98',1,'solve_ODE_1D_Steady.m']]],
   ['ig',['ig',['../solve__ODE__1D__Steady_8m.html#a1d4621067a8e29dfb4e02d90ae8c00c8',1,'solve_ODE_1D_Steady.m']]],
   ['implementation_5ftypes',['implementation_types',['../structPeclet_1_1Parameters_1_1BoundaryConditions.html#a044973a7722d7c7812b92d593745e1b9',1,'Peclet::Parameters::BoundaryConditions']]],
-  ['init',['init',['../classPeclet_1_1Peclet.html#adfab441a2c2fda596e4ad6e49118bd14',1,'Peclet::Peclet']]],
   ['initial_5fboundary_5fcycles',['initial_boundary_cycles',['../structPeclet_1_1Parameters_1_1Refinement.html#aac5511c67f1fa392f03d2a55be351f65',1,'Peclet::Parameters::Refinement']]],
   ['initial_5fcycles',['initial_cycles',['../structPeclet_1_1Parameters_1_1AdaptiveRefinement.html#a15d4845889feb73b6246d71c7d785f03',1,'Peclet::Parameters::AdaptiveRefinement']]],
   ['initial_5fglobal_5fcycles',['initial_global_cycles',['../structPeclet_1_1Parameters_1_1Refinement.html#a8ed3125da5b47000f7416396ef926149',1,'Peclet::Parameters::Refinement']]],
