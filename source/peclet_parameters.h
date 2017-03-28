@@ -8,31 +8,25 @@
 
 #include <deal.II/base/parameter_handler.h>
 
-/*
-    
-    @brief Encapsulates parameter handling and paramter input file handling.
+/*! Encapsulates parameter handling and paramter input file handling.
+  
+    Originally the ParameterReader from deal.II's step-26 was used;
+    but that was too prohibitive. The approach in this file isolates the details
+    of the input file handling from the rest of the program,
+    allowing for rich data structures and simplifying the user code.
 
-    @detail
-    
-        Originally the ParameterReader from deal.II's step-26 was used;
-        but that was too prohibitive. The approach in this file isolates the details
-        of the input file handling from the rest of the program,
-        allowing for rich data structures and simplifying the user code.
+    The goal is to allow one to run the program with different parameters,
+    without having to recomplile the program.
 
-        The goal is to allow one to run the program with different parameters,
-        without having to recomplile the program.
+    It is valuable to structure the parameter data as done here, to greatly
+    simplify the writing and debugging of the code.
 
-        It is valuable to structure the parameter data as done here, to greatly
-        simplify the writing and debugging of the code.
-
-        This also makes it simple to insantiate a PDE Model in a user program 
-        and then change it's parameters directly without having to use any intermediate text files.
+    This also makes it simple to insantiate a PDE Model in a user program 
+    and then change it's parameters directly without having to use any intermediate text files.
         
     @todo Allow for multiple parsed boundary functions.
         This might not be possible.
         This will obsolete the "constant" function option.
-    
-    @author A. Zimmerman <zimmerman@aices.rwth-aachen.de>
     
 */
 

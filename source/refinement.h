@@ -56,6 +56,7 @@ namespace Refinement
         triangulation.execute_coarsening_and_refinement();
     }
     
+    /*! Refine the mesh only near specified boundaries. */
     template <int dim>
     void refine_mesh_near_boundaries (
         Triangulation<dim> &triangulation,

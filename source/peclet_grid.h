@@ -1,14 +1,5 @@
 #include "refinement.h"
 
-/*! Set the coarse Triangulation, i.e. Peclet::triangulation
-
-    In deal.II language, coarse means the coarsest available representation of the geometry. In combination with geometric manifolds, this can indeed be quite coarse, even for curved geometries. For example, see the hemisphere_cylinder_shell in MyGridGenerator.
-    
-    Unfortunately geometric manifold data is not contained by the Triangulation. This separation allows for flexibility, but also requires extra bookkeeping by the programmer.
-
-    Peclet<1>::create_coarse_grid(), Peclet<2>::create_coarse_grid(), and Peclet<3>::create_coarse_grid() had to be implemented separately because GridTools::rotate() has not be implemented for Triangulation<1>.
-    
-*/
 template<>
 void Peclet<1>::create_coarse_grid()
 {
@@ -28,11 +19,6 @@ void Peclet<1>::create_coarse_grid()
     this->spherical_manifold_center = shifted_center;
 }
 
-/*! Set the coarse Triangulation, i.e. Peclet::triangulation
-
-    See Peclet<1>::create_coarse_grid().
-
-*/
 template <>
 void Peclet<2>::create_coarse_grid()
 {
@@ -53,22 +39,12 @@ void Peclet<2>::create_coarse_grid()
     this->spherical_manifold_center = shifted_center;
 }
 
-/*! Set the coarse Triangulation, i.e. Peclet::triangulation
-
-    See Peclet<1>::create_coarse_grid().
-
-*/
 template<>
 void Peclet<3>::create_coarse_grid()
 {
     Assert(false, ExcNotImplemented()); // Only missing a 3D rotation method
 }
 
-/*! Adaptively refine the triangulation based on an error measure.
-            
-    This is mostly a copy of the routine from deal.II's step-26, which uses the Kelly Error Estimator.
-        
-*/
 template<int dim>
 void Peclet<dim>::adaptive_refine()
 {
