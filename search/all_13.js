@@ -1,10 +1,15 @@
 var searchData=
 [
-  ['value',['value',['../classMyFunctions_1_1ExtrapolatedField.html#ac36aa11cd2540b0ca571aaf855062353',1,'MyFunctions::ExtrapolatedField']]],
-  ['velocity_5ffunction',['velocity_function',['../classPeclet_1_1Peclet.html#a11582e851dcec89d5e498bc99a69d9a5',1,'Peclet::Peclet']]],
-  ['verification',['Verification',['../structPeclet_1_1Parameters_1_1Verification.html',1,'Peclet::Parameters']]],
-  ['verification',['verification',['../structPeclet_1_1Parameters_1_1StructuredParameters.html#ae1cbb61bb39cd1ebb8dd2ba0c43e9e9b',1,'Peclet::Parameters::StructuredParameters']]],
-  ['verification_5ftable',['verification_table',['../classPeclet_1_1Peclet.html#ab7c95adb6707e538c128905e8ab70f31',1,'Peclet::Peclet']]],
-  ['verification_5ftable_5ffile_5fname',['verification_table_file_name',['../classPeclet_1_1Peclet.html#a1b4583874b07ccfbf458790a8a7fae66',1,'Peclet::Peclet']]],
-  ['vx',['vx',['../2D__VariableVelocity_2derive__manufactured__auxiliary__functions_8m.html#a0cb11390c1cff3cab74a7d6aadbea31d',1,'derive_manufactured_auxiliary_functions.m']]]
+  ['k_5fvectors',['k_vectors',['http://www.dealii.org/8.5.0/doxygen/deal.II/classFESeries_1_1Fourier.html#a85490837aee6fbaa19637abe46939e83',1,'FESeries::Fourier']]],
+  ['kellyerrorestimator',['KellyErrorEstimator',['http://www.dealii.org/8.5.0/doxygen/deal.II/classKellyErrorEstimator.html',1,'']]],
+  ['kellyerrorestimator_3c_201_2c_20spacedim_20_3e',['KellyErrorEstimator&lt; 1, spacedim &gt;',['http://www.dealii.org/8.5.0/doxygen/deal.II/classKellyErrorEstimator_3_011_00_01spacedim_01_4.html',1,'']]],
+  ['key_5fpattern',['key_pattern',['http://www.dealii.org/8.5.0/doxygen/deal.II/classPatterns_1_1Map.html#ae2b25c56b4bf895ea3649468fa9a712a',1,'Patterns::Map']]],
+  ['kill_5ffile',['kill_file',['http://www.dealii.org/8.5.0/doxygen/deal.II/classSwappableVector.html#ab7534657f74442edca2275b53e2523ba',1,'SwappableVector']]],
+  ['kinematics_2ecc',['kinematics.cc',['http://www.dealii.org/8.5.0/doxygen/deal.II/kinematics_8cc.html',1,'']]],
+  ['kinematics_2eh',['kinematics.h',['http://www.dealii.org/8.5.0/doxygen/deal.II/kinematics_8h.html',1,'']]],
+  ['king_5fordering',['king_ordering',['http://www.dealii.org/8.5.0/doxygen/deal.II/namespaceDoFRenumbering_1_1boost.html#a7dae40bee2464606f71a81ddf85e1811',1,'DoFRenumbering::boost']]],
+  ['kovasznay',['Kovasznay',['http://www.dealii.org/8.5.0/doxygen/deal.II/classFunctions_1_1Kovasznay.html#a082166be0e076803fed98a61450e05a5',1,'Functions::Kovasznay']]],
+  ['kovasznay',['Kovasznay',['http://www.dealii.org/8.5.0/doxygen/deal.II/classFunctions_1_1Kovasznay.html',1,'Functions']]],
+  ['krylov_5fspace_5fsignal',['krylov_space_signal',['http://www.dealii.org/8.5.0/doxygen/deal.II/classSolverGMRES.html#a47f808a040a71ebdf96bb019f81e4540',1,'SolverGMRES']]],
+  ['ksp',['ksp',['http://www.dealii.org/8.5.0/doxygen/deal.II/structPETScWrappers_1_1SolverBase_1_1SolverData.html#a3b67abc1b21e164f52a19d0a3852689e',1,'PETScWrappers::SolverBase::SolverData']]]
 ];

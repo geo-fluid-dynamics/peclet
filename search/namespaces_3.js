@@ -1,6 +1,7 @@
 var searchData=
 [
-  ['parameters',['Parameters',['../namespacePeclet_1_1Parameters.html',1,'Peclet']]],
-  ['peclet',['Peclet',['../namespacePeclet.html',1,'']]],
-  ['refinement',['Refinement',['../namespacePeclet_1_1Refinement.html',1,'Peclet']]]
+  ['cellsimilarity',['CellSimilarity',['http://www.dealii.org/8.5.0/doxygen/deal.II/namespaceCellSimilarity.html',1,'']]],
+  ['chunksparsematrixiterators',['ChunkSparseMatrixIterators',['http://www.dealii.org/8.5.0/doxygen/deal.II/namespaceChunkSparseMatrixIterators.html',1,'']]],
+  ['chunksparsitypatterniterators',['ChunkSparsityPatternIterators',['http://www.dealii.org/8.5.0/doxygen/deal.II/namespaceChunkSparsityPatternIterators.html',1,'']]],
+  ['constraintmatrix',['ConstraintMatrix',['../namespaceConstraintMatrix.html',1,'']]]
 ];
