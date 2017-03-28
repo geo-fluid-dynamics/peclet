@@ -537,14 +537,14 @@ namespace Peclet
 
   /*! Run the simulation.
   
-    This pulls together all of Peclet's data and methods and runs the simulation.
+    This is the main method of the class.
   
   */
   template<int dim>
   void Peclet<dim>::run(const std::string parameter_file)
   {
     
-    // Clean up the files in the working directory
+    /*! Clean up the files in the working directory */
     
     if (dim == 1)
     {
@@ -556,12 +556,13 @@ namespace Peclet
         std::remove(this->verification_table_file_name.c_str());
     }
     
-    /*
+    /*!
     Working with deal.II's Function class has been interesting, and I'm 
     sure many of my choices are unorthodox. The most important lesson learned has been that 
-    a Function<dim>* can point to any class derived from Function<dim>. The general design pattern
-    then is to instantitate all of the functions that might be needed, and then to point to the ones
-    actually being used.
+    a Function<dim>* can point to any class derived from Function<dim>. This is generally true
+    for derived classes in C++. In this code, the general design pattern then is to 
+    instantitate all of the functions that might be needed, and then to point to the ones
+    actually being used. The extra instantiations don't cost us anything.
     */
     Functions::ParsedFunction<dim> parsed_velocity_function(dim),
         parsed_diffusivity_function,
@@ -582,21 +583,25 @@ namespace Peclet
     this->create_coarse_grid();
     
     this->velocity_function = &parsed_velocity_function;
+    
     this->diffusivity_function = &parsed_diffusivity_function;
+    
     this->source_function = &parsed_source_function;
+    
     this->exact_solution_function = &parsed_exact_solution_function;
     
-    /*
+    /*!
     Generalizing the handling of auxiliary functions is complicated. In most cases one should be able to use a ParsedFunction, but the generality of Function<dim>* allows for a standard way to account for any possible derived class of Function<dim>. 
     For example this allows for....
         - an optional initial values function that interpolates an old solution loaded from disk. 
         - flexibily implementing general boundary conditions
     */
 
-    // Initial values function
-    
+    /*! Initial values function */
     Triangulation<dim> field_grid;
+    
     DoFHandler<dim> field_dof_handler(field_grid);
+    
     Vector<double> field_solution;
     
     if (this->params.initial_values.function_name != "interpolate_old_field")
@@ -625,7 +630,7 @@ namespace Peclet
         this->initial_values_function = &parsed_initial_values_function;
     }
     
-    // Boundary condition functions
+    /*! Boundary condition functions */
     
     unsigned int boundary_count = this->params.boundary_conditions.implementation_types.size();
     
@@ -646,7 +651,7 @@ namespace Peclet
         }
     }
         
-    // Organize boundary functions to simplify application during the time loop
+    /*! Organize boundary functions to simplify application during the time loop */
     
     unsigned int constant_function_index = 0;
     
@@ -668,7 +673,7 @@ namespace Peclet
         
     }
     
-    // Attach manifolds
+    /*! Attach manifolds for exact geometry */
     
     assert(dim < 3); // @todo: 3D extension: For now the CylindricalManifold is being ommitted.
         // deal.II makes is impractical for a CylindricalManifold to exist in 2D.
@@ -682,8 +687,7 @@ namespace Peclet
         }
     }
     
-    // Run initial refinement cycles
-    
+    /*! Run initial grid refinement cycles */
     this->triangulation.refine_global(this->params.refinement.initial_global_cycles);
     
     Refinement::refine_mesh_near_boundaries(
@@ -691,17 +695,27 @@ namespace Peclet
         this->params.refinement.boundaries_to_refine,
         this->params.refinement.initial_boundary_cycles);
         
-    // Initialize the linear system
-    
+    /*! Initialize the linear system and constraints */
     this->setup_system(); 
 
     Vector<double> tmp;
+    
     Vector<double> forcing_terms;
     
-    // Iterate
+    double epsilon = 1e-14;
+    
+    /*! 
+    
+    Iterate through time steps
+    
+        A goto statement (to the start_time_iteration label) is used to handle pre-refinement.
+        Generally goto's are a terrible idea; but the step-26 tutorial makes a case for it being instructive here.
+        It would probably be better to redesign this without a goto.
+    
+    */
     unsigned int pre_refinement_step = 0;
     
-start_time_iteration:
+start_time_iteration: 
 
     tmp.reinit(this->solution.size());
 
@@ -710,31 +724,40 @@ start_time_iteration:
                              this->old_solution); 
     
     this->solution = this->old_solution;
+    
+    this->write_solution(); /*! Write the initial values */
+    
     this->time_step_counter = 0;
+    
     this->time = 0;
     
     double theta = this->params.time.semi_implicit_theta;
+    
     this->time_step_size = this->params.time.step_size;
+    
     if (this->time_step_size < EPSILON)
     {
         this->time_step_size = this->params.time.end_time/
             pow(2., this->params.time.global_refinement_levels);
     }
+    
     double Delta_t = this->time_step_size;
     
-    this->write_solution();
     bool final_time_step = false;
+    
     bool output_this_step = true;
-    double epsilon = 1e-14;
     
     SolverStatus solver_status;
     
     do
     {
         ++this->time_step_counter;
-        time = Delta_t*time_step_counter; // Incrementing the time directly would accumulate errors
         
-        // Set some flags that will control output for this step.
+        /*! Typically you see something more like "time += Delta_t" in time-dependent codes,
+            but that method accumulates finite-precision roundoff errors. This is a better way. */
+        time = Delta_t*time_step_counter;
+        
+        /*! Set some flags that will control output for this step. */
         final_time_step = this->time > this->params.time.end_time - epsilon;
         
         bool at_interval = false;
@@ -764,39 +787,45 @@ start_time_iteration:
             output_this_step = false;
         }
         
-        // Run the time step
+        /*! Report the time step index and time. */
         if (output_this_step)
         {
             std::cout << "Time step " << this->time_step_counter 
                 << " at t=" << this->time << std::endl;    
         }
 
-        // Add mass and convection-diffusion matrix terms to RHS
+        /*! Add mass and convection-diffusion matrix terms to the RHS. */
         this->mass_matrix.vmult(this->system_rhs, this->old_solution);
 
         this->convection_diffusion_matrix.vmult(tmp, this->old_solution);
         
-        this->system_rhs.add(-(1. - theta) * Delta_t, tmp);
+        this->system_rhs.add(-(1. - theta)*Delta_t, tmp);
         
-        // Add source terms to RHS
+        /* Add source/forcing terms to the RHS. */
         source_function->set_time(this->time);
+        
         VectorTools::create_right_hand_side(this->dof_handler,
                                             QGauss<dim>(fe.degree+1),
                                             *source_function,
                                             tmp);
+        
         forcing_terms = tmp;
-        forcing_terms *= Delta_t * theta;
+        
+        forcing_terms *= Delta_t*theta;
         
         source_function->set_time(this->time - Delta_t);
-        VectorTools::create_right_hand_side(this->dof_handler,
-                                            QGauss<dim>(fe.degree+1),
-                                            *source_function,
-                                            tmp);
-        forcing_terms.add(Delta_t * (1 - theta), tmp);
+        
+        VectorTools::create_right_hand_side(
+            this->dof_handler,
+            QGauss<dim>(fe.degree + 1),
+            *source_function,
+            tmp);
+        
+        forcing_terms.add(Delta_t*(1 - theta), tmp);
         
         this->system_rhs += forcing_terms;
         
-        // Add natural boundary conditions to RHS
+        /*! Add natural boundary conditions to RHS */
         for (unsigned int boundary = 0; boundary < boundary_count; boundary++)
         {
             if ((this->params.boundary_conditions.implementation_types[boundary] != "natural"))
@@ -804,43 +833,47 @@ start_time_iteration:
                 continue;
             }
             
-            std::set<types::boundary_id> dealii_boundary_id = {boundary}; // @todo: This throws a warning
+            std::set<types::boundary_id> dealii_boundary_id = {boundary}; /*! @todo: This throws a warning */
             
             boundary_functions[boundary]->set_time(this->time);
             
             MyVectorTools::my_create_boundary_right_hand_side(
                 this->dof_handler,
-                QGauss<dim-1>(fe.degree+1),
+                QGauss<dim-1>(fe.degree + 1),
                 *boundary_functions[boundary],
                 tmp,
                 dealii_boundary_id);
+                
             forcing_terms = tmp;
-            forcing_terms *= Delta_t * theta;
+            
+            forcing_terms *= Delta_t*theta;
                 
             boundary_functions[boundary]->set_time(this->time - Delta_t);
+            
             MyVectorTools::my_create_boundary_right_hand_side(
                 this->dof_handler,
-                QGauss<dim-1>(fe.degree+1),
+                QGauss<dim-1>(fe.degree + 1),
                 *boundary_functions[boundary],
                 tmp,
                 dealii_boundary_id);
              
-            forcing_terms.add(Delta_t * (1. - theta), tmp);
+            forcing_terms.add(Delta_t*(1. - theta), tmp);
             
             this->system_rhs += forcing_terms;
 
         }
         
-        // Make the system matrix and apply constraints
+        /*! Make the system matrix and apply constraints. */
         system_matrix.copy_from(mass_matrix);
         
-        system_matrix.add(theta * Delta_t, convection_diffusion_matrix);
+        system_matrix.add(theta*Delta_t, convection_diffusion_matrix);
 
-        constraints.condense (system_matrix, system_rhs);
+        constraints.condense(system_matrix, system_rhs);
 
         {
-            // Apply strong boundary conditions
+            /*! Apply strong boundary conditions */
             std::map<types::global_dof_index, double> boundary_values;
+            
             for (unsigned int boundary = 0; boundary < boundary_count; boundary++)
             {
                 if (this->params.boundary_conditions.implementation_types[boundary] != "strong") 
@@ -850,30 +883,37 @@ start_time_iteration:
                 
                 boundary_functions[boundary]->set_time(time);
                 
-                VectorTools::interpolate_boundary_values
-                    (
+                VectorTools::interpolate_boundary_values(
                     this->dof_handler,
                     boundary,
                     *boundary_functions[boundary],
                     boundary_values
                     );
+                    
             }
+            
             MatrixTools::apply_boundary_values(
                 boundary_values,
                 this->system_matrix,
                 this->solution,
                 this->system_rhs);
+                
         }
 
         solver_status = this->solve_time_step(!output_this_step);
         
+        /*! Check if a steady state has been reached. */
         if ((this->params.time.stop_when_steady) & (solver_status.last_step == 0))
         {
             std::cout << "Reached steady state at t = " << this->time << std::endl;
-            final_time_step = true;
-            output_this_step = true;
-        }
             
+            final_time_step = true;
+            
+            output_this_step = true;
+            
+        }
+        
+        /*! Write the solution. */
         if (output_this_step)
         {
             this->write_solution();
@@ -885,10 +925,12 @@ start_time_iteration:
             
         }
         
+        /*! Adaptively refine the grid. */
         if ((time_step_counter == 1) &&
             (pre_refinement_step < this->params.refinement.adaptive.initial_cycles))
         {
             this->adaptive_refine();
+            
             ++pre_refinement_step;
 
             tmp.reinit(this->solution.size());
@@ -896,16 +938,19 @@ start_time_iteration:
             std::cout << std::endl;
 
             goto start_time_iteration;
+            
         }
         else if ((time_step_counter > 0) 
                  && (params.refinement.adaptive.interval > 0)  // % 0 (mod 0) is undefined
                  && (time_step_counter % params.refinement.adaptive.interval == 0))
         {
+            
             for (unsigned int cycle = 0;
                  cycle < params.refinement.adaptive.cycles_at_interval; cycle++)
             {
                 this->adaptive_refine();
             }
+            
             tmp.reinit(this->solution.size());
             
         }
@@ -914,25 +959,30 @@ start_time_iteration:
         
     } while (!final_time_step);
     
-    // Save data for FEFieldFunction so that it can be loaded for initialization
+    /*! Write FEFieldFunction related data so that it can be used as initial values for another run. */
     FEFieldTools::save_field_parts(triangulation, dof_handler, solution);
     
-    // Write error table
+    /*! Write the convergence/verification table. */
     if (this->params.verification.enabled)
     {
         this->write_verification_table();
     }
     
-    // Write the solution table containing pointwise values for every timestep.
+    /*! Write the 1D solution table */
     if (dim == 1)
     {
         this->write_1D_solution_table(this->solution_table_1D_file_name);
     }
     
-    // Cleanup
+    /*! Clean up. 
+    
+        Manifolds must be detached from Triangulations before leaving this scope.
+    
+    */
     this->triangulation.set_manifold(0);
     
-  }
+    }
+    
 }
 
 #endif
