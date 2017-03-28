@@ -111,7 +111,13 @@ Variables</h2></td></tr>
 <tr class="separator:ab4ebb615dbc17bc93fd628d0441e8771"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>A namespace for everything specific to <a class="el" href="namespacePeclet.html">Peclet</a>. This mostly just includes the <a class="el" href="namespacePeclet.html">Peclet</a> class, but also some related data. </p>
+<div class="textblock"><p>A namespace for everything specific to <a class="el" href="namespacePeclet.html">Peclet</a>. This mostly just includes the <a class="el" href="namespacePeclet.html">Peclet</a> class, but also some related data.</p>
+<p>Encapsulates parameter handling and paramter input file handling.</p>
+<p>Originally the ParameterReader from deal.II's step-26 was used; but that was too prohibitive. The approach in this file isolates the details of the input file handling from the rest of the program, allowing for rich data structures and simplifying the user code.</p>
+<p>The goal is to allow one to run the program with different parameters, without having to recomplile the program.</p>
+<p>It is valuable to structure the parameter data as done here, to greatly simplify the writing and debugging of the code.</p>
+<p>This also makes it simple to insantiate a PDE Model in a user program and then change it's parameters directly without having to use any intermediate text files.</p>
+<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000004">Todo:</a></b></dt><dd>Allow for multiple parsed boundary functions. This might not be possible. This will obsolete the "constant" function option.</dd></dl>
 </div><h2 class="groupheader">Variable Documentation</h2>
 <a class="anchor" id="ab4ebb615dbc17bc93fd628d0441e8771"></a>
 <div class="memitem">
@@ -128,7 +134,7 @@ Variables</h2></td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Mar 28 2017 21:22:16 for peclet by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Mar 28 2017 21:40:35 for peclet by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>
