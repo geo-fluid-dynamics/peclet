@@ -1,7 +1,7 @@
 # peclet
 A convection-diffusion solver written in C++ and based on deal.II
 
-[![Build Status](https://travis-ci.org/alexanderzimmerman/nsb-pcm.svg?branch=master)](https://travis-ci.org/alexanderzimmerman/nsb-pcm) (<b>Continuous integration status</b>; click the button to go to Travis-CI)
+[![Build Status](https://travis-ci.org/alexanderzimmerman/peclet.svg?branch=master)](https://travis-ci.org/alexanderzimmerman/peclet) (<b>Continuous integration status</b>; click the button to go to Travis-CI)
 
 Author: Alexander G. Zimmerman <zimmerman@aices.rwth-aachen.de>
 
