@@ -24,7 +24,7 @@
   <td style="padding-left: 0.5em;">
    <div id="projectname">peclet
    </div>
-   <div id="projectbrief">Scalar convection-diffusion solver based on deal.II</div>
+   <div id="projectbrief">an unsteady scalar convection-diffusion solver based on the finite element C++ library deal.II</div>
   </td>
  </tr>
  </tbody>
@@ -80,13 +80,50 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="title">peclet Documentation</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p>A convection-diffusion solver written in C++ and based on deal.II</p>
+<div class="textblock"><p>an unsteady scalar convection-diffusion solver based on the finite element C++ library deal.II</p>
+<p><a href="https://travis-ci.org/alexanderzimmerman/peclet">![Build Status](https://travis-ci.org/alexanderzimmerman/peclet.svg?branch=master)</a> (<b>Continuous integration status</b>; click the button to go to Travis-CI)</p>
 <p>Author: Alexander G. Zimmerman <a href="#" onclick="location.href='mai'+'lto:'+'zim'+'me'+'rma'+'n@'+'aic'+'es'+'.rw'+'th'+'-aa'+'ch'+'en.'+'de'; return false;">zimme<span style="display: none;">.nosp@m.</span>rman<span style="display: none;">.nosp@m.</span>@aice<span style="display: none;">.nosp@m.</span>s.rw<span style="display: none;">.nosp@m.</span>th-aa<span style="display: none;">.nosp@m.</span>chen<span style="display: none;">.nosp@m.</span>.de</a></p>
-<p>Doxygen generated HTML documentation: <a href="https://alexanderzimmerman.github.io/peclet/">https://alexanderzimmerman.github.io/peclet/</a> </p>
-</div></div><!-- contents -->
+<p>Doxygen generated HTML documentation: <a href="https://alexanderzimmerman.github.io/peclet/">https://alexanderzimmerman.github.io/peclet/</a></p>
+<h1>For users:</h1>
+<h2>Run pre-built version on docker image</h2>
+<p>Pull the image from <a href="https://hub.docker.com/r/zimmerman/peclet/">https://hub.docker.com/r/zimmerman/peclet/</a> </p>
+<pre class="fragment">docker pull zimmerman/peclet
+</pre><h1>For developers:</h1>
+<h2>Versions</h2>
+<p>This is currently being tested with the following builds of deal.II:</p>
+<ul>
+<li>deal.II v8.5.pre from docker image dealii/dealii:v8.5.pre.4-gcc-mpi-fulldepsmanual-debugrelease (as shown in peclet/Dockerfile)</li>
+</ul>
+<h2>Design notes</h2>
+<p>The <a class="el" href="namespacePeclet.html">Peclet</a> class is implemented entirely with header files. This reduces the structural complexity of the code and can increase programming productivity, but it leads to longer compile times. A header-only approach would be impractical for the deal.II library itself; but in this small project's experience, the header-only approach is more than adequate. Most notably, this simplifies working with C++ templates.</p>
+<h2>Build</h2>
+<pre class="fragment">git clone git@github.com:alexanderzimmerman/peclet.git
+
+mkdir build
+
+cd build
+
+cmake ../peclet
+
+make test
+</pre><h2>Documentation</h2>
+<p>The Doxygen generated HTML docs are hosted in the standard GitHub fashion on the gh-pages branch.</p>
+<p>For initial set up with your local clone, follow the procedure found in <a href="https://github.com/m-a-d-n-e-s-s/madness/issues/104">https://github.com/m-a-d-n-e-s-s/madness/issues/104</a></p>
+<p>Then whenever commiting to the master branch, update the gh-pages branch as follows: </p>
+<pre class="fragment">git push origin master
+
+doxygen
+
+cd doc/html
+
+git add *
+
+git commit -m "Refreshed HTML doc"
+
+git push origin gh-pages</pre> </div></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Mar 28 2017 15:45:27 for peclet by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Mar 28 2017 21:22:17 for peclet by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

@@ -1,6 +1,5 @@
 var searchData=
 [
-  ['center',['center',['../classMyFunctions_1_1RegularizedSphericalStep.html#a360adfd899d8e4d07a65449883069722',1,'MyFunctions::RegularizedSphericalStep']]],
   ['coarsen_5ffraction',['coarsen_fraction',['../structPeclet_1_1Parameters_1_1AdaptiveRefinement.html#a88d15b229248ada5a18b9006c5305965',1,'Peclet::Parameters::AdaptiveRefinement']]],
   ['color',['Color',['../solve__ODE__1D__Steady_8m.html#ab87bacfdad76e61b9412d7124be44c1c',1,'solve_ODE_1D_Steady.m']]],
   ['colors',['Colors',['../solve__ODE__1D__Steady_8m.html#a55ecd4f2ec2ebfe8d5b0163e4ac2a967',1,'solve_ODE_1D_Steady.m']]],

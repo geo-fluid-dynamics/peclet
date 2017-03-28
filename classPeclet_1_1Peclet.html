@@ -24,7 +24,7 @@
   <td style="padding-left: 0.5em;">
    <div id="projectname">peclet
    </div>
-   <div id="projectbrief">Scalar convection-diffusion solver based on deal.II</div>
+   <div id="projectbrief">an unsteady scalar convection-diffusion solver based on the finite element C++ library deal.II</div>
   </td>
  </tr>
  </tbody>
@@ -117,14 +117,14 @@ Public Attributes</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-methods"></a>
 Private Member Functions</h2></td></tr>
+<tr class="memitem:a57a7b7bfaae38c58af3efc1da2b3743b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structPeclet_1_1SolverStatus.html">SolverStatus</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classPeclet_1_1Peclet.html#a57a7b7bfaae38c58af3efc1da2b3743b">solve_time_step</a> (bool quiet=false)</td></tr>
+<tr class="separator:a57a7b7bfaae38c58af3efc1da2b3743b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae7ac6e4d8ec8da400d5426578a13e65f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classPeclet_1_1Peclet.html#ae7ac6e4d8ec8da400d5426578a13e65f">create_coarse_grid</a> ()</td></tr>
 <tr class="separator:ae7ac6e4d8ec8da400d5426578a13e65f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5504e8c6bde777bd1934fd42f3cd6496"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classPeclet_1_1Peclet.html#a5504e8c6bde777bd1934fd42f3cd6496">adaptive_refine</a> ()</td></tr>
 <tr class="separator:a5504e8c6bde777bd1934fd42f3cd6496"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afb3c5e0931b2829e589986a286757b48"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classPeclet_1_1Peclet.html#afb3c5e0931b2829e589986a286757b48">setup_system</a> (bool quiet=false)</td></tr>
 <tr class="separator:afb3c5e0931b2829e589986a286757b48"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a57a7b7bfaae38c58af3efc1da2b3743b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structPeclet_1_1SolverStatus.html">SolverStatus</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classPeclet_1_1Peclet.html#a57a7b7bfaae38c58af3efc1da2b3743b">solve_time_step</a> (bool quiet=false)</td></tr>
-<tr class="separator:a57a7b7bfaae38c58af3efc1da2b3743b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a148f29535b2bd222b69b7a318455ea17"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classPeclet_1_1Peclet.html#a148f29535b2bd222b69b7a318455ea17">write_solution</a> ()</td></tr>
 <tr class="separator:a148f29535b2bd222b69b7a318455ea17"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a57e164692b52908fc3ba830d32223091"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classPeclet_1_1Peclet.html#a57e164692b52908fc3ba830d32223091">append_verification_table</a> ()</td></tr>
@@ -202,7 +202,41 @@ Private Attributes</h2></td></tr>
 <tr class="memitem:ad28b03ffb1676a81c8034437374f2795"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classPeclet_1_1Peclet.html#ad28b03ffb1676a81c8034437374f2795">solution_table_1D_file_name</a> = &quot;1D_solution_table.txt&quot;</td></tr>
 <tr class="separator:ad28b03ffb1676a81c8034437374f2795"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><h3>template&lt;int dim&gt;<br/>
+class Peclet::Peclet&lt; dim &gt;</h3>
+
+<p>Solve the unsteady scalar convection-diffusion equation.</p>
+<p>This class solves the unsteady scalar convection-diffusion equation.</p>
+<p>System assembly and time stepping are based on deal.II Tutorial 26 by Wolfgang Bangerth, Texas A&amp;M University, 2013</p>
+<p>Some of the more notable extensions (beyond step-26) include:</p>
+<ul>
+<li>Builds convection-diffusion matrix instead of Laplace matrix</li>
+<li>Supports time-dependent non-zero Dirichlet and Neumann boundary condition</li>
+<li>Re-designed parmameter handling</li>
+<li>Generalized boundary condition handling via the parameter input file</li>
+<li>Writes FEFieldFunction to disk, and can read it from disk to initialize a restart</li>
+<li>Extended the FEFieldFunction class for extrapolation</li>
+<li>Added verification via Method of Manufactured Solutions (MMS) with error table based on approach from Tutorial 7</li>
+<li>Added test suite using ctest and the standard deal.II approach</li>
+<li>Added a parameteric sphere-cylinder grid</li>
+<li>Added a boundary grid refinement routine</li>
+<li>Added a output option for 1D solutions in tabular format</li>
+</ul>
+<p>A simulation can be run for example with the following main program: </p>
+<div class="fragment"><div class="line"><span class="preprocessor">#include &quot;<a class="code" href="peclet_8h.html">peclet.h</a>&quot;</span></div>
+<div class="line"></div>
+<div class="line"><span class="keywordtype">int</span> <a class="code" href="main_8cc.html#a0ddf1224851353fc92bfbff6f499fa97">main</a>(<span class="keywordtype">int</span> argc, <span class="keywordtype">char</span>* argv[])</div>
+<div class="line">{   </div>
+<div class="line">    <a class="code" href="classPeclet_1_1Peclet.html">Peclet::Peclet&lt;2&gt;</a> peclet;</div>
+<div class="line">    </div>
+<div class="line">    peclet.<a class="code" href="classPeclet_1_1Peclet.html#a9b0ed314603f27385c5d01d3edddc742">run</a>();</div>
+<div class="line">    </div>
+<div class="line">    <span class="keywordflow">return</span> 0;</div>
+<div class="line">}</div>
+</div><!-- fragment --><p>The previous example uses default parameters and writes used_parameters.prm. A user can edit this file and save it as an input parameter file. The main program <a class="el" href="main_8cc.html">peclet/source/main.cc</a> accepts an input parameter file path from the command line.</p>
+<p>Some methods of this class are decomposed into header files named peclet_*.h. All prototypes are implemented in header files to facilitate templating. </p>
+</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a class="anchor" id="a023be1faf427eb33ac0c45680d98813a"></a>
 <div class="memitem">
 <div class="memproto">
@@ -243,6 +277,9 @@ template&lt;int dim&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>Adaptively refine the triangulation based on an error measure.</p>
+<p>Adaptively refine the triangulation based on an error measure.</p>
+<p>This is mostly a copy of the routine from deal.II's step-26, which uses the Kelly Error Estimator. </p>
 
 </div>
 </div>
@@ -268,6 +305,7 @@ template&lt;int dim&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>Append 1D solution data to the table in memory </p>
 
 </div>
 </div>
@@ -293,6 +331,9 @@ template&lt;int dim&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>Append convergence/verification data to the table in memory</p>
+<p>Append convergence/verification data to the table in memory</p>
+<p>This calculates both L2 and L1 norms based on a provided exact solution. </p>
 
 </div>
 </div>
@@ -318,6 +359,10 @@ template&lt;&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>Set the coarse Triangulation, i.e. Peclet::triangulation</p>
+<p>In deal.II language, coarse means the coarsest available representation of the geometry. In combination with geometric manifolds, this can indeed be quite coarse, even for curved geometries. For example, see the hemisphere_cylinder_shell in <a class="el" href="namespaceMyGridGenerator.html">MyGridGenerator</a>.</p>
+<p>Unfortunately geometric manifold data is not contained by the Triangulation. This separation allows for flexibility, but also requires extra bookkeeping by the programmer.</p>
+<p><a class="el" href="namespaceMyGridGenerator.html#a6e23dfabfb50859751be8d4870d29d55">Peclet&lt;1&gt;::create_coarse_grid()</a>, <a class="el" href="namespaceMyGridGenerator.html#a6e23dfabfb50859751be8d4870d29d55">Peclet&lt;2&gt;::create_coarse_grid()</a>, and <a class="el" href="namespaceMyGridGenerator.html#a6e23dfabfb50859751be8d4870d29d55">Peclet&lt;3&gt;::create_coarse_grid()</a> had to be implemented separately because GridTools::rotate() has not be implemented for Triangulation&lt;1&gt;. </p>
 
 </div>
 </div>
@@ -343,6 +388,8 @@ template&lt;&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>Set the coarse Triangulation, i.e. Peclet::triangulation</p>
+<p>See <a class="el" href="namespaceMyGridGenerator.html#a6e23dfabfb50859751be8d4870d29d55">Peclet&lt;1&gt;::create_coarse_grid()</a>. </p>
 
 </div>
 </div>
@@ -368,6 +415,8 @@ template&lt;&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>Set the coarse Triangulation, i.e. Peclet::triangulation</p>
+<p>See <a class="el" href="namespaceMyGridGenerator.html#a6e23dfabfb50859751be8d4870d29d55">Peclet&lt;1&gt;::create_coarse_grid()</a>. </p>
 
 </div>
 </div>
@@ -393,6 +442,7 @@ template&lt;int dim&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>Set the coarse Triangulation, i.e. Peclet::triangulation </p>
 
 </div>
 </div>
@@ -429,6 +479,42 @@ template&lt;int dim&gt; </div>
         </tr>
       </table>
 </div><div class="memdoc">
+<p>Run the simulation.</p>
+<p>This is the main method of the class. </p>
+<p>Clean up the files in the working directory</p>
+<p>Working with deal.II's Function class has been interesting, and I'm sure many of my choices are unorthodox. The most important lesson learned has been that a Function&lt;dim&gt;* can point to any class derived from Function&lt;dim&gt;. This is generally true for derived classes in C++. In this code, the general design pattern then is to instantitate all of the functions that might be needed, and then to point to the ones actually being used. The extra instantiations don't cost us anything.</p>
+<p>Generalizing the handling of auxiliary functions is complicated. In most cases one should be able to use a ParsedFunction, but the generality of Function&lt;dim&gt;* allows for a standard way to account for any possible derived class of Function&lt;dim&gt;. For example this allows for....</p>
+<ul>
+<li>an optional initial values function that interpolates an old solution loaded from disk.</li>
+<li>flexibily implementing general boundary conditions</li>
+</ul>
+<p>Initial values function</p>
+<p>Boundary condition functions</p>
+<p>Organize boundary functions to simplify application during the time loop</p>
+<p>Attach manifolds for exact geometry</p>
+<p>Run initial grid refinement cycles</p>
+<p>Initialize the linear system and constraints</p>
+<p>Iterate through time steps </p>
+<pre class="fragment">A goto statement (to the start_time_iteration label) is used to handle pre-refinement.
+Generally goto's are a terrible idea; but the step-26 tutorial makes a case for it being instructive here.
+It would probably be better to redesign this without a goto.
+</pre><p>Write the initial values</p>
+<p>Typically you see something more like "time += Delta_t" in time-dependent codes, but that method accumulates finite-precision roundoff errors. This is a better way.</p>
+<p>Set some flags that will control output for this step.</p>
+<p>Report the time step index and time.</p>
+<p>Add mass and convection-diffusion matrix terms to the RHS.</p>
+<p>Add natural boundary conditions to RHS</p>
+<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000002">Todo:</a></b></dt><dd>: This throws a warning </dd></dl>
+<p>Make the system matrix and apply constraints.</p>
+<p>Apply strong boundary conditions</p>
+<p>Check if a steady state has been reached.</p>
+<p>Write the solution.</p>
+<p>Adaptively refine the grid.</p>
+<p>Write FEFieldFunction related data so that it can be used as initial values for another run.</p>
+<p>Write the convergence/verification table.</p>
+<p>Write the 1D solution table</p>
+<p>Clean up.</p>
+<p>Manifolds must be detached from Triangulations before leaving this scope.</p>
 
 </div>
 </div>
@@ -455,6 +541,15 @@ template&lt;int dim&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>Re-initialize the linear system data and assemble the important matrices.</p>
+<p>Re-initialize the linear system data and assemble the important matrices.</p>
+<p>This involves a few very important steps:</p>
+<ul>
+<li>initializing hanging node constraints, the sparsity pattern, all matrices</li>
+<li>assemble the mass and convection-diffusion matrices</li>
+<li>reinitialize solution vectors</li>
+</ul>
+<p>The separation between this method and some of the work done in Peclet::run() may not be very well organized. There may be a better approach. That being said, little has been changed here relative to the step-26 tutorial. </p>
 
 </div>
 </div>
@@ -481,6 +576,9 @@ template&lt;int dim&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>Solve the linear system for a time step.</p>
+<p>Solve a time step.</p>
+<p>This involves solving the linear system based on the homogeneous part of the solution, recovering the inhomogeneous solution via the constraints matrix, and applying hanging node constraints also via the constraints matrix. </p>
 
 </div>
 </div>
@@ -507,6 +605,7 @@ template&lt;int dim&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>Write 1D solution data to disk </p>
 
 </div>
 </div>
@@ -532,6 +631,10 @@ template&lt;int dim&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>Write the solution to files for visualization</p>
+<p>Write the solution to files for visualization</p>
+<p>Only the VTK format is supported by this class; but deal.II makes it easy to use many other standard formats.</p>
+<p>Additionally for 1D problems, a simple table can be written for easy import into MATLAB. </p>
 
 </div>
 </div>
@@ -557,6 +660,8 @@ template&lt;int dim&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>Write convergence/verification data to disk</p>
+<p>Append convergence/verification data to disk. </p>
 
 </div>
 </div>
@@ -580,6 +685,7 @@ template&lt;int dim&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>A vector of pointers to deal.II Functions for spatially and temporally variable boundary conditions </p>
 
 </div>
 </div>
@@ -602,6 +708,12 @@ template&lt;int dim&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>The constraints matrix</p>
+<p>This serves two purposes:</p>
+<ol type="1">
+<li>Enforce Dirichlet boundary conditions.</li>
+<li>Apply hanging node constraints originating from local grid refinement. </li>
+</ol>
 
 </div>
 </div>
@@ -624,6 +736,9 @@ template&lt;int dim&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>The convection-diffusion matrix, (C + K)</p>
+<p>This is the convection diffusion matrix, which is the sum of the convection matrix, C, and the well known stiffness (a.k.a. Laplace) matrix, K.</p>
+<p>Rather than assembling C and K separately and then summing them, this class assembles the convection-diffusion matrix element-wise with a single kernel, which is only a slight modfication of the Laplace matrix assembly routine. </p>
 
 </div>
 </div>
@@ -646,6 +761,7 @@ template&lt;int dim&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>A pointer to a deal.II Function for spatially variable thermal diffusivity </p>
 
 </div>
 </div>
@@ -668,6 +784,8 @@ template&lt;int dim&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>The degrees of freedom handler</p>
+<p>This relates triangulation and fe to the system matrix. </p>
 
 </div>
 </div>
@@ -690,6 +808,8 @@ template&lt;int dim&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>A pointer to a deal.II Function for spatially and temporally variable exact solution</p>
+<p>Of course this is only used for code verification purposes, when an exact solution is known. See the tests involving the method of manufactured solution (MMS). </p>
 
 </div>
 </div>
@@ -712,6 +832,7 @@ template&lt;int dim&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>The Q1 finite element </p>
 
 </div>
 </div>
@@ -734,6 +855,7 @@ template&lt;int dim&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>A pointer to a deal.II Function for spatially variable initial values </p>
 
 </div>
 </div>
@@ -756,6 +878,7 @@ template&lt;int dim&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>These strings label types of manifolds used for exact geometry </p>
 
 </div>
 </div>
@@ -778,6 +901,7 @@ template&lt;int dim&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>These ID's label manifolds used for exact geometry </p>
 
 </div>
 </div>
@@ -800,6 +924,8 @@ template&lt;int dim&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>The mass matrix, $M$</p>
+<p>This is the well known mass matrix arising from discretizing time via finite differences. </p>
 
 </div>
 </div>
@@ -822,6 +948,7 @@ template&lt;int dim&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>The solution vector from the previous time step </p>
 
 </div>
 </div>
@@ -836,6 +963,8 @@ template&lt;int dim&gt; </div>
         </tr>
       </table>
 </div><div class="memdoc">
+<p>Structures all input parameters so that ParameterHandler can be discarded.</p>
+<p>This is public so that the parameters can be edited directly before calling <a class="el" href="classPeclet_1_1Peclet.html">Peclet</a>:<a class="el" href="classPeclet_1_1Peclet.html#a9b0ed314603f27385c5d01d3edddc742">run()</a>. </p>
 
 </div>
 </div>
@@ -858,6 +987,7 @@ template&lt;int dim&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>The solution vector </p>
 
 </div>
 </div>
@@ -880,6 +1010,9 @@ template&lt;int dim&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>A deal.II TableHandler for tabulating 1D solution data</p>
+<p>This has primarily been used as a convenient output for importing the 1D data into MATLAB.</p>
+<p>This is impractical for large problems, which should use the standard visualization formats for tools such as ParaView or VisIt. </p>
 
 </div>
 </div>
@@ -902,6 +1035,8 @@ template&lt;int dim&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>The path where to write the table containing 1D solution data</p>
+<p>Also see Peclet::solution_table_1D. </p>
 
 </div>
 </div>
@@ -924,6 +1059,7 @@ template&lt;int dim&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>A pointer to a deal.II Function for a spatially and temporally variable source </p>
 
 </div>
 </div>
@@ -946,6 +1082,8 @@ template&lt;int dim&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>The sparsity pattern</p>
+<p>This maps values to the sparse system matrix. </p>
 
 </div>
 </div>
@@ -968,6 +1106,7 @@ template&lt;int dim&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>Geometric information required for exact spherical geometry </p>
 
 </div>
 </div>
@@ -990,6 +1129,8 @@ template&lt;int dim&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>The system matrix</p>
+<p>This is the composite matrix for the entire linear system. </p>
 
 </div>
 </div>
@@ -1012,6 +1153,7 @@ template&lt;int dim&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>The composite right-hand side of the entire linear system </p>
 
 </div>
 </div>
@@ -1034,6 +1176,7 @@ template&lt;int dim&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>The current time for the time-dependent simulation </p>
 
 </div>
 </div>
@@ -1056,6 +1199,7 @@ template&lt;int dim&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>A counter to track the current time step index </p>
 
 </div>
 </div>
@@ -1078,6 +1222,8 @@ template&lt;int dim&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>The time step size for the time-dependent simulation</p>
+<p>Note that this is constant for any call to Peclet::run(). </p>
 
 </div>
 </div>
@@ -1100,6 +1246,7 @@ template&lt;int dim&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>The finite element triangulation, often just called tria in deal.II codes </p>
 
 </div>
 </div>
@@ -1122,6 +1269,7 @@ template&lt;int dim&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>A pointer to a deal.II Function for spatially variable convection velocity </p>
 
 </div>
 </div>
@@ -1144,6 +1292,7 @@ template&lt;int dim&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>A deal.II TableHandler for tabulating convergence/verification data </p>
 
 </div>
 </div>
@@ -1166,6 +1315,8 @@ template&lt;int dim&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>The path where to write the table containing convergence/verification data</p>
+<p>Also see Peclet::verification_table. </p>
 
 </div>
 </div>
@@ -1175,7 +1326,7 @@ template&lt;int dim&gt; </div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Mar 28 2017 15:45:26 for peclet by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Mar 28 2017 21:22:16 for peclet by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>
