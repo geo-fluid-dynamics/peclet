@@ -1,27 +1,6 @@
- /*
- * @brief peclet solves the convection-diffusion equation
- *
- * @detail
- *
- *  This solves the unsteady convection-diffusion equation.
- *
- *  System assembly and time stepping are based on deal.II Tutorial 26 by Wolfgang Bangerth, Texas A&M University, 2013
- *
- *  Some of the more notable extensions include:
- *  - Builds convection-diffusion matrix instead of Laplace matrix
- *  - Supports time-dependent non-zero Dirichlet and Neumann boundary condition
- *  - Re-designed parmameter handling
- *  - Generalized boundary condition handling via the parameter input file
- *  - Writes FEFieldFunction to disk, and can read it from disk to initialize a restart
- *  - Extended the FEFieldFunction class for extrapolation
- *  - Added verification via Method of Manufactured Solutions (MMS) with error table based on approach from Tutorial 7
- *  - Added test suite using ctest and the standard deal.II approach
- *  - Added a parameteric sphere-cylinder grid
- *  - Added a boundary grid refinement routine
- *  - Added a output option for 1D solutions in tabular format
- *
- * @author Alexander Zimmerman <zimmerman@aices.rwth-aachen.de>, RWTH AAchen University, 2016
- */
+#ifndef peclet_h
+#define peclet_h
+
 #include <deal.II/base/utilities.h>
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/function.h>
@@ -67,288 +46,500 @@
 
 #include "peclet_parameters.h"
 
+/*!
+
+A namespace for everything specific to Peclet. This mostly just includes the Peclet class, but also
+some related data.
+
+@ingroup peclet
+
+*/
 namespace Peclet
 {
-  using namespace dealii;
-  
-  const double EPSILON = 1.e-14;
-  
-  struct SolverStatus
-  {
-      unsigned int last_step;
-  };
-  
-  template<int dim>
-  class Peclet
-  {
-  public:
-    Peclet();
-    Parameters::StructuredParameters params;
-    void init(std::string file_path);
-    void run(const std::string parameter_file = "");
+    using namespace dealii;
 
-  private:
-    void create_coarse_grid();
-    void adaptive_refine();
-    void setup_system(bool quiet = false);
-    SolverStatus solve_time_step(bool quiet = false);
-    void write_solution();
-    
-    Triangulation<dim>   triangulation;
-    FE_Q<dim>            fe;
-    DoFHandler<dim>      dof_handler;
+    const double EPSILON = 1.e-14;
 
-    ConstraintMatrix     constraints;
-
-    SparsityPattern      sparsity_pattern;
-    SparseMatrix<double> mass_matrix;
-    SparseMatrix<double> convection_diffusion_matrix;
-    SparseMatrix<double> system_matrix;
-
-    Vector<double>       solution;
-    Vector<double>       old_solution;
-    Vector<double>       system_rhs;
-
-    double               time;
-    double               time_step_size;
-    unsigned int         time_step_counter;
-    
-    Point<dim> spherical_manifold_center;
-    
-    std::vector<unsigned int> manifold_ids;
-    std::vector<std::string> manifold_descriptors;
-    
-    Function<dim>* velocity_function;
-    Function<dim>* diffusivity_function;
-    Function<dim>* source_function;
-    std::vector<Function<dim>*> boundary_functions;
-    Function<dim>* initial_values_function;
-    Function<dim>* exact_solution_function;
-    
-    void append_verification_table();
-    void write_verification_table();
-    TableHandler verification_table;
-    std::string verification_table_file_name = "verification_table.txt";
-    
-    void append_1D_solution_to_table();
-    void write_1D_solution_table(std::string file_name);
-    TableHandler solution_table_1D;
-    std::string solution_table_1D_file_name = "1D_solution_table.txt";
-    
-  };
-  
-  template<int dim>
-  Peclet<dim>::Peclet()
-    :
-    fe(1),
-    dof_handler(this->triangulation)
-  {}
-  
-  #include "peclet_grid.h"
-  
-  template<int dim>
-  void Peclet<dim>::setup_system(bool quiet)
-  {
-    dof_handler.distribute_dofs(fe);
-
-    if (!quiet)
+    struct SolverStatus
     {
-        std::cout << std::endl
-              << "==========================================="
-              << std::endl
-              << "Number of active cells: " << triangulation.n_active_cells()
-              << std::endl
-              << "Number of degrees of freedom: " << dof_handler.n_dofs()
-              << std::endl
-              << std::endl;    
-    }
-
-    constraints.clear();
-    
-    DoFTools::make_hanging_node_constraints(
-        dof_handler,
-        constraints);
-        
-    constraints.close();
-
-    DynamicSparsityPattern dsp(dof_handler.n_dofs());
-    
-    DoFTools::make_sparsity_pattern(
-        this->dof_handler,
-        dsp,
-        this->constraints,
-        /*keep_constrained_dofs = */ true);
-        
-    this->sparsity_pattern.copy_from(dsp);
-
-    this->mass_matrix.reinit(this->sparsity_pattern);
-    
-    this->convection_diffusion_matrix.reinit(this->sparsity_pattern);
-    
-    this->system_matrix.reinit(this->sparsity_pattern);
-
-    MatrixCreator::create_mass_matrix(this->dof_handler,
-                                      QGauss<dim>(fe.degree+1),
-                                      this->mass_matrix);
-                          
-    MyMatrixCreator::create_convection_diffusion_matrix<dim>(
-        this->dof_handler,
-        QGauss<dim>(fe.degree+1),
-        this->convection_diffusion_matrix,
-        this->diffusivity_function, 
-        this->velocity_function);
-
-    this->solution.reinit(dof_handler.n_dofs());
-    
-    this->old_solution.reinit(dof_handler.n_dofs());
-    
-    this->system_rhs.reinit(dof_handler.n_dofs());
-    
-  }
-
-  template<int dim>
-  SolverStatus Peclet<dim>::solve_time_step(bool quiet)
-  {
-    double tolerance = this->params.solver.tolerance;
-    if (this->params.solver.normalize_tolerance)
-    {
-        tolerance *= this->system_rhs.l2_norm();
-    }
-    SolverControl solver_control(
-        this->params.solver.max_iterations,
-        tolerance);
-       
-    SolverCG<> solver_cg(solver_control);
-    SolverBicgstab<> solver_bicgstab(solver_control);
-
-    PreconditionSSOR<> preconditioner;
-    
-    preconditioner.initialize(this->system_matrix, 1.0);
-
-    std::string solver_name;
-    
-    if (this->params.solver.method == "CG")
-    {
-        solver_name = "CG";
-        solver_cg.solve(
-            this->system_matrix,
-            this->solution,
-            this->system_rhs,
-            preconditioner);    
-    }
-    else if (this->params.solver.method == "BiCGStab")
-    {
-        solver_name = "BiCGStab";
-        solver_bicgstab.solve(
-            this->system_matrix,
-            this->solution,
-            this->system_rhs,
-            preconditioner);
-    }
-
-    this->constraints.distribute(this->solution);
-
-    if (!quiet)
-    {
-        std::cout << "     " << solver_control.last_step()
-              << " " << solver_name << " iterations." << std::endl;
-    }
-    
-    SolverStatus status;
-    status.last_step = solver_control.last_step();
-    
-    return status;
-    
-  }
+        unsigned int last_step;
+    };
   
-  #include "peclet_1D_solution_table.h"
-  
-  template<int dim>
-  void Peclet<dim>::write_solution()
-  {
+    /*! Solve the unsteady scalar convection-diffusion equation.
+
+    This class solves the unsteady scalar convection-diffusion equation.
+
+    System assembly and time stepping are based on deal.II Tutorial 26 by Wolfgang Bangerth, Texas A&M University, 2013
+
+    Some of the more notable extensions (beyond step-26) include:
+    - Builds convection-diffusion matrix instead of Laplace matrix
+    - Supports time-dependent non-zero Dirichlet and Neumann boundary condition
+    - Re-designed parmameter handling
+    - Generalized boundary condition handling via the parameter input file
+    - Writes FEFieldFunction to disk, and can read it from disk to initialize a restart
+    - Extended the FEFieldFunction class for extrapolation
+    - Added verification via Method of Manufactured Solutions (MMS) with error table based on approach from Tutorial 7
+    - Added test suite using ctest and the standard deal.II approach
+    - Added a parameteric sphere-cylinder grid
+    - Added a boundary grid refinement routine
+    - Added a output option for 1D solutions in tabular format
+
+    A simulation can be run for example with the following main program:
+    @code
+
+        #include "peclet.h"
+
+        int main(int argc, char* argv[])
+        {   
+            Peclet::Peclet<2> peclet;
+            
+            peclet.run();
+            
+            return 0;
+        }
+
+    @endcode
+
+    The previous example uses default parameters and writes used_parameters.prm. A user can edit this file and save it as an input parameter file. The main program peclet/source/main.cc accepts an input parameter file path from the command line.
+
+    Some methods of this class are decomposed into header files named peclet_*.h.
+    All prototypes are implemented in header files to facilitate templating.
+
+    @ingroup peclet
+    */
+    template<int dim>
+    class Peclet
+    {
+    public:
       
-    if (this->params.output.write_solution_vtk)
+        Peclet();
+        
+        /*! Structures all input parameters so that ParameterHandler can be discarded.
+        
+            This is public so that the parameters can be edited directly before calling Peclet:run().
+            
+        */
+        Parameters::StructuredParameters params;
+        
+        void init(std::string file_path);
+        
+        void run(const std::string parameter_file = "");
+
+    private:
+    
+        // Data members
+        
+        /*! The finite element triangulation, often just called tria in deal.II codes*/
+        Triangulation<dim>   triangulation;
+        
+        /*! The Q1 finite element */
+        FE_Q<dim>            fe;
+        
+        /*! The degrees of freedom handler
+        
+            This relates triangulation and fe to the system matrix.
+            
+        */
+        DoFHandler<dim>      dof_handler;
+
+        /*! The constraints matrix 
+        
+            This serves two purposes:
+                1. Enforce Dirichlet boundary conditions.
+                2. Apply hanging node constraints originating from local grid refinement.
+        
+        */
+        ConstraintMatrix     constraints;
+        
+        /*! The sparsity pattern
+        
+            This maps values to the sparse system matrix.
+        
+        */
+        SparsityPattern      sparsity_pattern;
+        
+        /*! The mass matrix, $M$
+        
+            This is the well known mass matrix arising from discretizing time via finite differences.
+        
+        */
+        SparseMatrix<double> mass_matrix;
+        
+        /*! The convection-diffusion matrix, (C + K)
+        
+            This is the convection diffusion matrix, which is the sum of the convection matrix, C, and the well known stiffness (a.k.a. Laplace) matrix, K.
+            
+            Rather than assembling C and K separately and then summing them, this class assembles the convection-diffusion matrix element-wise with a single kernel, which is only a slight modfication of the Laplace matrix assembly routine.
+        
+        */
+        SparseMatrix<double> convection_diffusion_matrix;
+        
+        /*! The system matrix
+        
+            This is the composite matrix for the entire linear system.
+            
+        */
+        SparseMatrix<double> system_matrix;
+
+        /*! The solution vector */
+        Vector<double>       solution;
+        
+        /*! The solution vector from the previous time step */
+        Vector<double>       old_solution;
+        
+        /*! The composite right-hand side of the entire linear system */
+        Vector<double>       system_rhs;
+
+        /*! The current time for the time-dependent simulation */
+        double               time;
+        
+        /*! The time step size for the time-dependent simulation 
+        
+            Note that this is constant for any call to Peclet::run().
+        
+        */
+        double               time_step_size;
+        
+        /*! A counter to track the current time step index */
+        unsigned int         time_step_counter;
+        
+        /*! Geometric information required for exact spherical geometry */
+        Point<dim> spherical_manifold_center;
+        
+        /*! These ID's label manifolds used for exact geometry */
+        std::vector<unsigned int> manifold_ids;
+        
+        /*! These strings label types of manifolds used for exact geometry */
+        std::vector<std::string> manifold_descriptors;
+        
+        // Function data members
+        
+        /*! A pointer to a deal.II Function for spatially variable convection velocity */
+        Function<dim>* velocity_function;
+        
+        /*! A pointer to a deal.II Function for spatially variable thermal diffusivity */
+        Function<dim>* diffusivity_function;
+        
+        /*! A pointer to a deal.II Function for a spatially and temporally variable source */
+        Function<dim>* source_function;
+        
+        /*! A vector of pointers to deal.II Functions for spatially and temporally variable boundary conditions */
+        std::vector<Function<dim>*> boundary_functions;
+        
+        /*! A pointer to a deal.II Function for spatially variable initial values */
+        Function<dim>* initial_values_function;
+        
+        /*! A pointer to a deal.II Function for spatially and temporally variable exact solution
+            
+            Of course this is only used for code verification purposes, when an exact solution is known. See the tests involving the method of manufactured solution (MMS).
+            
+        */
+        Function<dim>* exact_solution_function;
+        
+        /*! A deal.II TableHandler for tabulating convergence/verification data */
+        TableHandler verification_table;
+        
+        /*! The path where to write the table containing convergence/verification data 
+        
+            Also see Peclet::verification_table.
+        
+        */
+        std::string verification_table_file_name = "verification_table.txt";
+        
+        /*! A deal.II TableHandler for tabulating 1D solution data
+    
+            This has primarily been used as a convenient output for importing the 1D data into MATLAB.
+            
+            This is impractical for large problems, which should use the standard visualization formats for tools such as ParaView or VisIt.
+    
+        */        
+        TableHandler solution_table_1D;
+        
+        /*! The path where to write the table containing 1D solution data 
+        
+            Also see Peclet::solution_table_1D.
+        
+        */
+        std::string solution_table_1D_file_name = "1D_solution_table.txt";
+        
+        
+        // Methods
+        
+        /*! Solve the linear system for a time step. */
+        SolverStatus solve_time_step(bool quiet = false);
+        
+        /*! Set the coarse Triangulation, i.e. Peclet::triangulation */
+        void create_coarse_grid();
+      
+        /*! Adaptively refine the triangulation based on an error measure. */
+        void adaptive_refine();
+        
+        /*! Re-initialize the linear system data and assemble the important matrices. */
+        void setup_system(bool quiet = false);
+        
+        /*! Write the solution to files for visualization */
+        void write_solution();
+        
+        /*! Append convergence/verification data to the table in memory */
+        void append_verification_table();
+        
+        /*! Write convergence/verification data to disk */
+        void write_verification_table();
+        
+        /*! Append 1D solution data to the table in memory */
+        void append_1D_solution_to_table();
+        
+        /*! Write 1D solution data to disk */
+        void write_1D_solution_table(std::string file_name);
+    };
+  
+    template<int dim>
+    Peclet<dim>::Peclet()
+        :
+        fe(1),
+        dof_handler(this->triangulation)
+    {}
+  
+    #include "peclet_grid.h"
+  
+    /*! Re-initialize the linear system data and assemble the important matrices.
+        
+        This involves a few very important steps:
+            - initializing hanging node constraints, the sparsity pattern, all matrices
+            - assemble the mass and convection-diffusion matrices
+            - reinitialize solution vectors
+            
+        The separation between this method and some of the work done in Peclet::run() may not be very well organized. There may be a better approach. That being said, little has been changed here relative to the step-26 tutorial.
+        
+    */
+    template<int dim>
+    void Peclet<dim>::setup_system(bool quiet)
     {
-        Output::write_solution_to_vtk(
-            "solution-"+Utilities::int_to_string(this->time_step_counter)+".vtk",
+        dof_handler.distribute_dofs(fe);
+
+        if (!quiet)
+        {
+            std::cout << std::endl
+                  << "==========================================="
+                  << std::endl
+                  << "Number of active cells: " << triangulation.n_active_cells()
+                  << std::endl
+                  << "Number of degrees of freedom: " << dof_handler.n_dofs()
+                  << std::endl
+                  << std::endl;    
+        }
+
+        constraints.clear();
+        
+        DoFTools::make_hanging_node_constraints(
+            dof_handler,
+            constraints);
+            
+        constraints.close();
+
+        DynamicSparsityPattern dsp(dof_handler.n_dofs());
+        
+        DoFTools::make_sparsity_pattern(
             this->dof_handler,
-            this->solution);    
+            dsp,
+            this->constraints,
+            /*keep_constrained_dofs = */ true);
+            
+        this->sparsity_pattern.copy_from(dsp);
+
+        this->mass_matrix.reinit(this->sparsity_pattern);
+        
+        this->convection_diffusion_matrix.reinit(this->sparsity_pattern);
+        
+        this->system_matrix.reinit(this->sparsity_pattern);
+
+        MatrixCreator::create_mass_matrix(
+            this->dof_handler,
+            QGauss<dim>(fe.degree+1),
+            this->mass_matrix);
+                              
+        MyMatrixCreator::create_convection_diffusion_matrix<dim>(
+            this->dof_handler,
+            QGauss<dim>(fe.degree+1),
+            this->convection_diffusion_matrix,
+            this->diffusivity_function, 
+            this->velocity_function);
+
+        this->solution.reinit(dof_handler.n_dofs());
+        
+        this->old_solution.reinit(dof_handler.n_dofs());
+        
+        this->system_rhs.reinit(dof_handler.n_dofs());
+        
     }
-    
-    if (dim == 1)
+
+    /*! Solve a time step. 
+
+    This involves solving the linear system based on the homogeneous part of the solution, recovering the inhomogeneous solution via the constraints matrix, and applying hanging node constraints also via the constraints matrix.
+
+    */
+    template<int dim>
+    SolverStatus Peclet<dim>::solve_time_step(bool quiet)
     {
-        this->append_1D_solution_to_table();
+        double tolerance = this->params.solver.tolerance;
+        if (this->params.solver.normalize_tolerance)
+        {
+            tolerance *= this->system_rhs.l2_norm();
+        }
+        SolverControl solver_control(
+            this->params.solver.max_iterations,
+            tolerance);
+           
+        SolverCG<> solver_cg(solver_control);
+        SolverBicgstab<> solver_bicgstab(solver_control);
+
+        PreconditionSSOR<> preconditioner;
+        
+        preconditioner.initialize(this->system_matrix, 1.0);
+
+        std::string solver_name;
+        
+        if (this->params.solver.method == "CG")
+        {
+            solver_name = "CG";
+            solver_cg.solve(
+                this->system_matrix,
+                this->solution,
+                this->system_rhs,
+                preconditioner);    
+        }
+        else if (this->params.solver.method == "BiCGStab")
+        {
+            solver_name = "BiCGStab";
+            solver_bicgstab.solve(
+                this->system_matrix,
+                this->solution,
+                this->system_rhs,
+                preconditioner);
+        }
+
+        this->constraints.distribute(this->solution);
+
+        if (!quiet)
+        {
+            std::cout << "     " << solver_control.last_step()
+                  << " " << solver_name << " iterations." << std::endl;
+        }
+        
+        SolverStatus status;
+        status.last_step = solver_control.last_step();
+        
+        return status;
+        
     }
-    
-  }
   
-  template<int dim>
-  void Peclet<dim>::append_verification_table()
-  {
-    assert(this->params.verification.enabled);
-    
-    this->exact_solution_function->set_time(this->time);
-    
-    Vector<float> difference_per_cell(triangulation.n_active_cells());
-    
-    VectorTools::integrate_difference(
-        this->dof_handler,
-        this->solution,
-        *this->exact_solution_function,
-        difference_per_cell,
-        QGauss<dim>(3),
-        VectorTools::L2_norm);
-        
-    double L2_norm_error = difference_per_cell.l2_norm();
-    
-    VectorTools::integrate_difference(
-        this->dof_handler,
-        this->solution,
-        *this->exact_solution_function,
-        difference_per_cell,
-        QGauss<dim>(3),
-        VectorTools::L1_norm);
-        
-    double L1_norm_error = difference_per_cell.l1_norm();
-        
-    this->verification_table.add_value("time_step_size", this->time_step_size);
-    this->verification_table.add_value("time", this->time);
-    this->verification_table.add_value("cells", this->triangulation.n_active_cells());
-    this->verification_table.add_value("dofs", this->dof_handler.n_dofs());
-    this->verification_table.add_value("L1_norm_error", L1_norm_error);
-    this->verification_table.add_value("L2_norm_error", L2_norm_error);
-    
-  }
+    #include "peclet_1D_solution_table.h"
   
-  template<int dim>
-  void Peclet<dim>::write_verification_table()
-  {
-    const int precision = 14;
-    
-    this->verification_table.set_precision("time", precision);
-    this->verification_table.set_scientific("time", true);
-    
-    this->verification_table.set_precision("time_step_size", precision);
-    this->verification_table.set_scientific("time_step_size", true);
-    
-    this->verification_table.set_precision("cells", precision);
-    this->verification_table.set_scientific("cells", true);
-    
-    this->verification_table.set_precision("dofs", precision);
-    this->verification_table.set_scientific("dofs", true);
-    
-    this->verification_table.set_precision("L2_norm_error", precision);
-    this->verification_table.set_scientific("L2_norm_error", true);
-    
-    this->verification_table.set_precision("L1_norm_error", precision);
-    this->verification_table.set_scientific("L1_norm_error", true);
-    
-    std::ofstream out_file(this->verification_table_file_name, std::fstream::app);
-    assert(out_file.good());
-    this->verification_table.write_text(out_file);
-    out_file.close(); 
-  }
+    /*! Write the solution to files for visualization 
   
+    Only the VTK format is supported by this class; but deal.II makes it easy to use many other standard formats.
+    
+    Additionally for 1D problems, a simple table can be written for easy import into MATLAB.
+  
+    */
+    template<int dim>
+    void Peclet<dim>::write_solution()
+    {
+          
+        if (this->params.output.write_solution_vtk)
+        {
+            Output::write_solution_to_vtk(
+                "solution-"+Utilities::int_to_string(this->time_step_counter)+".vtk",
+                this->dof_handler,
+                this->solution);    
+        }
+        
+        if (dim == 1)
+        {
+            this->append_1D_solution_to_table();
+        }
+        
+    }
+  
+    /*! Append convergence/verification data to the table in memory 
+    
+        This calculates both L2 and L1 norms based on a provided exact solution.
+    
+    */
+    template<int dim>
+    void Peclet<dim>::append_verification_table()
+    {
+        assert(this->params.verification.enabled);
+        
+        this->exact_solution_function->set_time(this->time);
+        
+        Vector<float> difference_per_cell(triangulation.n_active_cells());
+        
+        VectorTools::integrate_difference(
+            this->dof_handler,
+            this->solution,
+            *this->exact_solution_function,
+            difference_per_cell,
+            QGauss<dim>(3),
+            VectorTools::L2_norm);
+            
+        double L2_norm_error = difference_per_cell.l2_norm();
+        
+        VectorTools::integrate_difference(
+            this->dof_handler,
+            this->solution,
+            *this->exact_solution_function,
+            difference_per_cell,
+            QGauss<dim>(3),
+            VectorTools::L1_norm);
+            
+        double L1_norm_error = difference_per_cell.l1_norm();
+            
+        this->verification_table.add_value("time_step_size", this->time_step_size);
+        this->verification_table.add_value("time", this->time);
+        this->verification_table.add_value("cells", this->triangulation.n_active_cells());
+        this->verification_table.add_value("dofs", this->dof_handler.n_dofs());
+        this->verification_table.add_value("L1_norm_error", L1_norm_error);
+        this->verification_table.add_value("L2_norm_error", L2_norm_error);
+        
+    }
+  
+    /*! Append convergence/verification data to disk. */
+    template<int dim>
+    void Peclet<dim>::write_verification_table()
+    {
+        const int precision = 14;
+        
+        this->verification_table.set_precision("time", precision);
+        this->verification_table.set_scientific("time", true);
+        
+        this->verification_table.set_precision("time_step_size", precision);
+        this->verification_table.set_scientific("time_step_size", true);
+        
+        this->verification_table.set_precision("cells", precision);
+        this->verification_table.set_scientific("cells", true);
+        
+        this->verification_table.set_precision("dofs", precision);
+        this->verification_table.set_scientific("dofs", true);
+        
+        this->verification_table.set_precision("L2_norm_error", precision);
+        this->verification_table.set_scientific("L2_norm_error", true);
+        
+        this->verification_table.set_precision("L1_norm_error", precision);
+        this->verification_table.set_scientific("L1_norm_error", true);
+        
+        std::ofstream out_file(this->verification_table_file_name, std::fstream::app);
+        assert(out_file.good());
+        this->verification_table.write_text(out_file);
+        out_file.close(); 
+
+    }
+
+  /*! Run the simulation.
+  
+    This pulls together all of Peclet's data and methods and runs the simulation.
+  
+  */
   template<int dim>
   void Peclet<dim>::run(const std::string parameter_file)
   {
@@ -743,3 +934,5 @@ start_time_iteration:
     
   }
 }
+
+#endif

@@ -1,5 +1,5 @@
 # peclet
-A convection-diffusion solver written in C++ and based on deal.II
+an unsteady scalar convection-diffusion solver based on the finite element C++ library deal.II
 
 [![Build Status](https://travis-ci.org/alexanderzimmerman/peclet.svg?branch=master)](https://travis-ci.org/alexanderzimmerman/peclet) (<b>Continuous integration status</b>; click the button to go to Travis-CI)
 
@@ -19,6 +19,9 @@ Pull the image from https://hub.docker.com/r/zimmerman/peclet/
 
 This is currently being tested with the following builds of deal.II:
 - deal.II v8.5.pre from docker image dealii/dealii:v8.5.pre.4-gcc-mpi-fulldepsmanual-debugrelease (as shown in peclet/Dockerfile)
+
+## Design notes
+The Peclet class is implemented entirely with header files. This reduces the structural complexity of the code and can increase programming productivity, but it leads to longer compile times. A header-only approach would be impractical for the deal.II library itself; but in this small project's experience, the header-only approach is more than adequate. Most notably, this simplifies working with C++ templates.
 
 ## Build
 

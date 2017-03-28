@@ -1,6 +1,11 @@
 namespace Refinement
 {
 
+    /*! Adaptively refine the triangulation based on an error measure.
+            
+        This is mostly a copy of the routine from deal.II's step-26, which uses the Kelly Error Estimator.
+            
+    */
     template <int dim>
     void adaptive_refine_mesh(
         Triangulation<dim> &triangulation,
