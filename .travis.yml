@@ -1,0 +1,15 @@
+language: cpp
+
+services:
+  - docker
+
+notifications:
+  email: false
+  slack: aices-pcm-cfd:ShncJAFCJzx48zt8hrXpRwGw
+
+before_install:
+- docker pull zimmerman/peclet
+
+script:
+- docker run -P -v `pwd`:/home/peclet:rw zimmerman/peclet /bin/sh -c "cd peclet; git pull; cd build; cmake ..; make -j2"
+- docker run -P -v `pwd`:/home/peclet:rw zimmerman/peclet /bin/sh -c "cd peclet/build; ctest -j2"
