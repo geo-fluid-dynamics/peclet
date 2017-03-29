@@ -1,6 +1,22 @@
 # peclet
 an unsteady scalar convection-diffusion solver based on the finite element C++ library deal.II
 
+The strong form of the initial boundary value problem (IBVP) is
+
+\begin{array}{rcl}
+
+    u_t(\bf{x},t) + \bf{v}(x)\cdot\nabla u(x,t) - \nabla \cdot (\alpha(\bf{x})\nabla u(\bf{x},t)) = s(\bf{x},t) \forall \bf{x}, t \in \bf{\Omega} \times (t_0,t_f) \\
+    
+    u(\bf{x},0) = u_0(\bf{x}) \quad \forall \bf{x} \in \bf{\Omega} \\
+    
+    u(\bf{x},t) = g(\bf{x},t) \quad \forall \bf{x},t \in \bf{\Gamma}_D \times (t_0,t_f) \\
+    
+    \alpha(\bf{x})(\hat{\bf{n}}\cdot\nabla)u(\bf{x},t) = h(\bf{x},t) \quad \forall \bf{x},t \in \bf{\Gamma}_N \times (t_0,t_f)
+
+\end{array}
+
+Spatial derivatives are discretized with the standard Galerkin finite element method, and the temporal derivative is discretized with the $\theta$-family of semi-implicit finite difference methods.
+
 [![Build Status](https://travis-ci.org/alexanderzimmerman/peclet.svg?branch=master)](https://travis-ci.org/alexanderzimmerman/peclet) (<b>Continuous integration status</b>; click the button to go to Travis-CI)
 
 Author: Alexander G. Zimmerman <zimmerman@aices.rwth-aachen.de>
