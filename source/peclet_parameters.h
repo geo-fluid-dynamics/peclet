@@ -32,16 +32,24 @@
 
 namespace Peclet
 {
+    /*!
+    
+    Contains parameters data structures and methods for reading from the input file 
+    
+    @ingroup parameters
+    */
     namespace Parameters
     {   
 
         using namespace dealii;
 
+        /*! Contain parameters that are required for instantiating a Peclet::Peclet */
         struct Meta
         {
             unsigned int dim;
         };
 
+        /*! Contains parameters for boundary conditions */
         struct BoundaryConditions
         {
             std::vector<std::string> implementation_types;
@@ -49,12 +57,14 @@ namespace Peclet
             std::list<double> function_double_arguments;
         };
         
+        /*! Contains parameters for initial values */
         struct InitialValues
         {
             std::string function_name;
             std::list<double> function_double_arguments; 
         };
         
+        /*! Contains parameters for geometry */
         struct Geometry
         {
             unsigned int dim;
@@ -63,6 +73,11 @@ namespace Peclet
             std::vector<double> transformations;
         };
         
+        /*! Contains parameters for adaptive grid refinement 
+            
+            Also see Peclet::Parameters::Refinement
+            
+        */
         struct AdaptiveRefinement
         {
             unsigned int initial_cycles;
@@ -73,7 +88,8 @@ namespace Peclet
             double refine_fraction;
             double coarsen_fraction;
         };
-            
+        
+        /*! Contains parameters for grid refinement */
         struct Refinement
         {
             unsigned int initial_global_cycles;
@@ -82,6 +98,7 @@ namespace Peclet
             AdaptiveRefinement adaptive;
         };
         
+        /*! Contains parameters for time integration */
         struct Time
         {
             double end_time;
@@ -91,6 +108,7 @@ namespace Peclet
             bool stop_when_steady;
         };
         
+        /*! Contains parameters for the iterative solver */
         struct IterativeSolver
         {
             std::string method;
@@ -99,6 +117,7 @@ namespace Peclet
             bool normalize_tolerance;
         };
         
+        /*! Contains parameters for solution output to file */
         struct Output
         {
             bool write_solution_vtk;
@@ -106,6 +125,7 @@ namespace Peclet
             int time_step_interval;
         };
         
+        /*! Contains parameters for verification against an exact solution */
         struct Verification
         {
             bool enabled;
@@ -113,6 +133,7 @@ namespace Peclet
             std::vector<double> exact_solution_function_double_arguments;
         };
         
+        /*! Contains are parameter data structures */
         struct StructuredParameters
         {
             Meta meta;
@@ -126,13 +147,15 @@ namespace Peclet
             Verification verification;
         };    
 
+        /*! Declare parmaeters using dealii::ParameterHandler */
         template<int dim>
         void declare(ParameterHandler &prm)
         {
             
             prm.enter_subsection("meta");
             {
-                prm.declare_entry("dim", std::to_string(dim), Patterns::Integer(1, 3));
+                prm.declare_entry("dim", std::to_string(dim), Patterns::Integer(1, 3),
+                    "The number of spatial dimensions, either 1, 2, or 3.");
             }
             prm.leave_subsection();
             
@@ -162,18 +185,41 @@ namespace Peclet
             {
                     
                 prm.declare_entry("grid_name", "hyper_cube",
-                     Patterns::Selection("hyper_rectangle | hyper_cube | hyper_shell | hemisphere_cylinder_shell"
-                                      " | cylinder | cylinder_with_split_boundaries"
-                                      " | hyper_cube_with_cylindrical_hole"),
+                     Patterns::Selection(
+                        "hyper_rectangle | hyper_cube | hyper_shell | hemisphere_cylinder_shell"
+                        " | cylinder | cylinder_with_split_boundaries"
+                        " | hyper_cube_with_cylindrical_hole"),
+                     
                      "Select the name of the geometry and grid to generate."
+                     "\nMost of these geometries are implemented in the deal.II library,"
+                     " so it is important to review the deal.II documentation for the geometry."
+                     " For the user's convenience, here is some boundary ID information:"
+                     
+                     "\nhyper_rectangle"
+                     "\n\tBoundary ID's in 2D:"
+                     "\n\t0: x_min"
+                     "\n\t1: x_max"
+                     "\n\t2: y_min"
+                     "\n\t3: y_max"
+                     
                      "\nhyper_shell"
                      "\n\tInner boundary ID = 0"
                      "\n\tOuter boundary ID = 1"
                      
                      "\nhemisphere_cylinder_shell"
+                     "\n\tBoundary ID's in 2D:"
+                     "\n\t0: Right half of outer circle"
+                     "\n\t1: Right side outer rectangle"
+                     "\n\t2: Top of outer rectangle"
+                     "\n\t3: Left side of outer rectangle"
+                     "\n\t4: Left side of outer circle"
+                     "\n\t5: Right half of inner circle"
+                     "\n\t6: Right side inner rectangle"
+                     "\n\t7: Top of inner rectangle"
+                     "\n\t8: Left side of inner rectangle"
+                     "\n\t9: Left side of inner circle"
                      
-                     "\ncylinder:"
-                     "\n\tBoundary ID's"
+                     "\ncylinder"
                      "\n\t\t0: Heat flux"
                      "\n\t\t1: Outflow"
                      "\n\t\t2: Domain sides"
@@ -186,6 +232,8 @@ namespace Peclet
                 prm.declare_entry("sizes", "0., 1.",
                     Patterns::List(Patterns::Double(0.)),
                     "Set the sizes for the grid's geometry."
+                    "\n hyper_rectangle:"
+                        "{Point0.x, Point0.y, Point1.x, Point1.y}"
                     "\n hyper_shell:"
                         "{inner_radius, outer_radius}"
                     "\n  hemisphere_cylinder_shell: "
@@ -198,6 +246,7 @@ namespace Peclet
                 prm.declare_entry("transformations", "0., 0., 0.",
                     Patterns::List(Patterns::Double()),
                     "Set the rigid body transformation vector."
+                    " This transformation will be applied to the coarse grid."
                     "\n  2D : {shift_along_x, shift_along_y, rotate_about_z}"
                     "\n  3D : {shift_along_x, shift_along_y, shift_along_z, "
                               "rotate_about_x, rotate_about_y, rotate_about_z}");
@@ -208,11 +257,17 @@ namespace Peclet
             
             prm.enter_subsection ("initial_values");
             {
-                prm.declare_entry("function_name", "parsed",
-                    Patterns::List(Patterns::Selection("parsed | constant | interpolate_old_field")));
+                prm.declare_entry(
+                    "function_name",
+                    "parsed",
+                    Patterns::List(Patterns::Selection("parsed | constant | interpolate_old_field"))
+                    "Choose to either use a parsed function for the initial values, "
+                    "or to interpolate them from an existing FEFieldFunction, "
+                    "e.g. from an old solution. ");
                     
                 prm.declare_entry("function_double_arguments", "",
-                    Patterns::List(Patterns::Double())); 
+                    Patterns::List(Patterns::Double()),
+                    "This is deprecated."); 
                     
                 prm.enter_subsection("parsed_function");
                 {
@@ -229,20 +284,17 @@ namespace Peclet
                 // Each of these lists needs a value for every boundary, in order
                 prm.declare_entry("implementation_types", "natural, strong",
                     Patterns::List(Patterns::Selection("natural | strong")),
-                    "Type of boundary conditions to apply to each boundary");  
+                    "Specify the type of boundary conditions to apply to each boundary."
+                    " A value is required for every boundary ID in the coarse grid.");  
                     
                 prm.declare_entry("function_names", "parsed, parsed",
                     Patterns::List(Patterns::Selection("parsed | constant")),
-                    "Names of functions to apply to each boundary");
+                    "Specify the names of functions to apply to each boundary."
+                    " A value is required for every boundary ID in the coarse grid.");
                     
                 prm.declare_entry("function_double_arguments", "",
                     Patterns::List(Patterns::Double()),
-                    "This list of doubles will be popped from front to back as needed."
-                    "\nThis puts some work on the user to greatly ease development."
-                    "\nHere are some tips:"
-                    "\n\t- The function values will only be popped during initialization."
-                    "\n\t- Boundaries will be handled in order of their ID's."
-                    "\n\t- If a function needs a Point as an argument, then it will pop doubles to make the point in order."); 
+                    "This is deprecated."); 
                     
                 prm.enter_subsection("parsed_function");
                 {
@@ -345,29 +397,35 @@ namespace Peclet
             prm.enter_subsection("solver");
             {
                 prm.declare_entry("method", "CG",
-                     Patterns::Selection("CG | BiCGStab"));
+                     Patterns::Selection("CG | BiCGStab"),
+                     "Select an iterative method for solving the linear system.");
                      
                 prm.declare_entry("max_iterations", "1000",
-                    Patterns::Integer(0));
+                    Patterns::Integer(0),
+                    "Set the maxinum number of iterations for solving the linear system.");
                     
                 prm.declare_entry("tolerance", "1e-8",
-                    Patterns::Double(0.));
+                    Patterns::Double(0.),
+                    "Set the convergence tolerance for the iterative method.");
                     
                 prm.declare_entry("normalize_tolerance", "false",
                     Patterns::Bool(),
                     "If true, then the residual will be multiplied by the L2-norm of the RHS"
-                    " before comparing to the tolerance.");
+                    " before comparing to the convergence tolerance.");
             }
             prm.leave_subsection();
             
             prm.enter_subsection("output");
             {
-                prm.declare_entry("write_solution_vtk", "true", Patterns::Bool());
+                prm.declare_entry("write_solution_vtk", "true", Patterns::Bool(),
+                "Write the solution to VTK files for visualization in Paraview or VisIt.");
+                
                 prm.declare_entry("write_solution_table", "false", Patterns::Bool(),
                     "This allow for simple export of 1D solutions into a table format"
                     " easily read by MATLAB."
                     "\nThe way this is currently implemented takes a great deal of memory"
                     ", so you should probably only use this in 1D.");
+                    
                 prm.declare_entry("time_step_interval", "1", Patterns::Integer(0),
                     "Solutions will only be written at every time_step_interval time step."
                     "\nSet to one to output at every time step."
@@ -377,9 +435,14 @@ namespace Peclet
             
             prm.enter_subsection("verification");
             {
-                prm.declare_entry("enabled", "false", Patterns::Bool());
+                prm.declare_entry("enabled", "false", Patterns::Bool(),
+                "If true, then an exact solution function must be provided."
+                "The solution will be compared to the exact solution at every time step,"
+                " and this data will be tabulated.");
+                
                 prm.declare_entry("exact_solution_function_name", "parsed", 
-                    Patterns::Selection("parsed"));
+                    Patterns::Selection("parsed"),
+                    "This is deprecated.");
                 
                 prm.enter_subsection("parsed_exact_solution_function");
                 {
@@ -391,7 +454,7 @@ namespace Peclet
 
         }
 
-
+        /*! Parse a vector valued parameter */
         template<typename ItemType>
         std::vector<ItemType> get_vector(ParameterHandler &prm, std::string parameter_name)
         {
@@ -407,7 +470,7 @@ namespace Peclet
             return items;
         }    
         
-        
+        /*! Read only the parameters needed for instantiating a Peclet::Peclet */
         Meta read_meta_parameters(const std::string parameter_file="")
         {
             Meta mp;
@@ -429,6 +492,11 @@ namespace Peclet
             return mp;
         }
         
+        /*! Structure all parameters from the input file which is read by dealii::ParameterHandler 
+        
+        This is where parameters in Peclet are handled somewhat differently than most deal.II applications. We only use dealii::ParameterHandler initially for parsing the parameter input file. We immediatley contain the data in a custom data structure. Working with this structure is much more convenient than working with the ParameterHandler throughout the rest of the code.
+        
+        */
         template <int dim>
         StructuredParameters read(
                 const std::string parameter_file,
