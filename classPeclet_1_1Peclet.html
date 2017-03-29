@@ -13,6 +13,12 @@
 <script type="text/javascript">
   $(document).ready(function() { searchBox.OnSelectItem(0); });
 </script>
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    extensions: ["tex2jax.js"],
+    jax: ["input/TeX","output/HTML-CSS"],
+});
+</script><script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
@@ -204,9 +210,13 @@ Private Attributes</h2></td></tr>
 <div class="textblock"><h3>template&lt;int dim&gt;<br/>
 class Peclet::Peclet&lt; dim &gt;</h3>
 
-<p>Solve the unsteady scalar convection-diffusion equation.</p>
-<p>This class solves the unsteady scalar convection-diffusion equation.</p>
-<p>System assembly and time stepping are based on deal.II Tutorial 26 by Wolfgang Bangerth, Texas A&amp;M University, 2013</p>
+<p>This class solves the unsteady scalar convection-diffusion initial boundary value problem.</p>
+<p>The strong form of the initial boundary value problem (IBVP) is</p>
+<p class="formulaDsp">
+\[ u_t(\bf{x},t) + \bf{v}(x)\cdot\nabla u(x,t) - \nabla \cdot (\alpha(\bf{x})\nabla u(\bf{x},t)) = s(\bf{x},t) \forall \bf{x}, t \in \bf{\Omega} \times (t_0,t_f) \\ u(\bf{x},0) = u_0(\bf{x}) \quad \forall \bf{x} \in \bf{\Omega} \\ u(\bf{x},t) = g(\bf{x},t) \quad \forall \bf{x},t \in \bf{\Gamma}_D \times (t_0,t_f) \\ \alpha(\bf{x})(\hat{\bf{n}}\cdot\nabla)u(\bf{x},t) = h(\bf{x},t) \quad \forall \bf{x},t \in \bf{\Gamma}_N \times (t_0,t_f) \]
+</p>
+<p>Spatial derivatives are discretized with the standard Galerkin finite element method, and the temporal derivative is discretized with the $$-family of semi-implicit finite difference methods.</p>
+<p>Linear system assembly and time stepping are based on deal.II Tutorial 26 by Wolfgang Bangerth, Texas A&amp;M University, 2013</p>
 <p>Some of the more notable extensions (beyond step-26) include:</p>
 <ul>
 <li>Builds convection-diffusion matrix instead of Laplace matrix</li>
@@ -1261,7 +1271,7 @@ template&lt;int dim&gt; </div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Mar 29 2017 12:05:23 for peclet by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Mar 29 2017 12:19:16 for peclet by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>
