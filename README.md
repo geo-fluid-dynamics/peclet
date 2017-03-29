@@ -10,9 +10,9 @@ Doxygen generated HTML documentation: https://alexanderzimmerman.github.io/pecle
 # For users:
 ## Run pre-built version on docker image
 
-Pull the image from https://hub.docker.com/r/zimmerman/peclet/
+Pull the image from https://hub.docker.com/r/zimmerman/peclet/ and run the container with docker
 
-    docker pull zimmerman/peclet
+    docker run -ti zimmerman/peclet:latest
 
 # For developers:
 ## Versions
