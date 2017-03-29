@@ -260,7 +260,7 @@ namespace Peclet
                 prm.declare_entry(
                     "function_name",
                     "parsed",
-                    Patterns::List(Patterns::Selection("parsed | constant | interpolate_old_field"))
+                    Patterns::List(Patterns::Selection("parsed | constant | interpolate_old_field")),
                     "Choose to either use a parsed function for the initial values, "
                     "or to interpolate them from an existing FEFieldFunction, "
                     "e.g. from an old solution. ");
