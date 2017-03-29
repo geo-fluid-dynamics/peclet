@@ -101,10 +101,10 @@ Functions</h2></td></tr>
 <tr class="memitem:a643f1b8d9766a99ff3abc97ab7eaa691"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceMyMatrixCreator.html#a643f1b8d9766a99ff3abc97ab7eaa691">convection_diffusion_assembler</a> (const CellIterator &amp;cell, <a class="el" href="structMyMatrixCreator_1_1AssemblerData_1_1Scratch.html">AssemblerData::Scratch</a>&lt; dim, double &gt; &amp;data, MatrixCreator::internal::AssemblerData::CopyData&lt; double &gt; &amp;copy_data)</td></tr>
 <tr class="separator:a643f1b8d9766a99ff3abc97ab7eaa691"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acfddb9f427f9ed0b02693f59db6c1764"><td class="memTemplParams" colspan="2">template&lt;int dim&gt; </td></tr>
-<tr class="memitem:acfddb9f427f9ed0b02693f59db6c1764"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceMyMatrixCreator.html#acfddb9f427f9ed0b02693f59db6c1764">create_convection_diffusion_matrix</a> (const <a class="elRef" doxygen="/mnt/c/Users/Alex/UbuntuShared/peclet/deal.tag:http://www.dealii.org/8.5.0/doxygen/deal.II/" href="http://www.dealii.org/8.5.0/doxygen/deal.II/classMapping.html">Mapping</a>&lt; dim &gt; &amp;mapping, const <a class="elRef" doxygen="/mnt/c/Users/Alex/UbuntuShared/peclet/deal.tag:http://www.dealii.org/8.5.0/doxygen/deal.II/" href="http://www.dealii.org/8.5.0/doxygen/deal.II/classDoFHandler.html">DoFHandler</a>&lt; dim &gt; &amp;dof, const <a class="elRef" doxygen="/mnt/c/Users/Alex/UbuntuShared/peclet/deal.tag:http://www.dealii.org/8.5.0/doxygen/deal.II/" href="http://www.dealii.org/8.5.0/doxygen/deal.II/classQuadrature.html">Quadrature</a>&lt; dim &gt; &amp;q, <a class="elRef" doxygen="/mnt/c/Users/Alex/UbuntuShared/peclet/deal.tag:http://www.dealii.org/8.5.0/doxygen/deal.II/" href="http://www.dealii.org/8.5.0/doxygen/deal.II/classSparseMatrix.html">SparseMatrix</a>&lt; double &gt; &amp;matrix, const <a class="elRef" doxygen="/mnt/c/Users/Alex/UbuntuShared/peclet/deal.tag:http://www.dealii.org/8.5.0/doxygen/deal.II/" href="http://www.dealii.org/8.5.0/doxygen/deal.II/classFunction.html">Function</a>&lt; dim &gt; *const diffusivity, const <a class="elRef" doxygen="/mnt/c/Users/Alex/UbuntuShared/peclet/deal.tag:http://www.dealii.org/8.5.0/doxygen/deal.II/" href="http://www.dealii.org/8.5.0/doxygen/deal.II/classFunction.html">Function</a>&lt; dim &gt; *const convection_velocity, const <a class="elRef" doxygen="/mnt/c/Users/Alex/UbuntuShared/peclet/deal.tag:http://www.dealii.org/8.5.0/doxygen/deal.II/" href="http://www.dealii.org/8.5.0/doxygen/deal.II/classConstraintMatrix.html">ConstraintMatrix</a> &amp;constraints=<a class="elRef" doxygen="/mnt/c/Users/Alex/UbuntuShared/peclet/deal.tag:http://www.dealii.org/8.5.0/doxygen/deal.II/" href="http://www.dealii.org/8.5.0/doxygen/deal.II/classConstraintMatrix.html">ConstraintMatrix</a>())</td></tr>
+<tr class="memitem:acfddb9f427f9ed0b02693f59db6c1764"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceMyMatrixCreator.html#acfddb9f427f9ed0b02693f59db6c1764">create_convection_diffusion_matrix</a> (const <a class="elRef" doxygen="/mnt/c/Users/Alex/UbuntuShared/peclet/deal.tag:http://www.dealii.org/8.4.1/doxygen/deal.II/" href="http://www.dealii.org/8.4.1/doxygen/deal.II/classMapping.html">Mapping</a>&lt; dim &gt; &amp;mapping, const <a class="elRef" doxygen="/mnt/c/Users/Alex/UbuntuShared/peclet/deal.tag:http://www.dealii.org/8.4.1/doxygen/deal.II/" href="http://www.dealii.org/8.4.1/doxygen/deal.II/classDoFHandler.html">DoFHandler</a>&lt; dim &gt; &amp;dof, const <a class="elRef" doxygen="/mnt/c/Users/Alex/UbuntuShared/peclet/deal.tag:http://www.dealii.org/8.4.1/doxygen/deal.II/" href="http://www.dealii.org/8.4.1/doxygen/deal.II/classQuadrature.html">Quadrature</a>&lt; dim &gt; &amp;q, <a class="elRef" doxygen="/mnt/c/Users/Alex/UbuntuShared/peclet/deal.tag:http://www.dealii.org/8.4.1/doxygen/deal.II/" href="http://www.dealii.org/8.4.1/doxygen/deal.II/classSparseMatrix.html">SparseMatrix</a>&lt; double &gt; &amp;matrix, const <a class="elRef" doxygen="/mnt/c/Users/Alex/UbuntuShared/peclet/deal.tag:http://www.dealii.org/8.4.1/doxygen/deal.II/" href="http://www.dealii.org/8.4.1/doxygen/deal.II/classFunction.html">Function</a>&lt; dim &gt; *const diffusivity, const <a class="elRef" doxygen="/mnt/c/Users/Alex/UbuntuShared/peclet/deal.tag:http://www.dealii.org/8.4.1/doxygen/deal.II/" href="http://www.dealii.org/8.4.1/doxygen/deal.II/classFunction.html">Function</a>&lt; dim &gt; *const convection_velocity, const <a class="elRef" doxygen="/mnt/c/Users/Alex/UbuntuShared/peclet/deal.tag:http://www.dealii.org/8.4.1/doxygen/deal.II/" href="http://www.dealii.org/8.4.1/doxygen/deal.II/classConstraintMatrix.html">ConstraintMatrix</a> &amp;constraints=<a class="elRef" doxygen="/mnt/c/Users/Alex/UbuntuShared/peclet/deal.tag:http://www.dealii.org/8.4.1/doxygen/deal.II/" href="http://www.dealii.org/8.4.1/doxygen/deal.II/classConstraintMatrix.html">ConstraintMatrix</a>())</td></tr>
 <tr class="separator:acfddb9f427f9ed0b02693f59db6c1764"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abba4924d7f5db5f81eb099d0467b50c5"><td class="memTemplParams" colspan="2">template&lt;int dim&gt; </td></tr>
-<tr class="memitem:abba4924d7f5db5f81eb099d0467b50c5"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceMyMatrixCreator.html#abba4924d7f5db5f81eb099d0467b50c5">create_convection_diffusion_matrix</a> (const <a class="elRef" doxygen="/mnt/c/Users/Alex/UbuntuShared/peclet/deal.tag:http://www.dealii.org/8.5.0/doxygen/deal.II/" href="http://www.dealii.org/8.5.0/doxygen/deal.II/classDoFHandler.html">DoFHandler</a>&lt; dim &gt; &amp;dof, const <a class="elRef" doxygen="/mnt/c/Users/Alex/UbuntuShared/peclet/deal.tag:http://www.dealii.org/8.5.0/doxygen/deal.II/" href="http://www.dealii.org/8.5.0/doxygen/deal.II/classQuadrature.html">Quadrature</a>&lt; dim &gt; &amp;q, <a class="elRef" doxygen="/mnt/c/Users/Alex/UbuntuShared/peclet/deal.tag:http://www.dealii.org/8.5.0/doxygen/deal.II/" href="http://www.dealii.org/8.5.0/doxygen/deal.II/classSparseMatrix.html">SparseMatrix</a>&lt; double &gt; &amp;matrix, const <a class="elRef" doxygen="/mnt/c/Users/Alex/UbuntuShared/peclet/deal.tag:http://www.dealii.org/8.5.0/doxygen/deal.II/" href="http://www.dealii.org/8.5.0/doxygen/deal.II/classFunction.html">Function</a>&lt; dim &gt; *const diffusivity, const <a class="elRef" doxygen="/mnt/c/Users/Alex/UbuntuShared/peclet/deal.tag:http://www.dealii.org/8.5.0/doxygen/deal.II/" href="http://www.dealii.org/8.5.0/doxygen/deal.II/classFunction.html">Function</a>&lt; dim &gt; *const convection_velocity, const <a class="elRef" doxygen="/mnt/c/Users/Alex/UbuntuShared/peclet/deal.tag:http://www.dealii.org/8.5.0/doxygen/deal.II/" href="http://www.dealii.org/8.5.0/doxygen/deal.II/classConstraintMatrix.html">ConstraintMatrix</a> &amp;constraints=<a class="elRef" doxygen="/mnt/c/Users/Alex/UbuntuShared/peclet/deal.tag:http://www.dealii.org/8.5.0/doxygen/deal.II/" href="http://www.dealii.org/8.5.0/doxygen/deal.II/classConstraintMatrix.html">ConstraintMatrix</a>())</td></tr>
+<tr class="memitem:abba4924d7f5db5f81eb099d0467b50c5"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceMyMatrixCreator.html#abba4924d7f5db5f81eb099d0467b50c5">create_convection_diffusion_matrix</a> (const <a class="elRef" doxygen="/mnt/c/Users/Alex/UbuntuShared/peclet/deal.tag:http://www.dealii.org/8.4.1/doxygen/deal.II/" href="http://www.dealii.org/8.4.1/doxygen/deal.II/classDoFHandler.html">DoFHandler</a>&lt; dim &gt; &amp;dof, const <a class="elRef" doxygen="/mnt/c/Users/Alex/UbuntuShared/peclet/deal.tag:http://www.dealii.org/8.4.1/doxygen/deal.II/" href="http://www.dealii.org/8.4.1/doxygen/deal.II/classQuadrature.html">Quadrature</a>&lt; dim &gt; &amp;q, <a class="elRef" doxygen="/mnt/c/Users/Alex/UbuntuShared/peclet/deal.tag:http://www.dealii.org/8.4.1/doxygen/deal.II/" href="http://www.dealii.org/8.4.1/doxygen/deal.II/classSparseMatrix.html">SparseMatrix</a>&lt; double &gt; &amp;matrix, const <a class="elRef" doxygen="/mnt/c/Users/Alex/UbuntuShared/peclet/deal.tag:http://www.dealii.org/8.4.1/doxygen/deal.II/" href="http://www.dealii.org/8.4.1/doxygen/deal.II/classFunction.html">Function</a>&lt; dim &gt; *const diffusivity, const <a class="elRef" doxygen="/mnt/c/Users/Alex/UbuntuShared/peclet/deal.tag:http://www.dealii.org/8.4.1/doxygen/deal.II/" href="http://www.dealii.org/8.4.1/doxygen/deal.II/classFunction.html">Function</a>&lt; dim &gt; *const convection_velocity, const <a class="elRef" doxygen="/mnt/c/Users/Alex/UbuntuShared/peclet/deal.tag:http://www.dealii.org/8.4.1/doxygen/deal.II/" href="http://www.dealii.org/8.4.1/doxygen/deal.II/classConstraintMatrix.html">ConstraintMatrix</a> &amp;constraints=<a class="elRef" doxygen="/mnt/c/Users/Alex/UbuntuShared/peclet/deal.tag:http://www.dealii.org/8.4.1/doxygen/deal.II/" href="http://www.dealii.org/8.4.1/doxygen/deal.II/classConstraintMatrix.html">ConstraintMatrix</a>())</td></tr>
 <tr class="separator:abba4924d7f5db5f81eb099d0467b50c5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Function Documentation</h2>
@@ -151,44 +151,44 @@ template&lt;int dim&gt; </div>
         <tr>
           <td class="memname">void MyMatrixCreator::create_convection_diffusion_matrix </td>
           <td>(</td>
-          <td class="paramtype">const <a class="elRef" doxygen="/mnt/c/Users/Alex/UbuntuShared/peclet/deal.tag:http://www.dealii.org/8.5.0/doxygen/deal.II/" href="http://www.dealii.org/8.5.0/doxygen/deal.II/classMapping.html">Mapping</a>&lt; dim &gt; &amp;&#160;</td>
+          <td class="paramtype">const <a class="elRef" doxygen="/mnt/c/Users/Alex/UbuntuShared/peclet/deal.tag:http://www.dealii.org/8.4.1/doxygen/deal.II/" href="http://www.dealii.org/8.4.1/doxygen/deal.II/classMapping.html">Mapping</a>&lt; dim &gt; &amp;&#160;</td>
           <td class="paramname"><em>mapping</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="elRef" doxygen="/mnt/c/Users/Alex/UbuntuShared/peclet/deal.tag:http://www.dealii.org/8.5.0/doxygen/deal.II/" href="http://www.dealii.org/8.5.0/doxygen/deal.II/classDoFHandler.html">DoFHandler</a>&lt; dim &gt; &amp;&#160;</td>
+          <td class="paramtype">const <a class="elRef" doxygen="/mnt/c/Users/Alex/UbuntuShared/peclet/deal.tag:http://www.dealii.org/8.4.1/doxygen/deal.II/" href="http://www.dealii.org/8.4.1/doxygen/deal.II/classDoFHandler.html">DoFHandler</a>&lt; dim &gt; &amp;&#160;</td>
           <td class="paramname"><em>dof</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="elRef" doxygen="/mnt/c/Users/Alex/UbuntuShared/peclet/deal.tag:http://www.dealii.org/8.5.0/doxygen/deal.II/" href="http://www.dealii.org/8.5.0/doxygen/deal.II/classQuadrature.html">Quadrature</a>&lt; dim &gt; &amp;&#160;</td>
+          <td class="paramtype">const <a class="elRef" doxygen="/mnt/c/Users/Alex/UbuntuShared/peclet/deal.tag:http://www.dealii.org/8.4.1/doxygen/deal.II/" href="http://www.dealii.org/8.4.1/doxygen/deal.II/classQuadrature.html">Quadrature</a>&lt; dim &gt; &amp;&#160;</td>
           <td class="paramname"><em>q</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="elRef" doxygen="/mnt/c/Users/Alex/UbuntuShared/peclet/deal.tag:http://www.dealii.org/8.5.0/doxygen/deal.II/" href="http://www.dealii.org/8.5.0/doxygen/deal.II/classSparseMatrix.html">SparseMatrix</a>&lt; double &gt; &amp;&#160;</td>
+          <td class="paramtype"><a class="elRef" doxygen="/mnt/c/Users/Alex/UbuntuShared/peclet/deal.tag:http://www.dealii.org/8.4.1/doxygen/deal.II/" href="http://www.dealii.org/8.4.1/doxygen/deal.II/classSparseMatrix.html">SparseMatrix</a>&lt; double &gt; &amp;&#160;</td>
           <td class="paramname"><em>matrix</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="elRef" doxygen="/mnt/c/Users/Alex/UbuntuShared/peclet/deal.tag:http://www.dealii.org/8.5.0/doxygen/deal.II/" href="http://www.dealii.org/8.5.0/doxygen/deal.II/classFunction.html">Function</a>&lt; dim &gt; *const&#160;</td>
+          <td class="paramtype">const <a class="elRef" doxygen="/mnt/c/Users/Alex/UbuntuShared/peclet/deal.tag:http://www.dealii.org/8.4.1/doxygen/deal.II/" href="http://www.dealii.org/8.4.1/doxygen/deal.II/classFunction.html">Function</a>&lt; dim &gt; *const&#160;</td>
           <td class="paramname"><em>diffusivity</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="elRef" doxygen="/mnt/c/Users/Alex/UbuntuShared/peclet/deal.tag:http://www.dealii.org/8.5.0/doxygen/deal.II/" href="http://www.dealii.org/8.5.0/doxygen/deal.II/classFunction.html">Function</a>&lt; dim &gt; *const&#160;</td>
+          <td class="paramtype">const <a class="elRef" doxygen="/mnt/c/Users/Alex/UbuntuShared/peclet/deal.tag:http://www.dealii.org/8.4.1/doxygen/deal.II/" href="http://www.dealii.org/8.4.1/doxygen/deal.II/classFunction.html">Function</a>&lt; dim &gt; *const&#160;</td>
           <td class="paramname"><em>convection_velocity</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="elRef" doxygen="/mnt/c/Users/Alex/UbuntuShared/peclet/deal.tag:http://www.dealii.org/8.5.0/doxygen/deal.II/" href="http://www.dealii.org/8.5.0/doxygen/deal.II/classConstraintMatrix.html">ConstraintMatrix</a> &amp;&#160;</td>
-          <td class="paramname"><em>constraints</em> = <code><a class="elRef" doxygen="/mnt/c/Users/Alex/UbuntuShared/peclet/deal.tag:http://www.dealii.org/8.5.0/doxygen/deal.II/" href="http://www.dealii.org/8.5.0/doxygen/deal.II/classConstraintMatrix.html">ConstraintMatrix</a>()</code>&#160;</td>
+          <td class="paramtype">const <a class="elRef" doxygen="/mnt/c/Users/Alex/UbuntuShared/peclet/deal.tag:http://www.dealii.org/8.4.1/doxygen/deal.II/" href="http://www.dealii.org/8.4.1/doxygen/deal.II/classConstraintMatrix.html">ConstraintMatrix</a> &amp;&#160;</td>
+          <td class="paramname"><em>constraints</em> = <code><a class="elRef" doxygen="/mnt/c/Users/Alex/UbuntuShared/peclet/deal.tag:http://www.dealii.org/8.4.1/doxygen/deal.II/" href="http://www.dealii.org/8.4.1/doxygen/deal.II/classConstraintMatrix.html">ConstraintMatrix</a>()</code>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -209,38 +209,38 @@ template&lt;int dim&gt; </div>
         <tr>
           <td class="memname">void MyMatrixCreator::create_convection_diffusion_matrix </td>
           <td>(</td>
-          <td class="paramtype">const <a class="elRef" doxygen="/mnt/c/Users/Alex/UbuntuShared/peclet/deal.tag:http://www.dealii.org/8.5.0/doxygen/deal.II/" href="http://www.dealii.org/8.5.0/doxygen/deal.II/classDoFHandler.html">DoFHandler</a>&lt; dim &gt; &amp;&#160;</td>
+          <td class="paramtype">const <a class="elRef" doxygen="/mnt/c/Users/Alex/UbuntuShared/peclet/deal.tag:http://www.dealii.org/8.4.1/doxygen/deal.II/" href="http://www.dealii.org/8.4.1/doxygen/deal.II/classDoFHandler.html">DoFHandler</a>&lt; dim &gt; &amp;&#160;</td>
           <td class="paramname"><em>dof</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="elRef" doxygen="/mnt/c/Users/Alex/UbuntuShared/peclet/deal.tag:http://www.dealii.org/8.5.0/doxygen/deal.II/" href="http://www.dealii.org/8.5.0/doxygen/deal.II/classQuadrature.html">Quadrature</a>&lt; dim &gt; &amp;&#160;</td>
+          <td class="paramtype">const <a class="elRef" doxygen="/mnt/c/Users/Alex/UbuntuShared/peclet/deal.tag:http://www.dealii.org/8.4.1/doxygen/deal.II/" href="http://www.dealii.org/8.4.1/doxygen/deal.II/classQuadrature.html">Quadrature</a>&lt; dim &gt; &amp;&#160;</td>
           <td class="paramname"><em>q</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="elRef" doxygen="/mnt/c/Users/Alex/UbuntuShared/peclet/deal.tag:http://www.dealii.org/8.5.0/doxygen/deal.II/" href="http://www.dealii.org/8.5.0/doxygen/deal.II/classSparseMatrix.html">SparseMatrix</a>&lt; double &gt; &amp;&#160;</td>
+          <td class="paramtype"><a class="elRef" doxygen="/mnt/c/Users/Alex/UbuntuShared/peclet/deal.tag:http://www.dealii.org/8.4.1/doxygen/deal.II/" href="http://www.dealii.org/8.4.1/doxygen/deal.II/classSparseMatrix.html">SparseMatrix</a>&lt; double &gt; &amp;&#160;</td>
           <td class="paramname"><em>matrix</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="elRef" doxygen="/mnt/c/Users/Alex/UbuntuShared/peclet/deal.tag:http://www.dealii.org/8.5.0/doxygen/deal.II/" href="http://www.dealii.org/8.5.0/doxygen/deal.II/classFunction.html">Function</a>&lt; dim &gt; *const&#160;</td>
+          <td class="paramtype">const <a class="elRef" doxygen="/mnt/c/Users/Alex/UbuntuShared/peclet/deal.tag:http://www.dealii.org/8.4.1/doxygen/deal.II/" href="http://www.dealii.org/8.4.1/doxygen/deal.II/classFunction.html">Function</a>&lt; dim &gt; *const&#160;</td>
           <td class="paramname"><em>diffusivity</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="elRef" doxygen="/mnt/c/Users/Alex/UbuntuShared/peclet/deal.tag:http://www.dealii.org/8.5.0/doxygen/deal.II/" href="http://www.dealii.org/8.5.0/doxygen/deal.II/classFunction.html">Function</a>&lt; dim &gt; *const&#160;</td>
+          <td class="paramtype">const <a class="elRef" doxygen="/mnt/c/Users/Alex/UbuntuShared/peclet/deal.tag:http://www.dealii.org/8.4.1/doxygen/deal.II/" href="http://www.dealii.org/8.4.1/doxygen/deal.II/classFunction.html">Function</a>&lt; dim &gt; *const&#160;</td>
           <td class="paramname"><em>convection_velocity</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="elRef" doxygen="/mnt/c/Users/Alex/UbuntuShared/peclet/deal.tag:http://www.dealii.org/8.5.0/doxygen/deal.II/" href="http://www.dealii.org/8.5.0/doxygen/deal.II/classConstraintMatrix.html">ConstraintMatrix</a> &amp;&#160;</td>
-          <td class="paramname"><em>constraints</em> = <code><a class="elRef" doxygen="/mnt/c/Users/Alex/UbuntuShared/peclet/deal.tag:http://www.dealii.org/8.5.0/doxygen/deal.II/" href="http://www.dealii.org/8.5.0/doxygen/deal.II/classConstraintMatrix.html">ConstraintMatrix</a>()</code>&#160;</td>
+          <td class="paramtype">const <a class="elRef" doxygen="/mnt/c/Users/Alex/UbuntuShared/peclet/deal.tag:http://www.dealii.org/8.4.1/doxygen/deal.II/" href="http://www.dealii.org/8.4.1/doxygen/deal.II/classConstraintMatrix.html">ConstraintMatrix</a> &amp;&#160;</td>
+          <td class="paramname"><em>constraints</em> = <code><a class="elRef" doxygen="/mnt/c/Users/Alex/UbuntuShared/peclet/deal.tag:http://www.dealii.org/8.4.1/doxygen/deal.II/" href="http://www.dealii.org/8.4.1/doxygen/deal.II/classConstraintMatrix.html">ConstraintMatrix</a>()</code>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -255,7 +255,7 @@ template&lt;int dim&gt; </div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Mar 28 2017 22:01:02 for peclet by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Mar 29 2017 07:44:37 for peclet by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>
