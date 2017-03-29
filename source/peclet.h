@@ -65,11 +65,25 @@ namespace Peclet
         unsigned int last_step;
     };
   
-    /*! Solve the unsteady scalar convection-diffusion equation.
+    /*! This class solves the unsteady scalar convection-diffusion initial boundary value problem.
 
-    This class solves the unsteady scalar convection-diffusion equation.
+    The strong form of the initial boundary value problem (IBVP) is
 
-    System assembly and time stepping are based on deal.II Tutorial 26 by Wolfgang Bangerth, Texas A&M University, 2013
+    \f[
+
+        u_t(\bf{x},t) + \bf{v}(x)\cdot\nabla u(x,t) - \nabla \cdot (\alpha(\bf{x})\nabla u(\bf{x},t)) = s(\bf{x},t) \forall \bf{x}, t \in \bf{\Omega} \times (t_0,t_f) \\
+        
+        u(\bf{x},0) = u_0(\bf{x}) \quad \forall \bf{x} \in \bf{\Omega} \\
+        
+        u(\bf{x},t) = g(\bf{x},t) \quad \forall \bf{x},t \in \bf{\Gamma}_D \times (t_0,t_f) \\
+        
+        \alpha(\bf{x})(\hat{\bf{n}}\cdot\nabla)u(\bf{x},t) = h(\bf{x},t) \quad \forall \bf{x},t \in \bf{\Gamma}_N \times (t_0,t_f)
+
+    \f]
+
+    Spatial derivatives are discretized with the standard Galerkin finite element method, and the temporal derivative is discretized with the $\theta$-family of semi-implicit finite difference methods.
+
+    Linear system assembly and time stepping are based on deal.II Tutorial 26 by Wolfgang Bangerth, Texas A&M University, 2013
 
     Some of the more notable extensions (beyond step-26) include:
     - Builds convection-diffusion matrix instead of Laplace matrix
