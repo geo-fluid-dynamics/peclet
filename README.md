@@ -18,6 +18,28 @@ Pull the image from https://hub.docker.com/r/zimmerman/peclet/ and run the conta
 Or run the container with access to a shared folder (shared between the host and the container)
 
     docker run -ti -v $(pwd):/home/dealii/shared zimmerman/peclet:latest
+    
+If you plan to use this container repeatedly, then instead use this command to also give it a name
+
+    docker run -ti -v $(pwd):/home/dealii/shared --name peclet zimmerman/peclet:latest
+
+After exiting the container, you can start it again with
+
+    docker start peclet
+    
+You can confirm that the container is running with
+
+    docker ps
+    
+or list all containers (running or not) with
+
+    docker ps -a
+
+To enter a bash terminal inside of the running container
+
+    docker start peclet
+    
+    docker exec -ti -u dealii peclet /bin/bash -l
 
 # For developers:
 ## Versions
