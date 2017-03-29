@@ -5,11 +5,11 @@ services:
 
 notifications:
   email: false
-  slack: aices-pcm-cfd:ShncJAFCJzx48zt8hrXpRwGw
+  slack: aices-pcm-cfd:geOqI1rTGdTtOiO8srchgzTp
 
 before_install:
-- docker pull zimmerman/peclet
+- docker pull zimmerman/peclet:latest
 
 script:
-- docker run -P -v `pwd`:/home/peclet:rw zimmerman/peclet /bin/sh -c "cd peclet; git pull; git checkout master; cd build; cmake ..; make -j2"
-- docker run -P -v `pwd`:/home/peclet:rw zimmerman/peclet /bin/sh -c "cd peclet/build; ctest -j2"
+- docker run -P -v `pwd`:/home/peclet:rw zimmerman/peclet:latest /bin/sh -c "cd peclet; git pull; git checkout master; cd build; cmake ..; make -j2"
+- docker run -P -v `pwd`:/home/peclet:rw zimmerman/peclet:latest /bin/sh -c "cd peclet/build; ctest -j2"
