@@ -9,6 +9,7 @@ Doxygen generated HTML documentation: https://alexanderzimmerman.github.io/pecle
 
 # For users:
 ## Run pre-built version on docker image
+Get the free community edition of Docker here: https://www.docker.com/community-edition
 
 Pull the image from https://hub.docker.com/r/zimmerman/peclet/ and run the container with docker
 
