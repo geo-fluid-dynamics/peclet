@@ -5,7 +5,7 @@ an unsteady scalar convection-diffusion solver based on the finite element C++ l
 
 Author: Alexander G. Zimmerman <zimmerman@aices.rwth-aachen.de>
 
-Doxygen generated HTML documentation: https://alexanderzimmerman.github.io/peclet/
+Doxygen generated HTML documentation: https://geo-fluid-dynamics.github.io/peclet/
 
 # For users:
 ## Run pre-built version on docker image
