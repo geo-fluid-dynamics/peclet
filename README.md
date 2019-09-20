@@ -7,6 +7,8 @@ Author: Alexander G. Zimmerman <zimmerman@aices.rwth-aachen.de>
 
 Doxygen generated HTML documentation: https://alexanderzimmerman.github.io/peclet/
 
+This code supports [the author's masters thesis](https://arxiv.org/abs/1909.08882).
+
 # For users:
 ## Run pre-built version on docker image
 Get the free community edition of Docker here: https://www.docker.com/community-edition
